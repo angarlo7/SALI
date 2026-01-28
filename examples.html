@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="SALI Examples - Worked calculations showing how to convert salary to satoshis at different Bitcoin prices.">
+  <title>Examples | SALI - Satoshi Annual Labor Index</title>
+  <link rel="stylesheet" href="/assets/css/styles.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="container nav__inner">
+      <a href="/" class="nav__logo">ANGARLO</a>
+      <ul class="nav__links">
+        <li><a href="/" class="nav__link">Home</a></li>
+        <li><a href="/methodology.html" class="nav__link">Methodology</a></li>
+        <li><a href="/examples.html" class="nav__link nav__link--active">Examples</a></li>
+        <li><a href="/podcast.html" class="nav__link">Podcast</a></li>
+        <li><a href="/contact.html" class="nav__link">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main>
+    <div class="page-header">
+      <div class="container">
+        <h1>Examples</h1>
+        <p class="page-header__subtitle">Worked SALI calculations at different salary and price levels</p>
+      </div>
+    </div>
+
+    <section class="section">
+      <div class="container">
+        <div class="content-section">
+
+          <p>
+            These examples demonstrate how SALI works at various salary and Bitcoin price combinations. Each shows the formula applied step by step.
+          </p>
+
+          <!-- Example 1 -->
+          <div class="example-card">
+            <h3 class="example-card__title">Example 1: Entry-Level Salary, Lower BTC Price</h3>
+            <div class="example-card__row">
+              <span class="example-card__label">Annual Salary</span>
+              <span class="example-card__value">$50,000 USD</span>
+            </div>
+            <div class="example-card__row">
+              <span class="example-card__label">Bitcoin Price</span>
+              <span class="example-card__value">$25,000 USD</span>
+            </div>
+            <div class="example-card__row">
+              <span class="example-card__label">BTC Equivalent</span>
+              <span class="example-card__value">$50,000 ÷ $25,000 = 2.000000 BTC</span>
+            </div>
+            <div class="example-card__result">
+              <div class="output-group__label">SALI Result</div>
+              <div class="example-card__result-value">200,000,000 sats/year</div>
+              <p class="text-muted" style="margin-top: 0.5rem; margin-bottom: 0; font-size: 0.875rem;">
+                Calculation: 2.0 BTC × 100,000,000 = 200,000,000 sats
+              </p>
+            </div>
+          </div>
+
+          <!-- Example 2 -->
+          <div class="example-card">
+            <h3 class="example-card__title">Example 2: Senior Salary, Mid-Range BTC Price</h3>
+            <div class="example-card__row">
+              <span class="example-card__label">Annual Salary</span>
+              <span class="example-card__value">$120,000 USD</span>
+            </div>
+            <div class="example-card__row">
+              <span class="example-card__label">Bitcoin Price</span>
+              <span class="example-card__value">$60,000 USD</span>
+            </div>
+            <div class="example-card__row">
+              <span class="example-card__label">BTC Equivalent</span>
+              <span class="example-card__value">$120,000 ÷ $60,000 = 2.000000 BTC</span>
+            </div>
+            <div class="example-card__result">
+              <div class="output-group__label">SALI Result</div>
+              <div class="example-card__result-value">200,000,000 sats/year</div>
+              <p class="text-muted" style="margin-top: 0.5rem; margin-bottom: 0; font-size: 0.875rem;">
+                Calculation: 2.0 BTC × 100,000,000 = 200,000,000 sats
+              </p>
+            </div>
+            <p class="text-muted" style="margin-top: 1rem; margin-bottom: 0; font-size: 0.875rem;">
+              <strong>Note:</strong> Despite earning $70,000 more, the SALI is identical to Example 1. The salary-to-BTC ratio matters, not the absolute numbers.
+            </p>
+          </div>
+
+          <!-- Example 3 -->
+          <div class="example-card">
+            <h3 class="example-card__title">Example 3: Mid-Level Salary, Higher BTC Price</h3>
+            <div class="example-card__row">
+              <span class="example-card__label">Annual Salary</span>
+              <span class="example-card__value">$80,000 USD</span>
+            </div>
+            <div class="example-card__row">
+              <span class="example-card__label">Bitcoin Price</span>
+              <span class="example-card__value">$100,000 USD</span>
+            </div>
+            <div class="example-card__row">
+              <span class="example-card__label">BTC Equivalent</span>
+              <span class="example-card__value">$80,000 ÷ $100,000 = 0.800000 BTC</span>
+            </div>
+            <div class="example-card__result">
+              <div class="output-group__label">SALI Result</div>
+              <div class="example-card__result-value">80,000,000 sats/year</div>
+              <p class="text-muted" style="margin-top: 0.5rem; margin-bottom: 0; font-size: 0.875rem;">
+                Calculation: 0.8 BTC × 100,000,000 = 80,000,000 sats
+              </p>
+            </div>
+            <p class="text-muted" style="margin-top: 1rem; margin-bottom: 0; font-size: 0.875rem;">
+              <strong>Note:</strong> At a higher BTC price, the same labor commands fewer satoshis. This is the core insight SALI reveals.
+            </p>
+          </div>
+
+          <h2>Key Observations</h2>
+          <ul>
+            <li><strong>SALI falls as BTC rises.</strong> If your salary stays flat and Bitcoin appreciates, your labor buys fewer sats each year.</li>
+            <li><strong>Raises can be deceiving.</strong> A 10% salary increase paired with a 50% BTC price increase still results in a lower SALI.</li>
+            <li><strong>The ratio is what matters.</strong> Examples 1 and 2 have identical SALI despite very different absolute values because their salary-to-BTC ratios are the same.</li>
+          </ul>
+
+          <p class="mt-lg">
+            <a href="/" class="btn btn--primary">Try the Calculator</a>
+          </p>
+
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer__content">
+      <p class="footer__disclaimer">
+        SALI is for informational purposes only and not financial advice.
+      </p>
+      <p class="footer__contact">
+        Contact: <a href="mailto:angarlotv@gmail.com">angarlotv@gmail.com</a>
+      </p>
+    </div>
+  </footer>
+</body>
+</html>

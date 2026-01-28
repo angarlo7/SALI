@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Contact ANGARLO - Get in touch about SALI, the podcast, or collaboration opportunities.">
+  <title>Contact | SALI - Satoshi Annual Labor Index</title>
+  <link rel="stylesheet" href="/assets/css/styles.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="container nav__inner">
+      <a href="/" class="nav__logo">ANGARLO</a>
+      <ul class="nav__links">
+        <li><a href="/" class="nav__link">Home</a></li>
+        <li><a href="/methodology.html" class="nav__link">Methodology</a></li>
+        <li><a href="/examples.html" class="nav__link">Examples</a></li>
+        <li><a href="/podcast.html" class="nav__link">Podcast</a></li>
+        <li><a href="/contact.html" class="nav__link nav__link--active">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main>
+    <div class="page-header">
+      <div class="container">
+        <h1>Contact</h1>
+        <p class="page-header__subtitle">Get in touch</p>
+      </div>
+    </div>
+
+    <section class="section">
+      <div class="container">
+        <div class="content-section">
+
+          <p>
+            Have questions about SALI? Want to discuss the methodology, suggest improvements, or explore collaboration? Reach out below.
+          </p>
+
+          <form class="contact-form" onsubmit="return handleContactSubmit(event)">
+            <div class="form-group">
+              <label for="contactName">Name</label>
+              <input type="text" id="contactName" name="name" required placeholder="Your name">
+            </div>
+
+            <div class="form-group">
+              <label for="contactEmail">Email</label>
+              <input type="email" id="contactEmail" name="email" required placeholder="you@example.com">
+            </div>
+
+            <div class="form-group">
+              <label for="contactMessage">Message</label>
+              <textarea id="contactMessage" name="message" required placeholder="What's on your mind?"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn--primary">Send Message</button>
+
+            <div id="contactStatus" class="status" style="margin-top: 1rem;"></div>
+          </form>
+
+          <h2>Direct Contact</h2>
+          <p>
+            Prefer email? Reach out directly:
+          </p>
+          <p>
+            <a href="mailto:angarlotv@gmail.com" style="font-size: 1.125rem; font-weight: 500;">angarlotv@gmail.com</a>
+          </p>
+
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer__content">
+      <p class="footer__disclaimer">
+        SALI is for informational purposes only and not financial advice.
+      </p>
+      <p class="footer__contact">
+        Contact: <a href="mailto:angarlotv@gmail.com">angarlotv@gmail.com</a>
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    function handleContactSubmit(event) {
+      event.preventDefault();
+
+      const name = document.getElementById('contactName').value;
+      const email = document.getElementById('contactEmail').value;
+      const message = document.getElementById('contactMessage').value;
+      const status = document.getElementById('contactStatus');
+
+      // Frontend-only: show confirmation
+      // In production, this would submit to a backend or service like Formspree
+      status.textContent = 'Thank you for your message! (Note: This is a frontend-only demo. For actual contact, please email angarlotv@gmail.com directly.)';
+      status.className = 'status status--success';
+
+      // Clear form
+      document.getElementById('contactName').value = '';
+      document.getElementById('contactEmail').value = '';
+      document.getElementById('contactMessage').value = '';
+
+      return false;
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="SALI - Satoshi Annual Labor Index. Measure your salary in satoshis to see if your labor is gaining or losing real value over time.">
+  <title>SALI - Satoshi Annual Labor Index | ANGARLO</title>
+  <link rel="stylesheet" href="/assets/css/styles.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="container nav__inner">
+      <a href="/" class="nav__logo">ANGARLO</a>
+      <ul class="nav__links">
+        <li><a href="/" class="nav__link nav__link--active">Home</a></li>
+        <li><a href="/methodology.html" class="nav__link">Methodology</a></li>
+        <li><a href="/examples.html" class="nav__link">Examples</a></li>
+        <li><a href="/podcast.html" class="nav__link">Podcast</a></li>
+        <li><a href="/contact.html" class="nav__link">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main>
+    <!-- Section 1: Hero -->
+    <section class="hero">
+      <div class="container">
+        <h1 class="hero__headline">Measure your salary in satoshis.</h1>
+        <p class="hero__subheadline">
+          SALI converts your annual income into Bitcoin's smallest unit so you can see whether your labor is gaining or losing real value over time.
+        </p>
+        <div class="hero__actions">
+          <a href="#calculator" class="btn btn--primary">Calculate your SALI</a>
+          <a href="#whySali" class="btn btn--secondary">Why SALI exists</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Calculator -->
+    <section id="calculator" class="section">
+      <div class="container">
+        <div class="calculator">
+          <h2 class="calculator__title">SALI Calculator</h2>
+
+          <div class="calculator__grid">
+            <!-- Inputs -->
+            <div class="calculator__inputs">
+              <div class="form-group">
+                <label for="salaryInput">Annual Salary</label>
+                <input type="number" id="salaryInput" placeholder="e.g., 75000" min="0" step="1000">
+              </div>
+
+              <div class="form-group">
+                <label for="currencySelect">Currency</label>
+                <select id="currencySelect">
+                  <option value="USD" selected>USD - US Dollar</option>
+                  <option value="EUR">EUR - Euro</option>
+                  <option value="MXN">MXN - Mexican Peso</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="salaryGrowthInput">Salary Growth Rate (% per year)</label>
+                <input type="number" id="salaryGrowthInput" value="0" min="-100" max="1000" step="0.5">
+              </div>
+
+              <div class="form-group">
+                <label for="startYearSelect">Start Year</label>
+                <select id="startYearSelect">
+                  <!-- Options populated by JS, default 2020 -->
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="yearsSelect">Forecast Horizon</label>
+                <select id="yearsSelect">
+                  <!-- Options populated by JS, default 10 -->
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="btcPriceMethodSelect">Bitcoin Price Method</label>
+                <select id="btcPriceMethodSelect">
+                  <option value="spot" selected>Spot (Live)</option>
+                  <option value="annual">Annual Average</option>
+                  <option value="manual">Manual Entry</option>
+                </select>
+              </div>
+
+              <div id="btcPriceDisplay" class="btc-price-display">Loading spot price...</div>
+
+              <div class="form-group form-group--hidden">
+                <label for="btcPriceManualInput">Manual BTC Price (USD)</label>
+                <input type="number" id="btcPriceManualInput" placeholder="e.g., 100000" min="1" step="100">
+              </div>
+
+              <div class="form-group">
+                <label for="btcGrowthInput">BTC Price Growth Rate (% per year)</label>
+                <input type="number" id="btcGrowthInput" value="0" min="-100" max="1000" step="0.5">
+              </div>
+
+              <button type="button" id="computeBtn" class="btn btn--primary">Calculate SALI</button>
+            </div>
+
+            <!-- Outputs -->
+            <div class="calculator__outputs">
+              <!-- Unit Toggle -->
+              <div class="unit-toggle">
+                <button type="button" id="unitToggleSats" class="unit-toggle__btn unit-toggle__btn--active">Sats</button>
+                <button type="button" id="unitToggleBtc" class="unit-toggle__btn">BTC</button>
+              </div>
+
+              <div class="output-group">
+                <div class="output-group__label">Your SALI (Current Year)</div>
+                <div id="saliSatsOutput" class="output-group__value output-group__value--primary">— sats/year</div>
+              </div>
+
+              <div class="output-group" id="btcOutputGroup">
+                <div class="output-group__label">BTC Equivalent</div>
+                <div id="saliBtcOutput" class="output-group__value output-group__value--secondary">— BTC/year</div>
+              </div>
+
+              <!-- SALI Score -->
+              <div class="output-group">
+                <div class="output-group__label">SALI Trend Score</div>
+                <div id="saliScoreOutput" class="output-group__value output-group__value--score">—</div>
+                <div id="saliScoreDesc" class="output-group__desc"></div>
+              </div>
+
+              <div class="output-group">
+                <div class="output-group__label">Projected Change (10yr)</div>
+                <div id="saliYoyOutput" class="output-group__value output-group__value--secondary">—</div>
+              </div>
+
+              <div id="statusOutput" class="status"></div>
+            </div>
+          </div>
+
+          <!-- Chart -->
+          <div class="chart-section">
+            <h3>SALI Over Time</h3>
+            <div class="chart-container">
+              <canvas id="saliChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Projection Table -->
+          <div class="table-container">
+            <table class="projection-table">
+              <thead>
+                <tr>
+                  <th>Year</th>
+                  <th>Salary</th>
+                  <th>BTC Price</th>
+                  <th>SALI</th>
+                </tr>
+              </thead>
+              <tbody id="projectionTableBody">
+                <!-- Rows populated by JS -->
+              </tbody>
+            </table>
+            <p class="table-note">* Projected BTC price based on growth rate assumption</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: Why This Matters -->
+    <section id="whySali" class="section section--alt">
+      <div class="container">
+        <div class="content-section">
+          <h2>Why This Matters</h2>
+          <p>
+            Traditional salary increases can mask what's actually happening to your purchasing power. A 3% raise means little if the monetary base expands by 10%. SALI gives you a different lens: measuring labor in Bitcoin's fixed-supply unit.
+          </p>
+          <p>
+            <strong>Fiat salary increases can hide dilution.</strong> When you measure in satoshis, you see whether you're actually getting ahead or just treading water against monetary expansion.
+          </p>
+          <p>
+            <strong>SALI is measurement, not prediction.</strong> This tool doesn't forecast Bitcoin's price or tell you what to do. It simply converts your income into a different unit of account so you can observe the relationship between your labor and sound money.
+          </p>
+          <p>
+            <strong>This is not financial advice.</strong> SALI is an educational tool for those who want to understand their income from a Bitcoin-denominated perspective. It makes no claims about future prices or investment returns.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 4: Methodology Preview -->
+    <section class="section">
+      <div class="container">
+        <div class="content-section">
+          <h2>The Formula</h2>
+          <div class="formula">
+            SALI (sats/year) = (Annual Salary in USD ÷ BTC Price in USD) × 100,000,000
+          </div>
+          <p>
+            SALI converts your salary to its Bitcoin equivalent, then expresses it in satoshis (the smallest Bitcoin unit, 1 BTC = 100 million sats). This makes year-over-year comparisons intuitive.
+          </p>
+          <p>
+            <a href="/methodology.html">Read the full methodology →</a>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 5: About -->
+    <section class="section section--alt">
+      <div class="container">
+        <div class="content-section">
+          <h2>About</h2>
+          <div class="about-section">
+            <p>
+              I'm ANGARLO, an entrepreneur, investor, and Bitcoin educator. I built SALI to understand the real value of my own labor. Now it's public.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer__content">
+      <p class="footer__disclaimer">
+        SALI is for informational purposes only and not financial advice.
+      </p>
+      <p class="footer__contact">
+        Contact: <a href="mailto:angarlotv@gmail.com">angarlotv@gmail.com</a>
+      </p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="/assets/js/app.js"></script>
+</body>
+</html>

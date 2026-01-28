@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="SALI Methodology - How the Satoshi Annual Labor Index works, including the formula, price selection methods, and limitations.">
+  <title>Methodology | SALI - Satoshi Annual Labor Index</title>
+  <link rel="stylesheet" href="/assets/css/styles.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="container nav__inner">
+      <a href="/" class="nav__logo">ANGARLO</a>
+      <ul class="nav__links">
+        <li><a href="/" class="nav__link">Home</a></li>
+        <li><a href="/methodology.html" class="nav__link nav__link--active">Methodology</a></li>
+        <li><a href="/examples.html" class="nav__link">Examples</a></li>
+        <li><a href="/podcast.html" class="nav__link">Podcast</a></li>
+        <li><a href="/contact.html" class="nav__link">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main>
+    <div class="page-header">
+      <div class="container">
+        <h1>Methodology</h1>
+        <p class="page-header__subtitle">How SALI works and what it measures</p>
+      </div>
+    </div>
+
+    <section class="section">
+      <div class="container">
+        <div class="content-section">
+
+          <h2>What is SALI?</h2>
+          <p>
+            The Satoshi Annual Labor Index (SALI) is a measurement tool that expresses your annual income in satoshis—the smallest unit of Bitcoin (1 BTC = 100,000,000 sats). By converting fiat income to satoshis, you can observe how your labor's value changes relative to Bitcoin over time.
+          </p>
+          <p>
+            SALI is not an investment metric. It's a unit conversion that provides a different perspective on income, one measured against a fixed-supply monetary asset rather than an inflationary fiat currency.
+          </p>
+
+          <h2>The Formula</h2>
+          <div class="formula">
+            SALI (sats/year) = (Annual Salary in USD ÷ BTC Price in USD) × 100,000,000
+          </div>
+          <p>
+            The calculation is straightforward:
+          </p>
+          <ol>
+            <li>Take your annual salary in your local currency</li>
+            <li>Convert it to USD (if not already in USD)</li>
+            <li>Divide by the current Bitcoin price in USD</li>
+            <li>Multiply by 100,000,000 to express in satoshis</li>
+          </ol>
+          <p>
+            The result tells you how many satoshis your annual labor could theoretically acquire at the given Bitcoin price.
+          </p>
+
+          <h2>Bitcoin Price Selection</h2>
+          <p>
+            SALI offers three methods for selecting the Bitcoin price used in calculations:
+          </p>
+
+          <h3>Spot Price</h3>
+          <p>
+            The current market price fetched from CoinGecko's public API. This reflects real-time market conditions but can be volatile. Use this for a snapshot of your current SALI.
+          </p>
+
+          <h3>Annual Average</h3>
+          <p>
+            Historical annual average prices smooth out daily volatility. The calculator uses the most recent year's average as the baseline. This method is useful for year-over-year comparisons that aren't distorted by short-term price swings.
+          </p>
+
+          <h3>Manual Entry</h3>
+          <p>
+            Enter any Bitcoin price manually. This is useful for:
+          </p>
+          <ul>
+            <li>Historical calculations using specific past prices</li>
+            <li>Scenario analysis ("What if BTC were at $X?")</li>
+            <li>Using prices from other sources or exchanges</li>
+            <li>Offline usage when API calls fail</li>
+          </ul>
+
+          <h2>Projections</h2>
+          <p>
+            The projection feature extends your SALI calculation over multiple years using simple compounding assumptions:
+          </p>
+          <div class="formula">
+            Salary (Year N) = Salary (Year 0) × (1 + Salary Growth Rate)^N<br><br>
+            BTC Price (Year N) = BTC Price (Year 0) × (1 + BTC Growth Rate)^N
+          </div>
+          <p>
+            These are not predictions. They're mechanical extrapolations that show how your SALI would evolve <em>if</em> the growth rates you specify were to hold constant. Real-world salary increases and Bitcoin prices are far more variable.
+          </p>
+          <p>
+            The Year-over-Year (YoY) change shows the percent difference between Year 0 and Year 1 SALI values, indicating the direction and magnitude of change given your assumptions.
+          </p>
+
+          <h2>What SALI Is Not</h2>
+          <p>
+            To use SALI responsibly, understand its limitations:
+          </p>
+          <ul>
+            <li><strong>Not a price prediction.</strong> SALI does not forecast Bitcoin's future price. The projection feature uses your inputs mechanically—it has no predictive power.</li>
+            <li><strong>Not an inflation model.</strong> SALI doesn't account for CPI, real purchasing power, or cost of living. It's purely a unit conversion to satoshis.</li>
+            <li><strong>Not financial advice.</strong> SALI is an educational tool. It doesn't tell you to buy Bitcoin, hold Bitcoin, or make any financial decision.</li>
+            <li><strong>Not a complete picture.</strong> Your financial health depends on many factors beyond how your salary compares to Bitcoin.</li>
+          </ul>
+
+          <h2>Limitations</h2>
+
+          <h3>Bitcoin Volatility</h3>
+          <p>
+            Bitcoin's price can move 10-20% in a single day. Your SALI will fluctuate accordingly. A high SALI during a price dip doesn't mean your labor is worth more—it means Bitcoin is temporarily cheaper.
+          </p>
+
+          <h3>Relative Benchmark</h3>
+          <p>
+            SALI measures your income against Bitcoin specifically. It doesn't compare to gold, real estate, stocks, or actual purchasing power. Bitcoin is a particular benchmark with its own characteristics.
+          </p>
+
+          <h3>Assumptions Matter</h3>
+          <p>
+            Projection accuracy depends entirely on your growth rate assumptions. If you assume 50% annual BTC price growth and it grows 10%, your projections will be wrong. Use conservative ranges and understand that projections illustrate sensitivity, not destiny.
+          </p>
+
+          <h3>Currency Conversion</h3>
+          <p>
+            Non-USD salaries are converted using static placeholder exchange rates. For accurate results with EUR, MXN, or other currencies, consider using the Manual price entry with your own calculations.
+          </p>
+
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer__content">
+      <p class="footer__disclaimer">
+        SALI is for informational purposes only and not financial advice.
+      </p>
+      <p class="footer__contact">
+        Contact: <a href="mailto:angarlotv@gmail.com">angarlotv@gmail.com</a>
+      </p>
+    </div>
+  </footer>
+</body>
+</html>
