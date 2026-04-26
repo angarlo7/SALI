@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SALI — Mobile Wireframe</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f0f0f0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+      gap: 48px;
+    }
+
+    /* ── Labels above each screen ── */
+    .screen-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #888;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    /* ── Phone shell ── */
+    .phone {
+      width: 375px;
+      border-radius: 40px;
+      border: 3px solid #bbb;
+      background: #1e1e1e;
+      overflow: hidden;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.18);
+      position: relative;
+    }
+
+    /* notch */
+    .phone::before {
+      content: '';
+      display: block;
+      width: 120px;
+      height: 28px;
+      background: #111;
+      border-radius: 0 0 18px 18px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* ── Wireframe base styles ── */
+    .wf {
+      font-size: 12px;
+      color: #ccc;
+      padding: 0 0 32px;
+    }
+
+    /* blocks */
+    .block {
+      background: #2a2a2a;
+      border-radius: 6px;
+    }
+    .block--accent {
+      background: #e53e3e;
+      border-radius: 6px;
+    }
+    .block--outline {
+      background: transparent;
+      border: 1.5px solid #3a3a3a;
+      border-radius: 6px;
+    }
+    .block--muted {
+      background: #252525;
+      border-radius: 6px;
+    }
+
+    /* ── NAV ── */
+    .wf-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 20px;
+      border-bottom: 1px solid #2a2a2a;
+      background: #181818;
+    }
+    .wf-nav__logo {
+      font-size: 13px;
+      font-weight: 700;
+      color: #f0f0f0;
+      letter-spacing: -0.02em;
+    }
+    .wf-nav__menu {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .wf-nav__bar {
+      width: 22px;
+      height: 2px;
+      background: #888;
+      border-radius: 2px;
+    }
+
+    /* ── HERO ── */
+    .wf-hero {
+      padding: 32px 20px 24px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .wf-hero__headline {
+      font-size: 22px;
+      font-weight: 700;
+      color: #f0f0f0;
+      line-height: 1.25;
+    }
+    .wf-hero__sub {
+      font-size: 12px;
+      color: #888;
+      line-height: 1.6;
+      max-width: 280px;
+    }
+    .wf-hero__cta {
+      margin-top: 8px;
+      width: 100%;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .wf-hero__cta2 {
+      width: 100%;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: #888;
+    }
+
+    /* ── SECTION LABEL ── */
+    .wf-section-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #555;
+      text-align: center;
+      padding: 20px 20px 10px;
+    }
+
+    /* ── CALCULATOR ── */
+    .wf-calc {
+      margin: 0 16px;
+      border: 1px solid #2e2e2e;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #1e1e1e;
+    }
+    .wf-calc__inputs {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      border-bottom: 1px solid #2a2a2a;
+    }
+    .wf-field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .wf-field__label {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #555;
+    }
+    .wf-field__input {
+      height: 36px;
+      background: #111;
+      border: 1px solid #2e2e2e;
+      border-radius: 6px;
+    }
+    .wf-calc__btn {
+      margin: 12px 16px 16px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      border-radius: 8px;
+    }
+
+    /* ── OUTPUTS ── */
+    .wf-outputs {
+      margin: 12px 16px 0;
+      background: #181818;
+      border: 1px solid #2a2a2a;
+      border-radius: 10px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .wf-toggle {
+      display: flex;
+      background: #111;
+      border: 1px solid #2a2a2a;
+      border-radius: 6px;
+      overflow: hidden;
+      height: 32px;
+    }
+    .wf-toggle__item {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 700;
+      color: #555;
+    }
+    .wf-toggle__item--active {
+      background: #e53e3e;
+      color: #fff;
+    }
+    .wf-out-primary {
+      text-align: center;
+      padding: 8px 0;
+    }
+    .wf-out-primary__label {
+      font-size: 9px;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .wf-out-primary__value {
+      font-size: 28px;
+      font-weight: 700;
+      color: #e53e3e;
+      margin-top: 4px;
+    }
+    .wf-out-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      border-top: 1px solid #232323;
+    }
+    .wf-out-row__label {
+      font-size: 9px;
+      color: #555;
+      text-transform: uppercase;
+    }
+    .wf-out-row__val {
+      font-size: 11px;
+      color: #888;
+      font-weight: 600;
+    }
+
+    /* ── CHART ── */
+    .wf-chart {
+      margin: 16px 16px 0;
+      height: 160px;
+      background: #181818;
+      border: 1px solid #2a2a2a;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 12px;
+      gap: 6px;
+      overflow: hidden;
+      position: relative;
+    }
+    .wf-chart__label {
+      font-size: 9px;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      position: absolute;
+      top: 10px;
+      left: 12px;
+    }
+    .wf-chart__bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 5px;
+      height: 100px;
+      padding-top: 24px;
+    }
+    .wf-chart__bar {
+      flex: 1;
+      border-radius: 3px 3px 0 0;
+      background: #2a2a2a;
+    }
+    .wf-chart__bar--accent {
+      background: #e53e3e;
+      opacity: 0.8;
+    }
+    .wf-chart__bar--dim {
+      background: #3a2020;
+    }
+
+    /* ── TABLE ── */
+    .wf-table {
+      margin: 12px 16px 0;
+    }
+    .wf-table__header {
+      display: flex;
+      padding: 6px 10px;
+      background: #181818;
+      border-radius: 6px 6px 0 0;
+      border: 1px solid #232323;
+      gap: 8px;
+    }
+    .wf-table__col {
+      flex: 1;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #555;
+      text-align: right;
+    }
+    .wf-table__col:first-child { text-align: left; }
+    .wf-table__row {
+      display: flex;
+      padding: 7px 10px;
+      border-bottom: 1px solid #1e1e1e;
+      border-left: 1px solid #232323;
+      border-right: 1px solid #232323;
+      gap: 8px;
+    }
+    .wf-table__row--accent {
+      background: rgba(229, 62, 62, 0.08);
+    }
+    .wf-table__cell {
+      flex: 1;
+      height: 8px;
+      background: #2a2a2a;
+      border-radius: 2px;
+    }
+    .wf-table__cell--accent {
+      background: rgba(229, 62, 62, 0.5);
+    }
+
+    /* ── CONTENT BLOCK ── */
+    .wf-content {
+      padding: 0 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .wf-content__title {
+      width: 60%;
+      height: 14px;
+      background: #2e2e2e;
+      border-radius: 4px;
+    }
+    .wf-content__line {
+      height: 8px;
+      background: #232323;
+      border-radius: 3px;
+    }
+    .wf-content__line--short {
+      width: 70%;
+    }
+
+    /* ── FOOTER ── */
+    .wf-footer {
+      padding: 16px 20px;
+      border-top: 1px solid #232323;
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .wf-footer__line {
+      height: 7px;
+      background: #232323;
+      border-radius: 3px;
+      width: 50%;
+    }
+    .wf-footer__line--narrow {
+      width: 35%;
+    }
+
+    /* ── DIVIDER ── */
+    .wf-divider {
+      height: 1px;
+      background: #232323;
+      margin: 20px 0 0;
+    }
+
+    /* ── annotations ── */
+    .annotations {
+      width: 375px;
+      margin-top: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .ann {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 11px;
+      color: #666;
+    }
+    .ann__dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #e53e3e;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .ann__dot--grey {
+      background: #555;
+    }
+
+    /* ── Layout: two phones side by side on wide screens ── */
+    .row {
+      display: flex;
+      gap: 48px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #666;
+      text-align: center;
+    }
+    .subtitle {
+      font-size: 12px;
+      color: #999;
+      text-align: center;
+      margin-top: 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <div>
+    <h1>SALI — Mobile Wireframe</h1>
+    <p class="subtitle">Dark theme · 375px viewport · Red accents</p>
+  </div>
+
+  <div class="row">
+
+    <!-- ── SCREEN 1: Hero + Calculator top ── -->
+    <div class="col">
+      <div class="screen-label">Screen 1 — Hero &amp; Calculator</div>
+      <div class="phone">
+        <!-- nav -->
+        <div class="wf-nav">
+          <span class="wf-nav__logo">ANGARLO</span>
+          <div class="wf-nav__menu">
+            <div class="wf-nav__bar"></div>
+            <div class="wf-nav__bar"></div>
+            <div class="wf-nav__bar"></div>
+          </div>
+        </div>
+
+        <div class="wf">
+          <!-- hero -->
+          <div class="wf-hero">
+            <div class="wf-hero__headline">Measure your salary<br>in satoshis.</div>
+            <p class="wf-hero__sub">SALI converts your annual income into Bitcoin's smallest unit so you can see whether your labor is gaining or losing real value.</p>
+            <div class="wf-hero__cta block--accent">Calculate your SALI</div>
+            <div class="wf-hero__cta2 block--outline">Why SALI exists</div>
+          </div>
+
+          <div class="wf-divider"></div>
+
+          <!-- calculator inputs -->
+          <div class="wf-section-label">SALI Calculator</div>
+          <div class="wf-calc">
+            <div class="wf-calc__inputs">
+              <div class="wf-field">
+                <div class="wf-field__label">Annual Salary</div>
+                <div class="wf-field__input block--outline"></div>
+              </div>
+              <div class="wf-field">
+                <div class="wf-field__label">Currency</div>
+                <div class="wf-field__input block--outline"></div>
+              </div>
+              <div class="wf-field">
+                <div class="wf-field__label">Salary Growth Rate (%)</div>
+                <div class="wf-field__input block--outline"></div>
+              </div>
+              <div class="wf-field">
+                <div class="wf-field__label">Start Year</div>
+                <div class="wf-field__input block--outline"></div>
+              </div>
+              <div class="wf-field">
+                <div class="wf-field__label">Bitcoin Price Method</div>
+                <div class="wf-field__input block--outline"></div>
+              </div>
+              <div class="wf-field">
+                <div class="wf-field__label">BTC Growth Rate (%)</div>
+                <div class="wf-field__input block--outline"></div>
+              </div>
+            </div>
+            <div class="wf-calc__btn block--accent">Calculate SALI</div>
+          </div>
+
+          <!-- outputs -->
+          <div class="wf-outputs">
+            <div class="wf-toggle">
+              <div class="wf-toggle__item wf-toggle__item--active">Sats</div>
+              <div class="wf-toggle__item">BTC</div>
+            </div>
+            <div class="wf-out-primary">
+              <div class="wf-out-primary__label">Your SALI (Current Year)</div>
+              <div class="wf-out-primary__value">1,234,567 sats</div>
+            </div>
+            <div class="wf-out-row">
+              <span class="wf-out-row__label">BTC Equivalent</span>
+              <span class="wf-out-row__val">0.01234 BTC</span>
+            </div>
+            <div class="wf-out-row">
+              <span class="wf-out-row__label">SALI Trend Score</span>
+              <span class="wf-out-row__val" style="color:#22c55e;">▲ Gaining</span>
+            </div>
+            <div class="wf-out-row">
+              <span class="wf-out-row__label">10yr Projected Change</span>
+              <span class="wf-out-row__val">+42%</span>
+            </div>
+          </div>
+
+          <!-- footer placeholder -->
+          <div class="wf-footer">
+            <div class="wf-footer__line"></div>
+            <div class="wf-footer__line wf-footer__line--narrow"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="annotations">
+        <div class="ann"><div class="ann__dot"></div><span>Full-width stacked inputs, comfortable 44px tap targets</span></div>
+        <div class="ann"><div class="ann__dot"></div><span>Red CTA button spans full width</span></div>
+        <div class="ann"><div class="ann__dot"></div><span>Outputs panel below inputs (no side-by-side grid on mobile)</span></div>
+        <div class="ann"><div class="ann__dot ann__dot--grey"></div><span>Hamburger menu replaces horizontal nav links</span></div>
+      </div>
+    </div>
+
+    <!-- ── SCREEN 2: Chart + Table + Content ── -->
+    <div class="col">
+      <div class="screen-label">Screen 2 — Chart, Table &amp; Content</div>
+      <div class="phone">
+        <!-- nav -->
+        <div class="wf-nav">
+          <span class="wf-nav__logo">ANGARLO</span>
+          <div class="wf-nav__menu">
+            <div class="wf-nav__bar"></div>
+            <div class="wf-nav__bar"></div>
+            <div class="wf-nav__bar"></div>
+          </div>
+        </div>
+
+        <div class="wf">
+          <!-- chart -->
+          <div class="wf-section-label">SALI Over Time</div>
+          <div class="wf-chart">
+            <span class="wf-chart__label">SALI OVER TIME</span>
+            <div class="wf-chart__bars">
+              <div class="wf-chart__bar wf-chart__bar--dim" style="height:40%"></div>
+              <div class="wf-chart__bar wf-chart__bar--dim" style="height:50%"></div>
+              <div class="wf-chart__bar wf-chart__bar--dim" style="height:45%"></div>
+              <div class="wf-chart__bar wf-chart__bar--dim" style="height:60%"></div>
+              <div class="wf-chart__bar wf-chart__bar--dim" style="height:55%"></div>
+              <div class="wf-chart__bar wf-chart__bar--accent" style="height:70%"></div>
+              <div class="wf-chart__bar" style="height:75%; opacity:0.5"></div>
+              <div class="wf-chart__bar" style="height:80%; opacity:0.4"></div>
+              <div class="wf-chart__bar" style="height:85%; opacity:0.3"></div>
+              <div class="wf-chart__bar" style="height:90%; opacity:0.2"></div>
+            </div>
+          </div>
+
+          <!-- projection table -->
+          <div class="wf-table" style="margin-top:16px">
+            <div class="wf-table__header">
+              <div class="wf-table__col">Year</div>
+              <div class="wf-table__col">Salary</div>
+              <div class="wf-table__col">BTC Price</div>
+              <div class="wf-table__col">SALI</div>
+            </div>
+            <div class="wf-table__row">
+              <div class="wf-table__cell"></div>
+              <div class="wf-table__cell"></div>
+              <div class="wf-table__cell"></div>
+              <div class="wf-table__cell"></div>
+            </div>
+            <div class="wf-table__row wf-table__row--accent">
+              <div class="wf-table__cell wf-table__cell--accent"></div>
+              <div class="wf-table__cell wf-table__cell--accent"></div>
+              <div class="wf-table__cell wf-table__cell--accent"></div>
+              <div class="wf-table__cell wf-table__cell--accent"></div>
+            </div>
+            <div class="wf-table__row">
+              <div class="wf-table__cell"></div>
+              <div class="wf-table__cell"></div>
+              <div class="wf-table__cell"></div>
+              <div class="wf-table__cell"></div>
+            </div>
+            <div class="wf-table__row" style="opacity:0.5">
+              <div class="wf-table__cell"></div>
+              <div class="wf-table__cell"></div>
+              <div class="wf-table__cell"></div>
+              <div class="wf-table__cell"></div>
+            </div>
+            <div class="wf-table__row" style="opacity:0.35">
+              <div class="wf-table__cell"></div>
+              <div class="wf-table__cell"></div>
+              <div class="wf-table__cell"></div>
+              <div class="wf-table__cell"></div>
+            </div>
+          </div>
+
+          <div class="wf-divider" style="margin-top:20px"></div>
+
+          <!-- why this matters -->
+          <div class="wf-section-label">Why This Matters</div>
+          <div class="wf-content">
+            <div class="wf-content__title"></div>
+            <div class="wf-content__line"></div>
+            <div class="wf-content__line"></div>
+            <div class="wf-content__line wf-content__line--short"></div>
+            <div class="wf-content__line" style="margin-top:8px"></div>
+            <div class="wf-content__line"></div>
+            <div class="wf-content__line wf-content__line--short"></div>
+          </div>
+
+          <!-- formula -->
+          <div style="margin:16px 16px 0; padding:12px; background:#181818; border:1px solid #2e2e2e; border-left:3px solid #e53e3e; border-radius:6px;">
+            <div style="font-size:9px; color:#555; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:6px;">Formula</div>
+            <div style="font-size:10px; color:#aaa; line-height:1.6;">SALI = (Salary ÷ BTC Price) × 100,000,000</div>
+          </div>
+
+          <!-- footer -->
+          <div class="wf-footer">
+            <div class="wf-footer__line"></div>
+            <div class="wf-footer__line wf-footer__line--narrow"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="annotations">
+        <div class="ann"><div class="ann__dot"></div><span>Current year highlighted in red in the table</span></div>
+        <div class="ann"><div class="ann__dot"></div><span>Projected rows fade out progressively</span></div>
+        <div class="ann"><div class="ann__dot"></div><span>Chart bar for current year in solid red</span></div>
+        <div class="ann"><div class="ann__dot ann__dot--grey"></div><span>Formula box with left red border, same pattern as desktop</span></div>
+        <div class="ann"><div class="ann__dot ann__dot--grey"></div><span>Horizontal scroll on table if needed (overflow-x: auto)</span></div>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

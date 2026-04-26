@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="SALI Methodology - How the Satoshi Annual Labor Index works, including the formula, price selection methods, and limitations.">
+  <meta name="description" content="How SALI works — the formula, Bitcoin price methods, projection logic, and why Bitcoin is the right benchmark for measuring labor value.">
   <title>Methodology | SALI - Satoshi Annual Labor Index</title>
   <link rel="stylesheet" href="/assets/css/styles.css">
 </head>
@@ -19,6 +19,7 @@
         <li><a href="/podcast.html" class="nav__link">Podcast</a></li>
         <li><a href="/contact.html" class="nav__link">Contact</a></li>
       </ul>
+      <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
     </div>
   </nav>
 
@@ -26,7 +27,7 @@
     <div class="page-header">
       <div class="container">
         <h1>Methodology</h1>
-        <p class="page-header__subtitle">How SALI works and what it measures</p>
+        <p class="page-header__subtitle">How SALI works, why Bitcoin is the benchmark, and what the numbers mean</p>
       </div>
     </div>
 
@@ -36,10 +37,10 @@
 
           <h2>What is SALI?</h2>
           <p>
-            The Satoshi Annual Labor Index (SALI) is a measurement tool that expresses your annual income in satoshis—the smallest unit of Bitcoin (1 BTC = 100,000,000 sats). By converting fiat income to satoshis, you can observe how your labor's value changes relative to Bitcoin over time.
+            SALI — the Satoshi Annual Labor Index — is the standard for measuring your labor in Bitcoin terms. It converts your annual income into satoshis (sats), the smallest unit of Bitcoin: one sat equals one hundred-millionth of a coin, or 0.000000001 BTC. By expressing your salary in sats, SALI gives you a consistent unit of account that doesn't inflate, expand, or get debased.
           </p>
           <p>
-            SALI is not an investment metric. It's a unit conversion that provides a different perspective on income, one measured against a fixed-supply monetary asset rather than an inflationary fiat currency.
+            SALI answers one specific question: <em>how does my salary denominated in Bitcoin change year over year?</em> It does not measure purchasing power in goods and services, and it does not replace CPI-adjusted real wages. Those are different questions. SALI is a Bitcoin-denominated income index — the right tool if understanding your labor's value relative to a fixed-supply asset is what you're after.
           </p>
 
           <h2>The Formula</h2>
@@ -87,50 +88,63 @@
 
           <h2>Projections</h2>
           <p>
-            The projection feature extends your SALI calculation over multiple years using simple compounding assumptions:
+            The projection feature extends your SALI calculation over multiple years using simple compounding assumptions anchored to the <em>current year</em>:
           </p>
           <div class="formula">
-            Salary (Year N) = Salary (Year 0) × (1 + Salary Growth Rate)^N<br><br>
-            BTC Price (Year N) = BTC Price (Year 0) × (1 + BTC Growth Rate)^N
+            Salary (Year N) = Current Salary × (1 + Salary Growth Rate)^(N − Current Year)<br><br>
+            BTC Price (Year N) = Current BTC Price × (1 + BTC Growth Rate)^(N − Current Year)
           </div>
+          <p>
+            The salary you enter is treated as your salary <em>today</em>. Past years are back-calculated (deflated) from that value, and future years grow forward. Historical years use actual annual average BTC price data; the current year and future years use your selected BTC price method (spot, annual average, or manual) as the baseline.
+          </p>
           <p>
             These are not predictions. They're mechanical extrapolations that show how your SALI would evolve <em>if</em> the growth rates you specify were to hold constant. Real-world salary increases and Bitcoin prices are far more variable.
           </p>
           <p>
-            The Year-over-Year (YoY) change shows the percent difference between Year 0 and Year 1 SALI values, indicating the direction and magnitude of change given your assumptions.
+            The <em>Projected Change</em> output shows the percent difference between your SALI today and your projected SALI at the end of the forecast window — measuring whether your labor's BTC purchasing power is expected to grow or shrink given your assumptions.
           </p>
 
           <h2>What SALI Is Not</h2>
           <p>
-            To use SALI responsibly, understand its limitations:
+            SALI is precise about its scope. Knowing what it doesn't do is as important as knowing what it does.
           </p>
           <ul>
-            <li><strong>Not a price prediction.</strong> SALI does not forecast Bitcoin's future price. The projection feature uses your inputs mechanically—it has no predictive power.</li>
-            <li><strong>Not an inflation model.</strong> SALI doesn't account for CPI, real purchasing power, or cost of living. It's purely a unit conversion to satoshis.</li>
-            <li><strong>Not financial advice.</strong> SALI is an educational tool. It doesn't tell you to buy Bitcoin, hold Bitcoin, or make any financial decision.</li>
-            <li><strong>Not a complete picture.</strong> Your financial health depends on many factors beyond how your salary compares to Bitcoin.</li>
+            <li><strong>Not a price prediction.</strong> SALI does not forecast Bitcoin's future price. The projection feature applies your growth rate inputs mechanically — it has no predictive power and does not imply any view on where Bitcoin will trade.</li>
+            <li><strong>Not an inflation model.</strong> SALI doesn't measure purchasing power in goods and services. Rent, food, and healthcare are priced in fiat — SALI doesn't track those. For inflation-adjusted real wages, use CPI data. SALI and CPI answer different questions.</li>
+            <li><strong>Not financial advice.</strong> SALI is an index. It doesn't tell you to buy Bitcoin, hold Bitcoin, or make any financial decision. Use it to measure; use your own judgment to act.</li>
+            <li><strong>Not a complete financial picture.</strong> Your financial health depends on many factors beyond your SALI. It is one lens, not a verdict.</li>
           </ul>
 
           <h2>Limitations</h2>
 
+          <h3>Bitcoin Is the Benchmark by Design</h3>
+          <p>
+            SALI uses Bitcoin because it is the only fixed-supply monetary asset with a hard cap of 21 million coins and a fully transparent, auditable issuance schedule. That makes it the most demanding benchmark for labor: no central bank can inflate it, no government can debase it, and no committee can change its rules. The choice is deliberate. SALI includes S&P 500, Gold, and CPI comparisons to show Bitcoin's divergence in context — not because those are equally valid units of account.
+          </p>
+
+          <h3>The Historical Window Was Extraordinary</h3>
+          <p>
+            The available historical data (2015–2025) covers a roughly 300× appreciation in Bitcoin's price — one of the most exceptional runs in modern financial history. Projections built on that window as a baseline may overstate what comes next. Use conservative BTC growth assumptions, run multiple scenarios, and treat the historical chart as context, not as a performance guarantee.
+          </p>
+
+          <h3>SALI Doesn't Measure Cost of Living</h3>
+          <p>
+            A rising SALI doesn't mean your standard of living improved. A falling SALI doesn't mean it deteriorated. Rent, food, and healthcare are priced in fiat. SALI measures one thing: your salary's value in Bitcoin terms. That is its scope, and it is intentionally narrow.
+          </p>
+
           <h3>Bitcoin Volatility</h3>
           <p>
-            Bitcoin's price can move 10-20% in a single day. Your SALI will fluctuate accordingly. A high SALI during a price dip doesn't mean your labor is worth more—it means Bitcoin is temporarily cheaper.
+            Bitcoin's price can move 10–20% in a single day. Your SALI will reflect that. A high SALI during a price dip doesn't mean your labor is suddenly more valuable — it means Bitcoin is temporarily cheaper. Annual average prices smooth short-term volatility for historical analysis; spot price captures the present moment.
           </p>
 
-          <h3>Relative Benchmark</h3>
+          <h3>Projection Assumptions Are Yours, Not Ours</h3>
           <p>
-            SALI measures your income against Bitcoin specifically. It doesn't compare to gold, real estate, stocks, or actual purchasing power. Bitcoin is a particular benchmark with its own characteristics.
-          </p>
-
-          <h3>Assumptions Matter</h3>
-          <p>
-            Projection accuracy depends entirely on your growth rate assumptions. If you assume 50% annual BTC price growth and it grows 10%, your projections will be wrong. Use conservative ranges and understand that projections illustrate sensitivity, not destiny.
+            Projection accuracy depends entirely on the growth rates you input. If you assume 20% annual BTC appreciation and Bitcoin grows 5%, your projections will be materially wrong. Run multiple scenarios with different assumptions. Treat the output as sensitivity analysis — a tool for thinking, not a forecast.
           </p>
 
           <h3>Currency Conversion</h3>
           <p>
-            Non-USD salaries are converted using static placeholder exchange rates. For accurate results with EUR, MXN, or other currencies, consider using the Manual price entry with your own calculations.
+            Non-USD salaries are converted using static placeholder exchange rates. For accurate results with EUR, MXN, or other currencies, convert your salary to USD manually and select the USD option.
           </p>
 
         </div>
@@ -149,5 +163,6 @@
       </p>
     </div>
   </footer>
+  <script src="/assets/js/theme.js"></script>
 </body>
 </html>

@@ -12,7 +12,41 @@
   const SATS_PER_BTC = 100000000;
   const DEFAULT_START_YEAR = 2020;
   const DEFAULT_FORECAST_YEARS = 10;
+  const DEFAULT_SALARY_GROWTH = 3;
+  const DEFAULT_BTC_GROWTH = 10;
   const CURRENT_YEAR = new Date().getFullYear();
+
+  // Historical benchmark data for multi-benchmark comparison
+  const BENCHMARK_DATA = {
+    spx: {
+      name: 'S&P 500', unit: 'S&P units/yr', unitShort: 'S&P units',
+      defaultGrowth: 10,
+      annual: {
+        2015: 2061, 2016: 2094, 2017: 2449, 2018: 2746, 2019: 2913,
+        2020: 3217, 2021: 4279, 2022: 4097, 2023: 4210, 2024: 5157, 2025: 5650
+      },
+      format: v => v.toFixed(3)
+    },
+    gold: {
+      name: 'Gold', unit: 'oz Au/yr', unitShort: 'oz Au',
+      defaultGrowth: 5,
+      annual: {
+        2015: 1160, 2016: 1251, 2017: 1257, 2018: 1268, 2019: 1393,
+        2020: 1770, 2021: 1799, 2022: 1800, 2023: 1943, 2024: 2386, 2025: 2650
+      },
+      format: v => v.toFixed(2)
+    },
+    cpi: {
+      name: 'Real (CPI)', unit: 'real $ (2015 base)', unitShort: 'real $',
+      defaultGrowth: 3,
+      // US CPI-U annual average (BLS, 1982-84 = 100)
+      annual: {
+        2015: 237.0, 2016: 240.0, 2017: 245.1, 2018: 251.1, 2019: 255.7,
+        2020: 258.8, 2021: 270.9, 2022: 292.7, 2023: 304.7, 2024: 314.2, 2025: 321.0
+      },
+      format: v => '$' + Math.round(v).toLocaleString('en-US')
+    }
+  };
 
   // Placeholder FX rates to USD (update for production)
   const FX_RATES = {
@@ -25,7 +59,16 @@
   let spotPrice = null;
   let annualAverages = null;
   let chartInstance = null;
+  let normalizedChartInstance = null;
+  let benchmarkChartInstance = null;
+  let sp500JsonData = null;
+  let goldJsonData = null;
+  let cpiJsonData = null;
   let displayUnit = 'sats'; // 'sats' or 'btc'
+  let salaryGrowthMode = 'nominal'; // 'nominal' or 'real'
+  let activeBenchmark = 'btc';     // 'btc', 'spx', 'gold', 'cpi'
+  let benchmarkGrowthOverride = null; // null = use benchmark default
+  let showBreakdown = false;
 
   // DOM Elements (cached after DOMContentLoaded)
   let elements = {};
@@ -81,13 +124,21 @@
   }
 
   /**
-   * Format SALI value based on current display unit
+   * Update purchasing power equivalents display
    */
-  function formatSaliValue(sats, btcEquivalent) {
-    if (displayUnit === 'btc') {
-      return formatBtc(btcEquivalent);
+  function updateEquivalents(sats, btcEquivalent) {
+    if (!elements.equivalentsGrid) return;
+    if (!sats || isNaN(sats) || sats <= 0) {
+      elements.equivalentsGrid.style.display = 'none';
+      return;
     }
-    return formatSats(sats) + ' sats';
+    const satsPerDay = sats / 365;
+    const satsPerHour = sats / 2080;
+    const pctOfBtc = btcEquivalent * 100;
+    if (elements.equivSatsDay) elements.equivSatsDay.textContent = formatSats(satsPerDay);
+    if (elements.equivSatsHour) elements.equivSatsHour.textContent = formatSats(satsPerHour);
+    if (elements.equivPctBtc) elements.equivPctBtc.textContent = pctOfBtc.toFixed(4) + '%';
+    elements.equivalentsGrid.style.display = 'grid';
   }
 
   /**
@@ -114,54 +165,34 @@
   }
 
   /**
-   * Get BTC price for a specific year (from historical data or projected)
-   */
-  function getBtcPriceForYear(year, basePrice, baseYear, btcGrowthRate) {
-    // Check if we have historical data for this year
-    if (annualAverages && annualAverages[year]) {
-      return annualAverages[year];
-    }
-
-    // Otherwise, project from base price
-    const yearsDiff = year - baseYear;
-    return basePrice * Math.pow(1 + btcGrowthRate / 100, yearsDiff);
-  }
-
-  /**
    * Generate projection data with actual years
    */
   function generateProjections(salaryUsd, baseBtcPrice, salaryGrowth, btcGrowth, startYear, forecastYears) {
     const projections = [];
     const endYear = CURRENT_YEAR + forecastYears;
 
-    // Determine the base year for projections (most recent year with data or current year)
-    const mostRecentDataYear = annualAverages ? Math.max(...Object.keys(annualAverages).map(Number)) : CURRENT_YEAR;
-
     for (let year = startYear; year <= endYear; year++) {
-      const yearIndex = year - startYear;
+      // Salary is anchored to CURRENT_YEAR — the entered value is today's salary.
+      // Past years are back-calculated (deflated) and future years grow forward.
+      const yearsFromCurrent = year - CURRENT_YEAR;
+      const salaryYear = salaryUsd * Math.pow(1 + salaryGrowth / 100, yearsFromCurrent);
 
-      // Salary grows from start year
-      const salaryYear = salaryUsd * Math.pow(1 + salaryGrowth / 100, yearIndex);
-
-      // BTC price: use historical if available, otherwise project
+      // BTC price: use historical annual average if available, otherwise use
+      // baseBtcPrice (the user's selected method) anchored at CURRENT_YEAR.
       let btcPriceYear;
       if (annualAverages && annualAverages[year]) {
         btcPriceYear = annualAverages[year];
       } else {
-        // Project from the most recent data point or base price
-        const projectionBase = year > mostRecentDataYear ? mostRecentDataYear : CURRENT_YEAR;
-        const projectionBasePrice = annualAverages && annualAverages[projectionBase]
-          ? annualAverages[projectionBase]
-          : baseBtcPrice;
-        const yearsFromBase = year - projectionBase;
-        btcPriceYear = projectionBasePrice * Math.pow(1 + btcGrowth / 100, yearsFromBase);
+        // Current year uses baseBtcPrice directly (spot, annual avg, or manual).
+        // Future years project forward from baseBtcPrice.
+        const yearsFromCurrent = year - CURRENT_YEAR;
+        btcPriceYear = baseBtcPrice * Math.pow(1 + btcGrowth / 100, yearsFromCurrent);
       }
 
       const { sats, btcEquivalent } = calculateSali(salaryYear, btcPriceYear);
 
       projections.push({
         year,
-        yearIndex,
         salary: salaryYear,
         btcPrice: btcPriceYear,
         sats,
@@ -202,13 +233,13 @@
     let trend, description;
     if (projectedChange > 10) {
       trend = 'gaining';
-      description = 'Your labor is projected to gain purchasing power in BTC terms';
+      description = 'At these assumptions, your salary is outpacing BTC appreciation';
     } else if (projectedChange < -10) {
       trend = 'losing';
-      description = 'Your labor is projected to lose purchasing power in BTC terms';
+      description = 'At these assumptions, BTC is appreciating faster than your salary';
     } else {
       trend = 'neutral';
-      description = 'Your labor purchasing power is relatively stable in BTC terms';
+      description = 'At these assumptions, your salary and BTC are appreciating at roughly the same rate';
     }
 
     return {
@@ -217,6 +248,207 @@
       description,
       historicalChange
     };
+  }
+
+  /**
+   * Generate benchmark series (S&P 500, Gold, CPI) aligned to projections
+   */
+  function generateBenchmarkSeries(projections, benchmark, growthRate) {
+    const bData = BENCHMARK_DATA[benchmark];
+    if (!bData) return projections;
+
+    const rate = (growthRate !== null && growthRate !== undefined) ? growthRate : bData.defaultGrowth;
+    const annualYears = Object.keys(bData.annual).map(Number).sort((a, b) => b - a);
+    const anchorYear = annualYears[0];
+    const anchorPrice = bData.annual[anchorYear];
+    const cpiBase = benchmark === 'cpi' ? bData.annual[2015] : null;
+
+    return projections.map(p => {
+      let benchPrice;
+      if (bData.annual[p.year]) {
+        benchPrice = bData.annual[p.year];
+      } else {
+        const yrs = p.year - anchorYear;
+        benchPrice = anchorPrice * Math.pow(1 + rate / 100, yrs);
+      }
+
+      let benchValue;
+      if (benchmark === 'cpi') {
+        benchValue = p.salary / (benchPrice / cpiBase);
+      } else {
+        benchValue = p.salary / benchPrice;
+      }
+
+      return {
+        ...p,
+        benchPrice,
+        benchValue,
+        isHistorical: bData.annual[p.year] !== undefined
+      };
+    });
+  }
+
+  /**
+   * Update decomposition summary callout
+   */
+  function updateDecompSummary(projections) {
+    const el = elements.decompSummary;
+    if (!el) return;
+
+    const currentIdx = projections.findIndex(p => p.isCurrentYear);
+    const first = projections[0];
+    const current = currentIdx >= 0 ? projections[currentIdx] : null;
+
+    if (!current || !first || first === current) {
+      el.style.display = 'none';
+      return;
+    }
+
+    const totalSaliChange = ((current.sats - first.sats) / first.sats) * 100;
+    const salaryCumulative = (current.salary / first.salary - 1) * 100;
+    const btcCumulative = -(current.btcPrice / first.btcPrice - 1) * 100;
+
+    const sign = v => v >= 0 ? '+' : '';
+    const fmt = v => sign(v) + v.toFixed(1) + '%';
+    const salaryColor = salaryCumulative >= 0 ? '#16a34a' : '#dc2626';
+    const btcColor = btcCumulative >= 0 ? '#16a34a' : '#dc2626';
+    const totalColor = totalSaliChange >= 0 ? '#16a34a' : '#dc2626';
+
+    el.innerHTML =
+      `SALI changed <strong style="color:${totalColor}">${fmt(totalSaliChange)}</strong> since ${first.year}: ` +
+      `salary <strong style="color:${salaryColor}">${fmt(salaryCumulative)}</strong> (positive) · ` +
+      `BTC <strong style="color:${btcColor}">${fmt(btcCumulative)}</strong> impact`;
+    el.style.display = 'block';
+  }
+
+  /**
+   * Generate and download a share card PNG
+   */
+  function generateShareCard() {
+    const salary = parseFloat(elements.salaryInput ? elements.salaryInput.value : 0) || 0;
+    const currency = elements.currencySelect ? elements.currencySelect.value : 'USD';
+    const satsText = elements.saliSatsOutput ? elements.saliSatsOutput.textContent : '—';
+    const btcPriceText = elements.btcPriceDisplay ? elements.btcPriceDisplay.textContent.replace('Spot: ', '') : '—';
+    const histEl = elements.historicalChangeOutput;
+    const histYearEl = elements.historicalChangeYear;
+    const projEl = elements.saliYoyOutput;
+
+    const W = 1200, H = 628, DPR = 2;
+    const canvas = document.createElement('canvas');
+    canvas.width = W * DPR;
+    canvas.height = H * DPR;
+    const ctx = canvas.getContext('2d');
+    ctx.scale(DPR, DPR);
+
+    const orange = '#F7931A';
+    const black = '#111111';
+    const gray = '#666666';
+    const lightGray = '#f5f5f5';
+    const font = '"Roboto Mono", "Courier New", monospace';
+
+    // Background
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, W, H);
+
+    // Top orange bar
+    ctx.fillStyle = orange;
+    ctx.fillRect(0, 0, W, 8);
+
+    // Left accent bar
+    ctx.fillStyle = orange;
+    ctx.fillRect(60, 60, 6, 180);
+
+    // Label
+    ctx.fillStyle = gray;
+    ctx.font = `600 16px ${font}`;
+    ctx.textAlign = 'left';
+    ctx.fillText('SATOSHI ANNUAL LABOR INDEX', 84, 95);
+
+    // Big number — strip unit suffix for display
+    const bigNum = satsText.replace(' sats/year', '').replace(' BTC/year', '');
+    ctx.fillStyle = orange;
+    ctx.font = `700 72px ${font}`;
+    ctx.fillText(bigNum, 84, 195);
+
+    // Unit
+    ctx.fillStyle = gray;
+    ctx.font = `400 26px ${font}`;
+    ctx.fillText('sats / year', 84, 235);
+
+    // Divider
+    ctx.strokeStyle = '#e5e5e5';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(60, 272);
+    ctx.lineTo(W - 60, 272);
+    ctx.stroke();
+
+    // Stats row
+    const statsY = 330;
+    const colW = 280;
+
+    const drawStat = (label, value, x, color) => {
+      ctx.fillStyle = gray;
+      ctx.font = `500 13px ${font}`;
+      ctx.textAlign = 'left';
+      ctx.fillText(label, x, statsY);
+      ctx.fillStyle = color || black;
+      ctx.font = `700 26px ${font}`;
+      ctx.fillText(value, x, statsY + 34);
+    };
+
+    drawStat('SALARY', formatCurrency(salary, currency), 60);
+    drawStat('BTC PRICE', btcPriceText, 60 + colW);
+
+    if (histEl && histYearEl && histEl.textContent && histEl.textContent !== '—') {
+      const hVal = histEl.textContent;
+      const hColor = hVal.startsWith('-') ? '#dc2626' : '#16a34a';
+      drawStat(`SINCE ${histYearEl.textContent}`, hVal, 60 + colW * 2, hColor);
+    }
+
+    if (projEl && projEl.textContent && projEl.textContent !== '—') {
+      const pVal = projEl.textContent;
+      const pColor = pVal.startsWith('-') ? '#dc2626' : '#16a34a';
+      drawStat('PROJECTED', pVal, 60 + colW * 3, pColor);
+    }
+
+    drawStat('YEAR', String(CURRENT_YEAR), 60 + colW * 4 > W - 120 ? 60 + colW * 3 : 60 + colW * 4);
+
+    // Orange accent bar below stats
+    ctx.fillStyle = 'rgba(247, 147, 26, 0.08)';
+    ctx.fillRect(0, H - 88, W, 88);
+
+    ctx.fillStyle = orange;
+    ctx.font = `600 18px ${font}`;
+    ctx.textAlign = 'left';
+    ctx.fillText('ANGARLO.COM/SALI', 60, H - 52);
+
+    ctx.fillStyle = gray;
+    ctx.font = `400 13px ${font}`;
+    ctx.textAlign = 'right';
+    ctx.fillText('For informational purposes only. Not financial advice.', W - 60, H - 52);
+
+    // Download
+    canvas.toBlob(blob => {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `sali-${CURRENT_YEAR}.png`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }, 'image/png');
+
+    // Clipboard: copy shareable URL + summary text
+    const shareUrl = window.location.href;
+    const textSummary = `My SALI (${CURRENT_YEAR}): ${satsText} | Salary: ${formatCurrency(salary, currency)} | BTC: ${btcPriceText}\n${shareUrl}`;
+    navigator.clipboard.writeText(textSummary).catch(() => {});
+
+    // Update button label briefly to confirm copy
+    if (elements.shareSaliBtn) {
+      const original = elements.shareSaliBtn.textContent;
+      elements.shareSaliBtn.textContent = '✓ Link & Card Copied';
+      setTimeout(() => { elements.shareSaliBtn.textContent = original; }, 2500);
+    }
   }
 
   /**
@@ -258,12 +490,34 @@
         throw new Error(`HTTP ${response.status}`);
       }
 
-      annualAverages = await response.json();
+      const raw = await response.json();
+      // Strip metadata keys (e.g. "_source") — keep only integer year keys
+      annualAverages = Object.fromEntries(
+        Object.entries(raw).filter(([k]) => /^\d{4}$/.test(k))
+      );
       return annualAverages;
     } catch (error) {
       console.error('Failed to load annual averages:', error);
       setStatus('Unable to load annual average data.', 'error');
       return null;
+    }
+  }
+
+  /**
+   * Load benchmark comparison JSON data (S&P 500, Gold, CPI)
+   */
+  async function loadBenchmarkJsonData() {
+    try {
+      const [sp500Resp, goldResp, cpiResp] = await Promise.all([
+        fetch('/data/sp500_annual.json'),
+        fetch('/data/gold_annual_avg_usd.json'),
+        fetch('/data/cpi_annual.json')
+      ]);
+      if (sp500Resp.ok) sp500JsonData = await sp500Resp.json();
+      if (goldResp.ok)  goldJsonData  = await goldResp.json();
+      if (cpiResp.ok)   cpiJsonData   = await cpiResp.json();
+    } catch (error) {
+      console.error('Failed to load benchmark JSON data:', error);
     }
   }
 
@@ -316,6 +570,15 @@
   }
 
   /**
+   * Show/hide FX warning when a non-USD currency is selected
+   */
+  function updateFxWarning() {
+    if (!elements.fxWarning) return;
+    const isNonUsd = elements.currencySelect.value !== 'USD';
+    elements.fxWarning.classList.toggle('fx-warning--hidden', !isNonUsd);
+  }
+
+  /**
    * Update BTC price display
    */
   function updateBtcPriceDisplay() {
@@ -343,7 +606,8 @@
       if (annualAverages) {
         const recentYear = getMostRecentAverageYear();
         if (recentYear) {
-          displayText = `${recentYear} Avg: ${formatUsdCurrency(annualAverages[recentYear])}`;
+          const isStale = recentYear < CURRENT_YEAR;
+          displayText = `${recentYear} Avg: ${formatUsdCurrency(annualAverages[recentYear])}${isStale ? ' — most recent full year' : ''}`;
         }
       } else {
         displayText = 'Loading annual data...';
@@ -403,80 +667,211 @@
   }
 
   /**
-   * Render projection table
+   * Render projection table (with optional salary/BTC decomposition columns)
    */
   function renderTable(projections, currency) {
     if (!elements.projectionTableBody) return;
 
-    elements.projectionTableBody.innerHTML = projections.map(p => {
-      const rowClass = p.isCurrentYear ? 'current-year-row' : (p.isHistorical ? '' : 'projected-row');
+    // Update main SALI/Salary headers (4th and 2nd columns)
+    const headerRow = document.querySelector('#mainProjectionTable thead tr');
+    if (headerRow) {
+      if (headerRow.cells[3]) headerRow.cells[3].textContent = displayUnit === 'btc' ? 'SALI (BTC)' : 'SALI (sats)';
+      if (headerRow.cells[1]) headerRow.cells[1].textContent = salaryGrowthMode === 'real' ? 'Salary (Real)' : 'Salary';
+    }
+
+    // Show/hide breakdown columns in thead
+    const breakdownThs = document.querySelectorAll('#mainProjectionTable thead .breakdown-col');
+    breakdownThs.forEach(th => { th.style.display = showBreakdown ? '' : 'none'; });
+
+    const firstFutureIdx = projections.findIndex(p => !p.isHistorical && p.year > CURRENT_YEAR);
+
+    elements.projectionTableBody.innerHTML = projections.map((p, idx) => {
+      let rowClass = p.isCurrentYear ? 'current-year-row' : (p.isHistorical ? '' : 'projected-row');
+      if (idx === firstFutureIdx) rowClass += ' first-projected-row';
       const yearLabel = p.isCurrentYear ? `${p.year} (Now)` : p.year;
       const saliDisplay = displayUnit === 'btc' ? formatBtc(p.btcEquivalent) : formatSats(p.sats);
+      const dispStyle = showBreakdown ? '' : 'style="display:none"';
+
+      let salaryEffectCell = `<td class="breakdown-col" ${dispStyle}>—</td>`;
+      let btcEffectCell = `<td class="breakdown-col" ${dispStyle}>—</td>`;
+
+      if (idx > 0) {
+        const prev = projections[idx - 1];
+        const salaryEffect = (p.salary / prev.salary - 1) * 100;
+        const btcEffect = -(p.btcPrice / prev.btcPrice - 1) * 100;
+        const seCls = salaryEffect >= 0 ? 'score--gaining' : 'score--losing';
+        const beCls = btcEffect >= 0 ? 'score--gaining' : 'score--losing';
+        salaryEffectCell = `<td class="breakdown-col ${seCls}" ${dispStyle}>${formatPercent(salaryEffect)}</td>`;
+        btcEffectCell = `<td class="breakdown-col ${beCls}" ${dispStyle}>${formatPercent(btcEffect)}</td>`;
+      }
 
       return `
-        <tr class="${rowClass}">
+        <tr class="${rowClass.trim()}">
           <td>${yearLabel}</td>
           <td>${formatCurrency(p.salary, currency)}</td>
           <td>${formatUsdCurrency(p.btcPrice)}${p.isHistorical ? '' : '*'}</td>
           <td>${saliDisplay}</td>
+          ${salaryEffectCell}
+          ${btcEffectCell}
         </tr>
       `;
     }).join('');
   }
 
   /**
-   * Render chart with actual years
+   * Read URL query params and apply to inputs (called after selects are populated)
+   */
+  function parseUrlParams() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('salary'))      elements.salaryInput.value        = params.get('salary');
+    if (params.has('currency'))    elements.currencySelect.value     = params.get('currency');
+    if (params.has('salaryGrowth'))elements.salaryGrowthInput.value  = params.get('salaryGrowth');
+    if (params.has('startYear'))   elements.startYearSelect.value    = params.get('startYear');
+    if (params.has('forecast'))    elements.yearsSelect.value        = params.get('forecast');
+    if (params.has('btcMethod'))   elements.btcPriceMethodSelect.value = params.get('btcMethod');
+    if (params.has('btcPrice'))    elements.btcPriceManualInput.value = params.get('btcPrice');
+    if (params.has('btcGrowth'))   elements.btcGrowthInput.value     = params.get('btcGrowth');
+  }
+
+  /**
+   * Write current calculator state to URL query params
+   */
+  function updateUrlParams() {
+    const params = new URLSearchParams();
+    if (elements.salaryInput.value) params.set('salary', elements.salaryInput.value);
+    const currency = elements.currencySelect.value;
+    if (currency !== 'USD') params.set('currency', currency);
+    const salaryGrowth = elements.salaryGrowthInput.value;
+    if (salaryGrowth && salaryGrowth !== String(DEFAULT_SALARY_GROWTH)) params.set('salaryGrowth', salaryGrowth);
+    params.set('startYear', elements.startYearSelect.value);
+    params.set('forecast', elements.yearsSelect.value);
+    const btcMethod = elements.btcPriceMethodSelect.value;
+    if (btcMethod !== 'spot') params.set('btcMethod', btcMethod);
+    if (btcMethod === 'manual' && elements.btcPriceManualInput.value) {
+      params.set('btcPrice', elements.btcPriceManualInput.value);
+    }
+    const btcGrowth = elements.btcGrowthInput.value;
+    if (btcGrowth && btcGrowth !== String(DEFAULT_BTC_GROWTH)) params.set('btcGrowth', btcGrowth);
+    const qs = params.toString();
+    window.history.replaceState({}, '', qs ? `${window.location.pathname}?${qs}` : window.location.pathname);
+  }
+
+  /**
+   * Render chart — Bitcoin (default) or benchmark comparison
    */
   function renderChart(projections) {
     if (!elements.saliChart) return;
 
     const ctx = elements.saliChart.getContext('2d');
-    const labels = projections.map(p => p.year.toString());
 
-    // Data depends on display unit
-    const data = displayUnit === 'btc'
-      ? projections.map(p => p.btcEquivalent)
-      : projections.map(p => Math.round(p.sats));
+    // Build dataset based on active benchmark
+    let chartProjections, chartData, yAxisLabel, datasetLabel, tooltipValueFn, yTickFn;
 
-    // Find index of current year for annotation
-    const currentYearIndex = projections.findIndex(p => p.isCurrentYear);
-
-    // Destroy existing chart
-    if (chartInstance) {
-      chartInstance.destroy();
+    if (activeBenchmark !== 'btc') {
+      const bConfig = BENCHMARK_DATA[activeBenchmark];
+      const growthRate = benchmarkGrowthOverride !== null ? benchmarkGrowthOverride : bConfig.defaultGrowth;
+      chartProjections = generateBenchmarkSeries(projections, activeBenchmark, growthRate);
+      chartData = chartProjections.map(p => p.benchValue);
+      yAxisLabel = bConfig.unit;
+      datasetLabel = `${bConfig.name} — salary in ${bConfig.unitShort}`;
+      tooltipValueFn = p => `${bConfig.name}: ${bConfig.format(p.benchValue)}`;
+      yTickFn = value => {
+        if (value >= 1e6) return (value / 1e6).toFixed(1) + 'M';
+        if (value >= 1e3) return (value / 1e3).toFixed(1) + 'K';
+        return value.toFixed(2);
+      };
+    } else {
+      chartProjections = projections;
+      chartData = displayUnit === 'btc'
+        ? projections.map(p => p.btcEquivalent)
+        : projections.map(p => Math.round(p.sats));
+      yAxisLabel = displayUnit === 'btc' ? 'BTC per Year' : 'Sats per Year';
+      datasetLabel = displayUnit === 'btc'
+        ? `SALI (BTC/year${salaryGrowthMode === 'real' ? ' · real' : ''})`
+        : `SALI (sats/year${salaryGrowthMode === 'real' ? ' · real' : ''})`;
+      tooltipValueFn = p => displayUnit === 'btc'
+        ? `SALI: ${formatBtc(p.btcEquivalent)}/year`
+        : `SALI: ${formatSats(p.sats)} sats/year`;
+      yTickFn = value => {
+        if (displayUnit === 'btc') return value.toFixed(4);
+        if (value >= 1e9) return (value / 1e9).toFixed(1).replace(/\.0$/, '') + 'B';
+        if (value >= 1e6) return (value / 1e6).toFixed(1).replace(/\.0$/, '') + 'M';
+        if (value >= 1e3) return (value / 1e3).toFixed(0) + 'K';
+        return formatSats(value);
+      };
     }
 
-    // Dark theme colors
-    const cyanColor = '#00d4aa';
-    const cyanDim = 'rgba(0, 212, 170, 0.15)';
-    const textMuted = '#6a6a7a';
-    const textSecondary = '#9898a8';
-    const bgCard = '#1a1a24';
+    // Update chart title
+    const titleEl = document.getElementById('chartTitle');
+    if (titleEl) {
+      titleEl.textContent = activeBenchmark === 'btc'
+        ? 'SALI Over Time'
+        : `Salary vs ${BENCHMARK_DATA[activeBenchmark].name} Over Time`;
+    }
 
-    chartInstance = new Chart(ctx, {
+    const labels = chartProjections.map(p => p.year.toString());
+    const currentYearIndex = chartProjections.findIndex(p => p.isCurrentYear);
+
+    const isRerender = !!chartInstance;
+    if (chartInstance) chartInstance.destroy();
+
+    // Get fresh context after destroy to avoid any stale state
+    const freshCtx = elements.saliChart.getContext('2d');
+
+    const accentColor = '#F7931A';
+    const accentDim = 'rgba(247, 147, 26, 0.12)';
+    const textMuted = '#999999';
+    const textSecondary = '#555555';
+    const bgCard = '#ffffff';
+
+    const todayLinePlugin = {
+      id: 'todayLine',
+      afterDraw(chart) {
+        if (currentYearIndex < 0) return;
+        const { ctx: c, chartArea, scales } = chart;
+        const label = labels[currentYearIndex];
+        const x = scales.x.getPixelForValue(label);
+        c.save();
+        c.beginPath();
+        c.setLineDash([4, 3]);
+        c.moveTo(x, chartArea.top);
+        c.lineTo(x, chartArea.bottom);
+        c.strokeStyle = 'rgba(247, 147, 26, 0.55)';
+        c.lineWidth = 1.5;
+        c.stroke();
+        c.setLineDash([]);
+        c.fillStyle = '#F7931A';
+        c.font = '10px "Roboto Mono", monospace';
+        c.textAlign = 'center';
+        c.fillText('Today', x, chartArea.top + 12);
+        c.restore();
+      }
+    };
+
+    chartInstance = new Chart(freshCtx, {
       type: 'line',
       data: {
         labels,
         datasets: [{
-          label: displayUnit === 'btc' ? 'SALI (BTC/year)' : 'SALI (sats/year)',
-          data,
-          borderColor: cyanColor,
-          backgroundColor: cyanDim,
+          label: datasetLabel,
+          data: chartData,
+          borderColor: accentColor,
+          backgroundColor: accentDim,
           borderWidth: 2,
           fill: true,
           tension: 0.3,
-          pointBackgroundColor: projections.map(p =>
-            p.isCurrentYear ? '#e8e8ed' : (p.isHistorical ? cyanColor : 'rgba(0, 212, 170, 0.5)')
+          pointBackgroundColor: chartProjections.map(p =>
+            p.isCurrentYear ? '#111111' : (p.isHistorical ? accentColor : 'rgba(247, 147, 26, 0.45)')
           ),
-          pointBorderColor: projections.map(p =>
-            p.isCurrentYear ? '#e8e8ed' : (p.isHistorical ? cyanColor : 'rgba(0, 212, 170, 0.5)')
+          pointBorderColor: chartProjections.map(p =>
+            p.isCurrentYear ? '#111111' : (p.isHistorical ? accentColor : 'rgba(247, 147, 26, 0.45)')
           ),
-          pointRadius: projections.map(p => p.isCurrentYear ? 6 : 4),
+          pointRadius: chartProjections.map(p => p.isCurrentYear ? 6 : 4),
           pointHoverRadius: 8,
           segment: {
             borderDash: ctx => {
               const idx = ctx.p0DataIndex;
-              return projections[idx] && !projections[idx].isHistorical && idx >= currentYearIndex ? [5, 5] : undefined;
+              return chartProjections[idx] && !chartProjections[idx].isHistorical && idx >= currentYearIndex ? [5, 5] : undefined;
             }
           }
         }]
@@ -484,22 +879,212 @@
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        interaction: {
-          intersect: false,
-          mode: 'index'
-        },
+        layout: { padding: { top: 20 } },
+        interaction: { intersect: false, mode: 'index' },
         plugins: {
-          legend: {
-            display: false
-          },
+          legend: { display: false },
           tooltip: {
             backgroundColor: bgCard,
-            borderColor: '#2a2a3a',
+            borderColor: '#e5e5e5',
             borderWidth: 1,
-            titleColor: '#e8e8ed',
+            titleColor: '#111111',
             bodyColor: textSecondary,
             padding: 12,
             displayColors: false,
+            callbacks: {
+              title: function(context) {
+                const idx = context[0].dataIndex;
+                const p = chartProjections[idx];
+                let title = p.year.toString();
+                if (p.isCurrentYear) title += ' (Current)';
+                else if (!p.isHistorical) title += ' (Projected)';
+                return title;
+              },
+              label: function(context) {
+                return tooltipValueFn(chartProjections[context.dataIndex]);
+              },
+              afterLabel: function(context) {
+                const p = chartProjections[context.dataIndex];
+                if (activeBenchmark === 'btc') return `BTC Price: ${formatUsdCurrency(p.btcPrice)}`;
+                const bConfig = BENCHMARK_DATA[activeBenchmark];
+                return `${bConfig.name} price: ${formatUsdCurrency(p.benchPrice)}`;
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            title: { display: true, text: 'Year', color: textMuted },
+            ticks: { color: textMuted },
+            grid: { color: 'rgba(0, 0, 0, 0.06)' }
+          },
+          y: {
+            beginAtZero: false,
+            title: { display: true, text: yAxisLabel, color: textMuted },
+            ticks: { color: textMuted, callback: yTickFn },
+            grid: { color: 'rgba(0, 0, 0, 0.06)' }
+          }
+        }
+      },
+      plugins: [todayLinePlugin]
+    });
+
+    // On first load, Chart.js may cache a stale container width; force-resize
+    // after one frame. On rerenders the container is already sized correctly.
+    if (!isRerender) {
+      const parent = elements.saliChart.parentNode;
+      requestAnimationFrame(() => {
+        if (chartInstance) chartInstance.resize(parent.clientWidth, parent.clientHeight);
+      });
+    }
+  }
+
+  /**
+   * Render normalized multi-benchmark comparison chart
+   * All four benchmarks normalized to 100 at start year so they can be compared directly.
+   */
+  function renderNormalizedChart(projections) {
+    const canvas = document.getElementById('normalizedChart');
+    if (!canvas || !projections.length) return;
+
+    // Build series for each benchmark using existing generateBenchmarkSeries
+    const spxSeries  = generateBenchmarkSeries(projections, 'spx',  null);
+    const goldSeries = generateBenchmarkSeries(projections, 'gold', null);
+    const cpiSeries  = generateBenchmarkSeries(projections, 'cpi',  null);
+
+    // First-year anchor values for normalization
+    const btcStart  = projections[0].btcEquivalent;
+    const spxStart  = spxSeries[0].benchValue;
+    const goldStart = goldSeries[0].benchValue;
+    const cpiStart  = cpiSeries[0].benchValue;
+
+    if (!btcStart || !spxStart || !goldStart || !cpiStart) return;
+
+    const labels = projections.map(p => p.year.toString());
+    const currentYearIndex = projections.findIndex(p => p.isCurrentYear);
+
+    // Normalize: value[year] / value[startYear] × 100
+    const btcData  = projections.map(p => (p.btcEquivalent / btcStart) * 100);
+    const spxData  = spxSeries.map(p  => (p.benchValue / spxStart)  * 100);
+    const goldData = goldSeries.map(p => (p.benchValue / goldStart) * 100);
+    const cpiData  = cpiSeries.map(p  => (p.benchValue / cpiStart)  * 100);
+
+    // Helper: dashed segment for projected years
+    function makeSegmentFn(series) {
+      return {
+        borderDash: ctx => {
+          const i = ctx.p0DataIndex;
+          return series[i] && !series[i].isHistorical && i >= currentYearIndex ? [5, 5] : undefined;
+        }
+      };
+    }
+
+    const todayPlugin = {
+      id: 'normTodayLine',
+      afterDraw(chart) {
+        if (currentYearIndex < 0) return;
+        const { ctx: c, chartArea, scales } = chart;
+        const x = scales.x.getPixelForValue(labels[currentYearIndex]);
+        c.save();
+        c.beginPath();
+        c.setLineDash([4, 3]);
+        c.moveTo(x, chartArea.top);
+        c.lineTo(x, chartArea.bottom);
+        c.strokeStyle = 'rgba(100, 100, 100, 0.35)';
+        c.lineWidth = 1.5;
+        c.stroke();
+        c.setLineDash([]);
+        c.fillStyle = '#888888';
+        c.font = '10px "Roboto Mono", monospace';
+        c.textAlign = 'center';
+        c.fillText('Today', x, chartArea.top + 12);
+        c.restore();
+      }
+    };
+
+    if (normalizedChartInstance) normalizedChartInstance.destroy();
+    const freshCtx = canvas.getContext('2d');
+
+    normalizedChartInstance = new Chart(freshCtx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: 'Bitcoin',
+            data: btcData,
+            borderColor: '#F7931A',
+            backgroundColor: 'transparent',
+            borderWidth: 2.5,
+            fill: false,
+            tension: 0.3,
+            pointRadius: projections.map(p => p.isCurrentYear ? 5 : 3),
+            pointHoverRadius: 7,
+            segment: makeSegmentFn(projections)
+          },
+          {
+            label: 'S&P 500',
+            data: spxData,
+            borderColor: '#4A90D9',
+            backgroundColor: 'transparent',
+            borderWidth: 2,
+            fill: false,
+            tension: 0.3,
+            pointRadius: spxSeries.map(p => p.isCurrentYear ? 5 : 3),
+            pointHoverRadius: 7,
+            segment: makeSegmentFn(spxSeries)
+          },
+          {
+            label: 'Gold',
+            data: goldData,
+            borderColor: '#C9A84C',
+            backgroundColor: 'transparent',
+            borderWidth: 2,
+            fill: false,
+            tension: 0.3,
+            pointRadius: goldSeries.map(p => p.isCurrentYear ? 5 : 3),
+            pointHoverRadius: 7,
+            segment: makeSegmentFn(goldSeries)
+          },
+          {
+            label: 'Real (CPI)',
+            data: cpiData,
+            borderColor: '#6B9E6B',
+            backgroundColor: 'transparent',
+            borderWidth: 2,
+            fill: false,
+            tension: 0.3,
+            pointRadius: cpiSeries.map(p => p.isCurrentYear ? 5 : 3),
+            pointHoverRadius: 7,
+            segment: makeSegmentFn(cpiSeries)
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        layout: { padding: { top: 20 } },
+        interaction: { intersect: false, mode: 'index' },
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top',
+            labels: {
+              color: '#555555',
+              usePointStyle: true,
+              pointStyleWidth: 14,
+              boxHeight: 8,
+              font: { family: '"Roboto Mono", monospace', size: 12 }
+            }
+          },
+          tooltip: {
+            backgroundColor: '#ffffff',
+            borderColor: '#e5e5e5',
+            borderWidth: 1,
+            titleColor: '#111111',
+            bodyColor: '#555555',
+            padding: 12,
+            displayColors: true,
             callbacks: {
               title: function(context) {
                 const idx = context[0].dataIndex;
@@ -510,58 +1095,222 @@
                 return title;
               },
               label: function(context) {
-                const idx = context.dataIndex;
-                const p = projections[idx];
-                if (displayUnit === 'btc') {
-                  return `SALI: ${formatBtc(p.btcEquivalent)}/year`;
-                }
-                return `SALI: ${formatSats(p.sats)} sats/year`;
-              },
-              afterLabel: function(context) {
-                const idx = context.dataIndex;
-                const p = projections[idx];
-                return `BTC Price: ${formatUsdCurrency(p.btcPrice)}`;
+                const val = context.parsed.y;
+                const diff = val - 100;
+                const sign = diff >= 0 ? '+' : '';
+                return `${context.dataset.label}: ${val.toFixed(1)}  (${sign}${diff.toFixed(1)}%)`;
               }
             }
           }
         },
         scales: {
           x: {
-            title: {
-              display: true,
-              text: 'Year',
-              color: textMuted
-            },
-            ticks: {
-              color: textMuted
-            },
-            grid: {
-              color: 'rgba(42, 42, 58, 0.5)'
-            }
+            title: { display: true, text: 'Year', color: '#999999' },
+            ticks: { color: '#999999' },
+            grid: { color: 'rgba(0, 0, 0, 0.06)' }
           },
           y: {
             beginAtZero: false,
-            title: {
-              display: true,
-              text: displayUnit === 'btc' ? 'BTC per Year' : 'Sats per Year',
-              color: textMuted
-            },
+            title: { display: true, text: 'Index (Start Year = 100)', color: '#999999' },
             ticks: {
-              color: textMuted,
-              callback: function(value) {
-                if (displayUnit === 'btc') {
-                  return value.toFixed(4);
-                }
-                return formatSats(value);
-              }
+              color: '#999999',
+              callback: v => v.toFixed(0)
             },
-            grid: {
-              color: 'rgba(42, 42, 58, 0.5)'
-            }
+            grid: { color: 'rgba(0, 0, 0, 0.06)' }
           }
         }
-      }
+      },
+      plugins: [todayPlugin]
     });
+  }
+
+  /**
+   * SALI Tier — compares user's sats to US income benchmarks at current BTC price
+   */
+  function updateSaliTier(userSats, btcPrice) {
+    const wrap = elements.saliTierWrap;
+    const badge = elements.saliTier;
+    if (!wrap || !badge || !btcPrice) return;
+
+    const saliFor = salary => (salary / btcPrice) * SATS_PER_BTC;
+    const minWage   = saliFor(15080);
+    const median    = saliFor(59000);
+    const top25     = saliFor(100000);
+    const top10     = saliFor(150000);
+
+    let tier, dot;
+    if (userSats >= top10)       { tier = 'Top 10%';      dot = '🔵'; }
+    else if (userSats >= top25)  { tier = 'Top 25%';      dot = '🟡'; }
+    else if (userSats >= median * 0.9 && userSats <= median * 1.1)
+                                 { tier = 'Median';        dot = '⚪'; }
+    else if (userSats > median)  { tier = 'Above Median'; dot = '🟠'; }
+    else                         { tier = 'Below Median'; dot = '🟤'; }
+
+    badge.textContent = `${dot} ${tier}`;
+    wrap.style.display = 'block';
+  }
+
+  /**
+   * Purchasing Power Narrative — plain-English interpretation of historical SALI change
+   */
+  function updatePurchasingPowerNarrative(projections, currency) {
+    const el = elements.ppNarrative;
+    if (!el) return;
+
+    const first = projections[0];
+    const current = projections.find(p => p.isCurrentYear);
+    if (!first || !current || first === current) { el.style.display = 'none'; return; }
+
+    const pctChange = ((current.sats - first.sats) / first.sats) * 100;
+    const absPct = Math.abs(pctChange).toFixed(1);
+    const direction = pctChange >= 0 ? 'gained' : 'lost';
+    const dirWord   = pctChange >= 0 ? 'more'   : 'less';
+
+    const firstBtc = first.btcEquivalent.toFixed(4);
+    const currBtc  = current.btcEquivalent.toFixed(4);
+
+    // Plain-English one-liner
+    let interpretation;
+    if (Math.abs(pctChange) < 5) {
+      interpretation = 'Your salary is roughly keeping pace with Bitcoin appreciation at these assumptions.';
+    } else if (pctChange < 0) {
+      interpretation = `Your salary is buying ${absPct}% less Bitcoin than it did in ${first.year} — Bitcoin has appreciated faster than wages.`;
+    } else {
+      interpretation = `Your salary is buying ${absPct}% more Bitcoin than it did in ${first.year} — your earnings have outpaced Bitcoin's price.`;
+    }
+
+    el.innerHTML =
+      `<div class="pp-narrative__headline">Purchasing Power Change since ${first.year}</div>` +
+      `In ${first.year}, your ${formatCurrency(first.salary, currency)} salary could acquire <strong>${firstBtc} BTC/year</strong>. ` +
+      `Today it acquires <strong>${currBtc} BTC/year</strong> — ` +
+      `<strong>${direction} ${absPct}%</strong> in Bitcoin terms. ` +
+      interpretation;
+    el.style.display = 'block';
+  }
+
+  /**
+   * Show real vs nominal salary growth callout
+   */
+  function updateInflationNote(nominalGrowth, inflationRate) {
+    if (!elements.realGrowthNote) return;
+    if (salaryGrowthMode !== 'real') {
+      elements.realGrowthNote.style.display = 'none';
+      return;
+    }
+    const realGrowth = ((1 + nominalGrowth / 100) / (1 + inflationRate / 100) - 1) * 100;
+    elements.realGrowthNote.textContent =
+      `Nominal ${nominalGrowth.toFixed(1)}% → real ${realGrowth.toFixed(2)}% after ${inflationRate.toFixed(1)}% inflation`;
+    elements.realGrowthNote.style.display = 'block';
+  }
+
+  /**
+   * Update break-even calculator
+   */
+  function updateBreakEven(salary, currency, nominalSalaryGrowth, btcGrowth) {
+    if (!elements.breakevenRateOutput) return;
+    const breakevenRate = btcGrowth;
+    elements.breakevenRateOutput.textContent = '+' + breakevenRate.toFixed(1) + '%/yr';
+
+    const yearsAhead = 5;
+    const salaryBreakEven5 = salary * Math.pow(1 + breakevenRate / 100, yearsAhead);
+    const salaryProjected5 = salary * Math.pow(1 + nominalSalaryGrowth / 100, yearsAhead);
+
+    if (elements.breakevenSalary5) elements.breakevenSalary5.textContent = formatCurrency(salaryBreakEven5, currency);
+    if (elements.projectedSalary5) elements.projectedSalary5.textContent = formatCurrency(salaryProjected5, currency);
+
+    const gap = nominalSalaryGrowth - breakevenRate;
+    if (elements.breakevenGap) {
+      if (Math.abs(gap) < 0.01) {
+        elements.breakevenGap.style.display = 'none';
+      } else {
+        const gapStr = Math.abs(gap).toFixed(1);
+        const diff5 = Math.abs(salaryBreakEven5 - salaryProjected5);
+        if (gap < 0) {
+          elements.breakevenGap.textContent =
+            `To accumulate Bitcoin at the same rate it's appreciating, your salary needs to grow ${gapStr}%/yr faster than it currently is. Over 5 years, that's a ${formatCurrency(diff5, currency)} gap.`;
+          elements.breakevenGap.className = 'breakeven-gap breakeven-gap--behind';
+        } else {
+          elements.breakevenGap.textContent =
+            `Your salary is growing ${gapStr}%/yr faster than BTC — your SALI is increasing at these assumptions.`;
+          elements.breakevenGap.className = 'breakeven-gap breakeven-gap--ahead';
+        }
+        elements.breakevenGap.style.display = 'block';
+      }
+    }
+  }
+
+  /**
+   * Compute and render actual historical SALI from a starting salary
+   */
+  function computeHistorical(baseBtcPrice, currency) {
+    if (!elements.histStartYear || !elements.histStartSalary) return;
+    const startYear = parseInt(elements.histStartYear.value);
+    const startSalaryRaw = parseFloat(elements.histStartSalary.value);
+
+    if (!startSalaryRaw || isNaN(startSalaryRaw) || startSalaryRaw <= 0) {
+      if (elements.historyResults) elements.historyResults.style.display = 'none';
+      return;
+    }
+
+    const nominalGrowth = parseFloat(elements.salaryGrowthInput.value) || 0;
+    const startSalaryUsd = convertToUsd(startSalaryRaw, currency);
+    const historyData = [];
+
+    for (let year = startYear; year <= CURRENT_YEAR; year++) {
+      let btcPrice;
+      if (annualAverages && annualAverages[year]) {
+        btcPrice = annualAverages[year];
+      } else if (year === CURRENT_YEAR) {
+        btcPrice = baseBtcPrice;
+      } else {
+        continue;
+      }
+      const yearsFromStart = year - startYear;
+      const salaryUsdYear = startSalaryUsd * Math.pow(1 + nominalGrowth / 100, yearsFromStart);
+      const salaryDisplay = startSalaryRaw * Math.pow(1 + nominalGrowth / 100, yearsFromStart);
+      const { sats, btcEquivalent } = calculateSali(salaryUsdYear, btcPrice);
+      const isSpotYear = year === CURRENT_YEAR && !(annualAverages && annualAverages[year]);
+      historyData.push({ year, salary: salaryDisplay, btcPrice, sats, btcEquivalent, isSpotYear });
+    }
+
+    if (historyData.length < 1) {
+      if (elements.historyResults) elements.historyResults.style.display = 'none';
+      return;
+    }
+
+    const first = historyData[0];
+    const last = historyData[historyData.length - 1];
+    const totalChange = ((last.sats - first.sats) / first.sats) * 100;
+    const direction = totalChange >= 0 ? 'gained' : 'lost';
+    const absPct = Math.abs(totalChange).toFixed(1);
+
+    if (elements.historySummary) {
+      elements.historySummary.innerHTML =
+        `From ${first.year} (<strong>${formatCurrency(startSalaryRaw, currency)}</strong>) to ${last.year}, ` +
+        `your BTC purchasing power <strong>${direction} ${absPct}%</strong>. ` +
+        `SALI: <strong>${formatSats(first.sats)}</strong> → <strong>${formatSats(last.sats)} sats/yr</strong>.`;
+    }
+
+    if (elements.historyTableBody) {
+      elements.historyTableBody.innerHTML = historyData.map((row, idx) => {
+        const prev = idx > 0 ? historyData[idx - 1] : null;
+        const yoyChange = prev ? ((row.sats - prev.sats) / prev.sats * 100) : null;
+        const yoyText = yoyChange !== null ? formatPercent(yoyChange) : '—';
+        const yoyClass = yoyChange !== null ? (yoyChange >= 0 ? 'score--gaining' : 'score--losing') : '';
+        const isLast = idx === historyData.length - 1;
+        return `
+          <tr class="${isLast ? 'current-year-row' : ''}">
+            <td>${row.year}${isLast ? ' (Now)' : ''}</td>
+            <td>${formatCurrency(row.salary, currency)}</td>
+            <td>${formatUsdCurrency(row.btcPrice)}${row.isSpotYear ? '*' : ''}</td>
+            <td>${formatSats(row.sats)}</td>
+            <td class="${yoyClass}">${yoyText}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    if (elements.historyResults) elements.historyResults.style.display = 'block';
   }
 
   /**
@@ -573,6 +1322,163 @@
   }
 
   /**
+   * Build normalized benchmark comparison chart on #benchmarkChart
+   * Normalizes Bitcoin, S&P 500, Gold, and CPI to 100 at startYear.
+   */
+  function buildBenchmarkChart(startYear) {
+    const canvas = document.getElementById('benchmarkChart');
+    const section = document.getElementById('benchmarkSection');
+    if (!canvas || !section) return;
+    if (!annualAverages || !sp500JsonData || !goldJsonData || !cpiJsonData) return;
+
+    // Collect years with data in all 4 sources, from startYear through 2024
+    const years = [];
+    for (let y = startYear; y <= 2024; y++) {
+      if (
+        annualAverages[y] !== undefined &&
+        sp500JsonData[y]  !== undefined &&
+        goldJsonData[y]   !== undefined &&
+        cpiJsonData[y]    !== undefined
+      ) {
+        years.push(y);
+      }
+    }
+    if (years.length < 2) return;
+
+    const base = years[0];
+    const btcBase  = annualAverages[base];
+    const sp500Base = sp500JsonData[base];
+    const goldBase  = goldJsonData[base];
+    const cpiBase   = cpiJsonData[base];
+    if (!btcBase || !sp500Base || !goldBase || !cpiBase) return;
+
+    const labels    = years.map(String);
+    const btcNorm   = years.map(y => (annualAverages[y] / btcBase)  * 100);
+    const sp500Norm = years.map(y => (sp500JsonData[y]  / sp500Base) * 100);
+    const goldNorm  = years.map(y => (goldJsonData[y]   / goldBase)  * 100);
+    const cpiNorm   = years.map(y => (cpiJsonData[y]    / cpiBase)   * 100);
+
+    if (benchmarkChartInstance) {
+      benchmarkChartInstance.destroy();
+      benchmarkChartInstance = null;
+    }
+
+    const freshCtx = canvas.getContext('2d');
+    benchmarkChartInstance = new Chart(freshCtx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: 'Bitcoin',
+            data: btcNorm,
+            borderColor: '#F7931A',
+            backgroundColor: 'transparent',
+            borderWidth: 2.5,
+            fill: false,
+            tension: 0.3,
+            pointRadius: 4,
+            pointHoverRadius: 7
+          },
+          {
+            label: 'S&P 500',
+            data: sp500Norm,
+            borderColor: '#4CAF50',
+            backgroundColor: 'transparent',
+            borderWidth: 2,
+            fill: false,
+            tension: 0.3,
+            pointRadius: 3,
+            pointHoverRadius: 7
+          },
+          {
+            label: 'Gold',
+            data: goldNorm,
+            borderColor: '#FFD700',
+            backgroundColor: 'transparent',
+            borderWidth: 2,
+            fill: false,
+            tension: 0.3,
+            pointRadius: 3,
+            pointHoverRadius: 7
+          },
+          {
+            label: 'CPI Inflation',
+            data: cpiNorm,
+            borderColor: '#9E9E9E',
+            backgroundColor: 'transparent',
+            borderWidth: 2,
+            fill: false,
+            tension: 0.3,
+            pointRadius: 3,
+            pointHoverRadius: 7
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        layout: { padding: { top: 20 } },
+        interaction: { intersect: false, mode: 'index' },
+        plugins: {
+          title: {
+            display: true,
+            text: `Normalized Growth Since ${startYear} (Base = 100)`,
+            color: '#111111',
+            font: { family: '"Roboto Mono", monospace', size: 13 }
+          },
+          legend: {
+            display: true,
+            position: 'top',
+            labels: {
+              color: '#555555',
+              usePointStyle: true,
+              pointStyleWidth: 14,
+              boxHeight: 8,
+              font: { family: '"Roboto Mono", monospace', size: 12 }
+            }
+          },
+          tooltip: {
+            backgroundColor: '#ffffff',
+            borderColor: '#e5e5e5',
+            borderWidth: 1,
+            titleColor: '#111111',
+            bodyColor: '#555555',
+            padding: 12,
+            displayColors: true,
+            callbacks: {
+              label: function(context) {
+                const val = context.parsed.y;
+                const diff = val - 100;
+                const sign = diff >= 0 ? '+' : '';
+                return `${context.dataset.label}: ${val.toFixed(1)}  (${sign}${diff.toFixed(1)}%)`;
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            title: { display: true, text: 'Year', color: '#999999' },
+            ticks: { color: '#999999' },
+            grid: { color: 'rgba(0, 0, 0, 0.06)' }
+          },
+          y: {
+            beginAtZero: false,
+            title: { display: true, text: 'Indexed Value (Start = 100)', color: '#999999' },
+            ticks: {
+              color: '#999999',
+              callback: v => v.toFixed(0)
+            },
+            grid: { color: 'rgba(0, 0, 0, 0.06)' }
+          }
+        }
+      }
+    });
+
+    section.style.display = 'block';
+  }
+
+  /**
    * Main compute function
    */
   function compute() {
@@ -580,8 +1486,18 @@
 
     try {
       // Validate inputs
-      const { salary, salaryGrowth, btcGrowth, startYear, forecastYears } = validateInputs();
+      const { salary, salaryGrowth: nominalSalaryGrowth, btcGrowth, startYear, forecastYears } = validateInputs();
       const currency = elements.currencySelect.value;
+
+      // Compute effective salary growth (nominal or real/inflation-adjusted)
+      const inflationRate = salaryGrowthMode === 'real'
+        ? (parseFloat(elements.inflationInput && elements.inflationInput.value) || 3)
+        : 0;
+      const effectiveSalaryGrowth = salaryGrowthMode === 'real'
+        ? ((1 + nominalSalaryGrowth / 100) / (1 + inflationRate / 100) - 1) * 100
+        : nominalSalaryGrowth;
+
+      updateInflationNote(nominalSalaryGrowth, inflationRate);
 
       // Convert salary to USD
       const salaryUsd = convertToUsd(salary, currency);
@@ -590,7 +1506,7 @@
       const baseBtcPrice = getBtcPrice();
 
       // Generate projections with actual years
-      const projections = generateProjections(salaryUsd, baseBtcPrice, salaryGrowth, btcGrowth, startYear, forecastYears);
+      const projections = generateProjections(salaryUsd, baseBtcPrice, effectiveSalaryGrowth, btcGrowth, startYear, forecastYears);
 
       // Find current year data for primary output
       const currentYearData = projections.find(p => p.isCurrentYear) || projections[projections.length - 1];
@@ -605,35 +1521,77 @@
         elements.btcOutputGroup.style.display = 'block';
       }
 
-      // Calculate and display trend score
+      // Calculate trend (used for historical change and projected description)
       const trendScore = calculateTrendScore(projections);
-      if (trendScore.score !== null) {
-        elements.saliScoreOutput.textContent = formatPercent(trendScore.score);
-        elements.saliScoreOutput.className = 'output-group__value output-group__value--score score--' + trendScore.trend;
-        elements.saliScoreDesc.textContent = trendScore.description;
-      } else {
-        elements.saliScoreOutput.textContent = '—';
-        elements.saliScoreOutput.className = 'output-group__value output-group__value--score';
-        elements.saliScoreDesc.textContent = '';
+
+      // Historical change (real data, not projection assumptions)
+      if (elements.historicalChangeGroup) {
+        if (trendScore.historicalChange !== undefined && startYear < CURRENT_YEAR) {
+          elements.historicalChangeYear.textContent = startYear;
+          elements.historicalChangeOutput.textContent = formatPercent(trendScore.historicalChange);
+          const hClass = trendScore.historicalChange >= 0 ? 'score--gaining' : 'score--losing';
+          elements.historicalChangeOutput.className = 'output-group__value output-group__value--secondary ' + hClass;
+          elements.historicalChangeGroup.style.display = 'block';
+        } else {
+          elements.historicalChangeGroup.style.display = 'none';
+        }
       }
 
-      // Update projected change output
-      const firstProjection = projections[0];
+      // Projected change — label reflects forecast horizon and salary mode
+      if (elements.projectedChangeLabel) {
+        const modeLabel = salaryGrowthMode === 'real' ? ' · real' : '';
+        elements.projectedChangeLabel.textContent = `Projected Change (${forecastYears}yr${modeLabel})`;
+      }
       const lastProjection = projections[projections.length - 1];
-      if (firstProjection && lastProjection && projections.length > 1) {
-        const totalChange = ((lastProjection.sats - firstProjection.sats) / firstProjection.sats) * 100;
-        elements.saliYoyOutput.textContent = formatPercent(totalChange);
+      const currentYearData2 = projections.find(p => p.isCurrentYear);
+      if (trendScore.score !== null && currentYearData2 && lastProjection && lastProjection.year > CURRENT_YEAR) {
+        elements.saliYoyOutput.textContent = formatPercent(trendScore.score);
+        elements.saliYoyOutput.className = 'output-group__value output-group__value--secondary score--' + trendScore.trend;
+        if (elements.projectedChangeDesc) {
+          elements.projectedChangeDesc.textContent = trendScore.description;
+        }
         elements.saliYoyOutput.parentElement.style.display = 'block';
       } else {
         elements.saliYoyOutput.parentElement.style.display = 'none';
       }
 
-      // Render table and chart
+      // FX warning
+      updateFxWarning();
+
+      // Update URL to reflect current state
+      updateUrlParams();
+
+      // Purchasing power equivalents
+      updateEquivalents(currentYearData.sats, currentYearData.btcEquivalent);
+
+      // Show share button once we have a valid result
+      if (elements.shareSaliBtn) elements.shareSaliBtn.style.display = 'block';
+
+      // Decomposition summary
+      updateDecompSummary(projections);
+
+      // SALI Tier
+      updateSaliTier(currentYearData.sats, baseBtcPrice);
+
+      // Purchasing Power Narrative
+      updatePurchasingPowerNarrative(projections, currency);
+
+      // Break-even calculator
+      updateBreakEven(salary, currency, nominalSalaryGrowth, btcGrowth);
+
+      // Historical SALI (if user has entered a starting point)
+      computeHistorical(baseBtcPrice, currency);
+
+      // Render table and charts
       renderTable(projections, currency);
       renderChart(projections);
+      renderNormalizedChart(projections);
+      buildBenchmarkChart(startYear);
 
     } catch (error) {
       setStatus(error.message, 'error');
+      const bSection = document.getElementById('benchmarkSection');
+      if (bSection) bSection.style.display = 'none';
     }
   }
 
@@ -659,6 +1617,17 @@
       if (i === DEFAULT_FORECAST_YEARS) option.selected = true;
       elements.yearsSelect.appendChild(option);
     }
+
+    // Historical start year select (earliest data year to CURRENT_YEAR - 1)
+    if (elements.histStartYear) {
+      for (let year = minYear; year < CURRENT_YEAR; year++) {
+        const option = document.createElement('option');
+        option.value = year;
+        option.textContent = year;
+        if (year === DEFAULT_START_YEAR) option.selected = true;
+        elements.histStartYear.appendChild(option);
+      }
+    }
   }
 
   /**
@@ -676,18 +1645,60 @@
       btcPriceDisplay: document.getElementById('btcPriceDisplay'),
       btcPriceManualInput: document.getElementById('btcPriceManualInput'),
       btcGrowthInput: document.getElementById('btcGrowthInput'),
-      computeBtn: document.getElementById('computeBtn'),
       unitToggleSats: document.getElementById('unitToggleSats'),
       unitToggleBtc: document.getElementById('unitToggleBtc'),
       saliSatsOutput: document.getElementById('saliSatsOutput'),
       saliBtcOutput: document.getElementById('saliBtcOutput'),
       btcOutputGroup: document.getElementById('btcOutputGroup'),
-      saliScoreOutput: document.getElementById('saliScoreOutput'),
-      saliScoreDesc: document.getElementById('saliScoreDesc'),
       saliYoyOutput: document.getElementById('saliYoyOutput'),
+      projectedChangeDesc: document.getElementById('projectedChangeDesc'),
+      historicalChangeGroup: document.getElementById('historicalChangeGroup'),
+      historicalChangeOutput: document.getElementById('historicalChangeOutput'),
+      historicalChangeYear: document.getElementById('historicalChangeYear'),
+      projectedChangeLabel: document.getElementById('projectedChangeLabel'),
+      fxWarning: document.getElementById('fxWarning'),
       statusOutput: document.getElementById('statusOutput'),
       saliChart: document.getElementById('saliChart'),
-      projectionTableBody: document.getElementById('projectionTableBody')
+      projectionTableBody: document.getElementById('projectionTableBody'),
+      // Purchasing power equivalents
+      equivalentsGrid: document.getElementById('equivalentsGrid'),
+      equivSatsDay: document.getElementById('equivSatsDay'),
+      equivSatsHour: document.getElementById('equivSatsHour'),
+      equivPctBtc: document.getElementById('equivPctBtc'),
+      // Inflation / real mode
+      nominalModeBtn: document.getElementById('nominalModeBtn'),
+      realModeBtn: document.getElementById('realModeBtn'),
+      inflationGroup: document.getElementById('inflationGroup'),
+      inflationInput: document.getElementById('inflationInput'),
+      realGrowthNote: document.getElementById('realGrowthNote'),
+      // Historical mode
+      histStartYear: document.getElementById('histStartYear'),
+      histStartSalary: document.getElementById('histStartSalary'),
+      historyResults: document.getElementById('historyResults'),
+      historySummary: document.getElementById('historySummary'),
+      historyTableBody: document.getElementById('historyTableBody'),
+      // Break-even
+      breakevenRateOutput: document.getElementById('breakevenRateOutput'),
+      breakevenSalary5: document.getElementById('breakevenSalary5'),
+      projectedSalary5: document.getElementById('projectedSalary5'),
+      breakevenGap: document.getElementById('breakevenGap'),
+      // Multi-benchmark
+      benchBtcBtn: document.getElementById('benchBtcBtn'),
+      benchSpxBtn: document.getElementById('benchSpxBtn'),
+      benchGoldBtn: document.getElementById('benchGoldBtn'),
+      benchCpiBtn: document.getElementById('benchCpiBtn'),
+      benchmarkPanel: document.getElementById('benchmarkPanel'),
+      benchmarkGrowthInput: document.getElementById('benchmarkGrowthInput'),
+      benchmarkGrowthLabel: document.getElementById('benchmarkGrowthLabel'),
+      // Share card
+      shareSaliBtn: document.getElementById('shareSaliBtn'),
+      // Decomposition
+      decompSummary: document.getElementById('decompSummary'),
+      breakdownToggle: document.getElementById('breakdownToggle'),
+      // SALI Tier + Purchasing Power
+      saliTierWrap: document.getElementById('saliTierWrap'),
+      saliTier: document.getElementById('saliTier'),
+      ppNarrative: document.getElementById('ppNarrative')
     };
 
     // Check if we're on the calculator page
@@ -698,10 +1709,13 @@
     // Load data first, then populate selects
     Promise.all([
       fetchSpotPrice(),
-      loadAnnualAverages()
+      loadAnnualAverages(),
+      loadBenchmarkJsonData()
     ]).then(() => {
       populateYearSelects();
+      parseUrlParams();        // apply any URL params after selects have options
       updateBtcPriceDisplay();
+      updateFxWarning();
 
       // Set up event listeners
       const inputElements = [
@@ -745,13 +1759,112 @@
         compute();
       });
 
-      // Compute button click
-      elements.computeBtn.addEventListener('click', compute);
+      // Salary growth mode toggle (Nominal / Real)
+      if (elements.nominalModeBtn) {
+        elements.nominalModeBtn.addEventListener('click', () => {
+          salaryGrowthMode = 'nominal';
+          elements.nominalModeBtn.classList.add('mode-btn--active');
+          elements.realModeBtn.classList.remove('mode-btn--active');
+          if (elements.inflationGroup) elements.inflationGroup.classList.add('form-group--hidden');
+          if (elements.realGrowthNote) elements.realGrowthNote.style.display = 'none';
+          compute();
+        });
+      }
+      if (elements.realModeBtn) {
+        elements.realModeBtn.addEventListener('click', () => {
+          salaryGrowthMode = 'real';
+          elements.realModeBtn.classList.add('mode-btn--active');
+          elements.nominalModeBtn.classList.remove('mode-btn--active');
+          if (elements.inflationGroup) elements.inflationGroup.classList.remove('form-group--hidden');
+          compute();
+        });
+      }
+      if (elements.inflationInput) {
+        elements.inflationInput.addEventListener('input', compute);
+        elements.inflationInput.addEventListener('change', compute);
+      }
 
-      // Initial compute if salary has a value
-      if (elements.salaryInput.value) {
+      // Historical mode listeners
+      if (elements.histStartYear) {
+        elements.histStartYear.addEventListener('change', compute);
+      }
+      if (elements.histStartSalary) {
+        elements.histStartSalary.addEventListener('input', compute);
+        elements.histStartSalary.addEventListener('change', compute);
+      }
+
+      // Multi-benchmark toggle
+      function setBenchmark(b) {
+        activeBenchmark = b;
+        benchmarkGrowthOverride = null;
+        // Update button states
+        [
+          [elements.benchBtcBtn, 'btc'],
+          [elements.benchSpxBtn, 'spx'],
+          [elements.benchGoldBtn, 'gold'],
+          [elements.benchCpiBtn, 'cpi']
+        ].forEach(([btn, key]) => {
+          if (btn) btn.classList.toggle('benchmark-btn--active', key === b);
+        });
+        // Show/hide benchmark growth panel
+        if (elements.benchmarkPanel) {
+          elements.benchmarkPanel.style.display = b === 'btc' ? 'none' : 'block';
+        }
+        if (b !== 'btc' && elements.benchmarkGrowthLabel && elements.benchmarkGrowthInput) {
+          const bConfig = BENCHMARK_DATA[b];
+          elements.benchmarkGrowthLabel.textContent = `${bConfig.name} Growth Rate (% per year)`;
+          elements.benchmarkGrowthInput.value = bConfig.defaultGrowth;
+        }
         compute();
       }
+      if (elements.benchBtcBtn) elements.benchBtcBtn.addEventListener('click', () => setBenchmark('btc'));
+      if (elements.benchSpxBtn) elements.benchSpxBtn.addEventListener('click', () => setBenchmark('spx'));
+      if (elements.benchGoldBtn) elements.benchGoldBtn.addEventListener('click', () => setBenchmark('gold'));
+      if (elements.benchCpiBtn) elements.benchCpiBtn.addEventListener('click', () => setBenchmark('cpi'));
+      if (elements.benchmarkGrowthInput) {
+        elements.benchmarkGrowthInput.addEventListener('input', () => {
+          benchmarkGrowthOverride = parseFloat(elements.benchmarkGrowthInput.value) || null;
+          compute();
+        });
+      }
+
+      // Breakdown toggle
+      if (elements.breakdownToggle) {
+        elements.breakdownToggle.addEventListener('click', () => {
+          showBreakdown = !showBreakdown;
+          elements.breakdownToggle.textContent = showBreakdown ? 'Hide breakdown ←' : 'Show breakdown →';
+          compute();
+        });
+      }
+
+      // Share card
+      if (elements.shareSaliBtn) {
+        elements.shareSaliBtn.addEventListener('click', generateShareCard);
+      }
+
+      // Resize charts when window resizes (Chart.js ResizeObserver can get stale)
+      window.addEventListener('resize', () => {
+        if (chartInstance) {
+          const parent = elements.saliChart.parentNode;
+          chartInstance.resize(parent.clientWidth, parent.clientHeight);
+        }
+        if (normalizedChartInstance) {
+          const normCanvas = document.getElementById('normalizedChart');
+          if (normCanvas) {
+            const parent = normCanvas.parentNode;
+            normalizedChartInstance.resize(parent.clientWidth, parent.clientHeight);
+          }
+        }
+        if (benchmarkChartInstance) {
+          const bmCanvas = document.getElementById('benchmarkChart');
+          if (bmCanvas) {
+            benchmarkChartInstance.resize(bmCanvas.parentNode.clientWidth, bmCanvas.parentNode.clientHeight);
+          }
+        }
+      });
+
+      // Initial compute — always run since salary has a default value
+      compute();
     });
   }
 

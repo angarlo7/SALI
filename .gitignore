@@ -14,3 +14,6 @@
 
 # Optional: local dev server files
 .cache/
+
+# Cowork internal scaffolding
+.claude/
