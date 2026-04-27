@@ -1,14 +1,14 @@
 {
-  "_source": "Calendar-year arithmetic mean of daily closing prices. 2015–2023 from CoinGecko historical data; 2024–2025 from CoinGecko/CoinMarketCap cross-referenced annual averages. Values rounded to nearest whole dollar.",
+  "_source": "Calendar-year arithmetic mean of daily closing prices. Source: StatMuse.com (cross-referenced with CoinGecko/CoinMarketCap). Values rounded to nearest whole dollar.",
   "2015": 272,
   "2016": 568,
-  "2017": 3996,
-  "2018": 8019,
-  "2019": 7523,
-  "2020": 11111,
-  "2021": 47111,
-  "2022": 35061,
-  "2023": 27060,
-  "2024": 65000,
-  "2025": 97527
+  "2017": 4006,
+  "2018": 7573,
+  "2019": 7395,
+  "2020": 11116,
+  "2021": 47437,
+  "2022": 28198,
+  "2023": 28859,
+  "2024": 65964,
+  "2025": 101642
 }
