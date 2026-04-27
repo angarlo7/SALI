@@ -69,6 +69,8 @@
   let activeBenchmark = 'btc';     // 'btc', 'spx', 'gold', 'cpi'
   let benchmarkGrowthOverride = null; // null = use benchmark default
   let showBreakdown = false;
+  let initComputeComplete = false;   // true after the first auto-compute on page load
+  let hasInitialUrlParams = false;   // true if the page was loaded with meaningful URL params
 
   // DOM Elements (cached after DOMContentLoaded)
   let elements = {};
@@ -1586,7 +1588,14 @@
       renderTable(projections, currency);
       renderChart(projections);
       renderNormalizedChart(projections);
-      buildBenchmarkChart(startYear);
+      // Only show the benchmark section after the user has interacted (or if the
+      // page was loaded with URL params that imply explicit user intent).
+      if (initComputeComplete || hasInitialUrlParams) {
+        buildBenchmarkChart(startYear);
+      } else {
+        const bSection = document.getElementById('benchmarkSection');
+        if (bSection) bSection.style.display = 'none';
+      }
 
     } catch (error) {
       setStatus(error.message, 'error');
@@ -1863,8 +1872,18 @@
         }
       });
 
+      // Check whether the page was loaded with meaningful URL params (e.g. a
+      // shared link). Must happen BEFORE the first compute() call because
+      // compute() calls updateUrlParams() which will overwrite window.location.search.
+      const _initParams = new URLSearchParams(window.location.search);
+      hasInitialUrlParams = _initParams.has('salary') || _initParams.has('startYear') ||
+                            _initParams.has('btcGrowth') || _initParams.has('forecast');
+
       // Initial compute — always run since salary has a default value
       compute();
+      // After the first auto-compute, mark it done so subsequent user-triggered
+      // computes will show the benchmark chart section.
+      initComputeComplete = true;
     });
   }
 

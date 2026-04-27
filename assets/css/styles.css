@@ -1154,6 +1154,15 @@ a:hover {
   .projection-table td {
     padding: var(--spacing-xs) var(--spacing-sm);
   }
+
+  /* Pin dark-mode toggle to top-right corner on mobile so it's always reachable
+     regardless of how the nav collapses or wraps. */
+  .theme-toggle {
+    position: fixed;
+    top: 12px;
+    right: 16px;
+    z-index: 1000;
+  }
 }
 
 @media (max-width: 480px) {
