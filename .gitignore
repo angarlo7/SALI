@@ -15,5 +15,11 @@
 # Optional: local dev server files
 .cache/
 
+# Local dev helpers (not for production)
+start-server.command
+
+# Dev/wireframe artifacts
+wireframe-mobile.html
+
 # Cowork internal scaffolding
 .claude/

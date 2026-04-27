@@ -12,7 +12,7 @@
   const SATS_PER_BTC = 100000000;
   const DEFAULT_START_YEAR = 2020;
   const DEFAULT_FORECAST_YEARS = 10;
-  const DEFAULT_SALARY_GROWTH = 3;
+  const DEFAULT_SALARY_GROWTH = 3.5;
   const DEFAULT_BTC_GROWTH = 10;
   const CURRENT_YEAR = new Date().getFullYear();
 
@@ -23,7 +23,7 @@
       defaultGrowth: 10,
       annual: {
         2015: 2061, 2016: 2094, 2017: 2449, 2018: 2746, 2019: 2913,
-        2020: 3217, 2021: 4279, 2022: 4097, 2023: 4210, 2024: 5157, 2025: 5650
+        2020: 3217, 2021: 4279, 2022: 4097, 2023: 4210, 2024: 5881, 2025: 6846
       },
       format: v => v.toFixed(3)
     },
@@ -32,7 +32,7 @@
       defaultGrowth: 5,
       annual: {
         2015: 1160, 2016: 1251, 2017: 1257, 2018: 1268, 2019: 1393,
-        2020: 1770, 2021: 1799, 2022: 1800, 2023: 1943, 2024: 2386, 2025: 2650
+        2020: 1770, 2021: 1799, 2022: 1800, 2023: 1943, 2024: 2395, 2025: 3446
       },
       format: v => v.toFixed(2)
     },
@@ -42,7 +42,7 @@
       // US CPI-U annual average (BLS, 1982-84 = 100)
       annual: {
         2015: 237.0, 2016: 240.0, 2017: 245.1, 2018: 251.1, 2019: 255.7,
-        2020: 258.8, 2021: 270.9, 2022: 292.7, 2023: 304.7, 2024: 314.2, 2025: 321.0
+        2020: 258.8, 2021: 270.9, 2022: 292.7, 2023: 304.7, 2024: 314.2, 2025: 321.9
       },
       format: v => '$' + Math.round(v).toLocaleString('en-US')
     }
@@ -454,12 +454,37 @@
   }
 
   /**
-   * Fetch spot price from CoinGecko
+   * Fetch live FX rates from Frankfurter (ECB-sourced, free, no API key)
+   * Updates FX_RATES in place and refreshes the warning banner text.
+   */
+  async function fetchFxRates() {
+    try {
+      const response = await fetch(
+        'https://api.frankfurter.app/latest?from=USD&to=EUR,MXN'
+      );
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data = await response.json();
+      // Frankfurter gives USD→EUR and USD→MXN; we need the inverse (per-unit-to-USD)
+      if (data.rates && data.rates.EUR) FX_RATES.EUR = 1 / data.rates.EUR;
+      if (data.rates && data.rates.MXN) FX_RATES.MXN = 1 / data.rates.MXN;
+      // Update warning banner with live values
+      if (elements.fxWarning) {
+        elements.fxWarning.textContent =
+          `Live FX rates (ECB, ${data.date}): 1 EUR ≈ ${FX_RATES.EUR.toFixed(4)} USD · 1 MXN ≈ ${FX_RATES.MXN.toFixed(5)} USD`;
+      }
+    } catch (error) {
+      console.warn('FX rate fetch failed, using fallback rates:', error);
+      // Leave FX_RATES at their hardcoded fallback values — warning text stays as-is
+    }
+  }
+
+  /**
+   * Fetch spot price from Coinbase (free, no API key, no rate limit)
    */
   async function fetchSpotPrice() {
     try {
       const response = await fetch(
-        'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd'
+        'https://api.coinbase.com/v2/prices/BTC-USD/spot'
       );
 
       if (!response.ok) {
@@ -468,11 +493,11 @@
 
       const data = await response.json();
 
-      if (!data.bitcoin || !data.bitcoin.usd) {
+      if (!data.data || !data.data.amount) {
         throw new Error('Invalid response format');
       }
 
-      spotPrice = data.bitcoin.usd;
+      spotPrice = parseFloat(data.data.amount);
       return spotPrice;
     } catch (error) {
       console.error('Failed to fetch spot price:', error);
@@ -518,6 +543,24 @@
       if (sp500Resp.ok) sp500JsonData = await sp500Resp.json();
       if (goldResp.ok)  goldJsonData  = await goldResp.json();
       if (cpiResp.ok)   cpiJsonData   = await cpiResp.json();
+
+      // Sync JSON data into BENCHMARK_DATA so the benchmark calculator
+      // always uses the same values as the normalized comparison chart.
+      if (sp500JsonData) {
+        Object.keys(sp500JsonData).forEach(y => {
+          if (!isNaN(Number(y))) BENCHMARK_DATA.spx.annual[y] = sp500JsonData[y];
+        });
+      }
+      if (goldJsonData) {
+        Object.keys(goldJsonData).forEach(y => {
+          if (!isNaN(Number(y))) BENCHMARK_DATA.gold.annual[y] = goldJsonData[y];
+        });
+      }
+      if (cpiJsonData) {
+        Object.keys(cpiJsonData).forEach(y => {
+          if (!isNaN(Number(y))) BENCHMARK_DATA.cpi.annual[y] = cpiJsonData[y];
+        });
+      }
     } catch (error) {
       console.error('Failed to load benchmark JSON data:', error);
     }
@@ -1718,6 +1761,7 @@
     // Load data first, then populate selects
     Promise.all([
       fetchSpotPrice(),
+      fetchFxRates(),
       loadAnnualAverages(),
       loadBenchmarkJsonData()
     ]).then(() => {
