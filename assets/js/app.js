@@ -11,7 +11,7 @@
   // Constants
   const SATS_PER_BTC = 100000000;
   const DEFAULT_START_YEAR = 2020;
-  const DEFAULT_FORECAST_YEARS = 10;
+  const DEFAULT_FORECAST_YEARS = 5;
   const DEFAULT_SALARY_GROWTH = 3.5;
   const DEFAULT_BTC_GROWTH = 5;
   const BTC_GROWTH_MODES = { CUSTOM: 'custom', HISTORICAL: 'historical', FIVE_YEAR: '5y' };
@@ -719,6 +719,31 @@
       historicalSpan: [earliest, latest],
       fiveYearSpan: [fiveStart, latest]
     };
+  }
+
+  /**
+   * Compute trailing CPI CAGR (compound annual growth rate) from cpi_annual.json.
+   * Returns { cagr, span: [startYear, endYear] } as a percentage, or null if
+   * not enough data. Default is trailing 3 years; falls back to whatever data
+   * is available if the file has fewer years.
+   */
+  function computeTrailingCpi(yearsBack = 3) {
+    if (!cpiJsonData) return null;
+    const years = Object.keys(cpiJsonData).map(Number).filter(n => !isNaN(n)).sort((a, b) => a - b);
+    if (years.length < 2) return null;
+
+    const latest = years[years.length - 1];
+    const startTarget = latest - yearsBack;
+    const start = startTarget >= years[0] ? startTarget : years[0];
+    const span = latest - start;
+    if (span <= 0) return null;
+
+    const startVal = cpiJsonData[start];
+    const latestVal = cpiJsonData[latest];
+    if (!startVal || !latestVal) return null;
+
+    const cagr = (Math.pow(latestVal / startVal, 1 / span) - 1) * 100;
+    return { cagr, span: [start, latest] };
   }
 
   /**
@@ -2012,6 +2037,17 @@
       // overridden by a URL param). Keeps "switch back to Custom" honest.
       const initialBtcGrowth = parseFloat(elements.btcGrowthInput.value);
       if (!isNaN(initialBtcGrowth)) customBtcGrowth = initialBtcGrowth;
+
+      // Set the inflation input default to trailing 3-year CPI from the
+      // loaded data (BLS CPI-U via cpi_annual.json) instead of the static
+      // 3% in the HTML. Keeps the calculator's Real mode grounded in actual
+      // recent inflation rather than a hardcoded guess. Users can still edit.
+      const trailingCpi = computeTrailingCpi(3);
+      if (trailingCpi && elements.inflationInput) {
+        elements.inflationInput.value = trailingCpi.cagr.toFixed(1);
+        const [a, b] = trailingCpi.span;
+        elements.inflationInput.title = `Default: trailing ${b - a}-year US CPI (${a}–${b}) from BLS data. Edit to use your own assumption.`;
+      }
 
       // Set up event listeners
       const inputElements = [
