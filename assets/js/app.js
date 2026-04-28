@@ -13,7 +13,8 @@
   const DEFAULT_START_YEAR = 2020;
   const DEFAULT_FORECAST_YEARS = 10;
   const DEFAULT_SALARY_GROWTH = 3.5;
-  const DEFAULT_BTC_GROWTH = 10;
+  const DEFAULT_BTC_GROWTH = 5;
+  const BTC_GROWTH_MODES = { CUSTOM: 'custom', HISTORICAL: 'historical', FIVE_YEAR: '5y' };
   const CURRENT_YEAR = new Date().getFullYear();
 
   // Historical benchmark data for multi-benchmark comparison
@@ -68,6 +69,9 @@
   let cpiJsonData = null;
   let displayUnit = 'sats'; // 'sats' or 'btc'
   let salaryGrowthMode = 'nominal'; // 'nominal' or 'real'
+  let btcGrowthMode = BTC_GROWTH_MODES.CUSTOM; // 'custom', 'historical', '5y'
+  let customBtcGrowth = DEFAULT_BTC_GROWTH;    // last value the user typed in Custom mode
+  let btcCagrCache = null;                     // { historical: number, fiveYear: number, historicalSpan: [yA,yB], fiveYearSpan: [yA,yB] }
   let activeBenchmark = 'btc';     // 'btc', 'spx', 'gold', 'cpi'
   let benchmarkGrowthOverride = null; // null = use benchmark default
   let showBreakdown = false;
@@ -675,6 +679,102 @@
     } catch (error) {
       console.error('Failed to load benchmark JSON data:', error);
     }
+  }
+
+  /**
+   * Compute BTC CAGR (compound annual growth rate) from the loaded annual averages.
+   * Returns { historical, fiveYear, historicalSpan, fiveYearSpan } as percentages.
+   * Returns null if not enough data (need at least 2 years).
+   *
+   * Math: CAGR = (endPrice / startPrice)^(1 / years) - 1
+   */
+  function computeBtcCagrs() {
+    if (!annualAverages) return null;
+    const years = Object.keys(annualAverages).map(Number).sort((a, b) => a - b);
+    if (years.length < 2) return null;
+
+    const earliest = years[0];
+    const latest = years[years.length - 1];
+    const earliestPrice = annualAverages[earliest];
+    const latestPrice = annualAverages[latest];
+
+    // Historical CAGR: full available span
+    const historicalYears = latest - earliest;
+    const historical = historicalYears > 0
+      ? (Math.pow(latestPrice / earliestPrice, 1 / historicalYears) - 1) * 100
+      : null;
+
+    // 5-year CAGR: latest minus 5, falling back to earliest if data shorter
+    const fiveStartTarget = latest - 5;
+    const fiveStart = fiveStartTarget >= earliest ? fiveStartTarget : earliest;
+    const fiveStartPrice = annualAverages[fiveStart];
+    const fiveYears = latest - fiveStart;
+    const fiveYear = (fiveYears > 0 && fiveStartPrice)
+      ? (Math.pow(latestPrice / fiveStartPrice, 1 / fiveYears) - 1) * 100
+      : null;
+
+    return {
+      historical,
+      fiveYear,
+      historicalSpan: [earliest, latest],
+      fiveYearSpan: [fiveStart, latest]
+    };
+  }
+
+  /**
+   * Update the Historical / 5-Year mode-toggle button labels with the
+   * actual CAGR values. Called once after annual averages load.
+   */
+  function updateBtcGrowthButtonLabels() {
+    if (!btcCagrCache) return;
+    if (elements.btcHistoricalModeBtn && btcCagrCache.historical !== null) {
+      const [a, b] = btcCagrCache.historicalSpan;
+      elements.btcHistoricalModeBtn.textContent = `Historical CAGR (${btcCagrCache.historical.toFixed(1)}%)`;
+      elements.btcHistoricalModeBtn.title = `${a}–${b} compound annual growth rate of BTC annual averages.`;
+    }
+    if (elements.btc5yModeBtn && btcCagrCache.fiveYear !== null) {
+      const [a, b] = btcCagrCache.fiveYearSpan;
+      elements.btc5yModeBtn.textContent = `5-Year CAGR (${btcCagrCache.fiveYear.toFixed(1)}%)`;
+      elements.btc5yModeBtn.title = `${a}–${b} compound annual growth rate of BTC annual averages.`;
+    }
+  }
+
+  /**
+   * Switch the BTC growth-rate mode (custom / historical / 5y) and reflect
+   * the change in the input value, readonly state, and active-button class.
+   * - Custom: input is editable and shows the user's last custom value.
+   * - Historical / 5y: input is read-only and shows the computed CAGR.
+   * Always re-runs compute() at the end so the calculator reflects the new value.
+   */
+  function setBtcGrowthMode(mode) {
+    if (!elements.btcGrowthInput) return;
+
+    // Preserve the user's last custom value before switching away from Custom
+    if (btcGrowthMode === BTC_GROWTH_MODES.CUSTOM) {
+      const v = parseFloat(elements.btcGrowthInput.value);
+      if (!isNaN(v)) customBtcGrowth = v;
+    }
+
+    btcGrowthMode = mode;
+
+    // Active-button class
+    if (elements.btcCustomModeBtn)     elements.btcCustomModeBtn.classList.toggle('mode-btn--active',     mode === BTC_GROWTH_MODES.CUSTOM);
+    if (elements.btcHistoricalModeBtn) elements.btcHistoricalModeBtn.classList.toggle('mode-btn--active', mode === BTC_GROWTH_MODES.HISTORICAL);
+    if (elements.btc5yModeBtn)         elements.btc5yModeBtn.classList.toggle('mode-btn--active',         mode === BTC_GROWTH_MODES.FIVE_YEAR);
+
+    // Input value & readonly
+    if (mode === BTC_GROWTH_MODES.CUSTOM) {
+      elements.btcGrowthInput.removeAttribute('readonly');
+      elements.btcGrowthInput.value = customBtcGrowth;
+    } else {
+      elements.btcGrowthInput.setAttribute('readonly', 'readonly');
+      if (btcCagrCache) {
+        const value = mode === BTC_GROWTH_MODES.HISTORICAL ? btcCagrCache.historical : btcCagrCache.fiveYear;
+        if (value !== null) elements.btcGrowthInput.value = value.toFixed(1);
+      }
+    }
+
+    compute();
   }
 
   /**
@@ -1845,6 +1945,10 @@
       inflationGroup: document.getElementById('inflationGroup'),
       inflationInput: document.getElementById('inflationInput'),
       realGrowthNote: document.getElementById('realGrowthNote'),
+      // BTC growth mode toggle (custom / historical CAGR / 5-Year CAGR)
+      btcCustomModeBtn: document.getElementById('btcCustomModeBtn'),
+      btcHistoricalModeBtn: document.getElementById('btcHistoricalModeBtn'),
+      btc5yModeBtn: document.getElementById('btc5yModeBtn'),
       // Historical mode
       histStartYear: document.getElementById('histStartYear'),
       histStartSalary: document.getElementById('histStartSalary'),
@@ -1899,6 +2003,15 @@
       parseUrlParams();        // apply any URL params after selects have options
       updateBtcPriceDisplay();
       updateFxWarning();
+
+      // Compute BTC CAGRs from the loaded annual averages, then populate
+      // the Historical / 5-Year toggle button labels with live values.
+      btcCagrCache = computeBtcCagrs();
+      updateBtcGrowthButtonLabels();
+      // Sync customBtcGrowth with the input value (which may have been
+      // overridden by a URL param). Keeps "switch back to Custom" honest.
+      const initialBtcGrowth = parseFloat(elements.btcGrowthInput.value);
+      if (!isNaN(initialBtcGrowth)) customBtcGrowth = initialBtcGrowth;
 
       // Set up event listeners
       const inputElements = [
@@ -1965,6 +2078,22 @@
       if (elements.inflationInput) {
         elements.inflationInput.addEventListener('input', compute);
         elements.inflationInput.addEventListener('change', compute);
+      }
+
+      // BTC growth mode toggle (Custom / Historical CAGR / 5-Year CAGR)
+      if (elements.btcCustomModeBtn)     elements.btcCustomModeBtn.addEventListener('click',     () => setBtcGrowthMode(BTC_GROWTH_MODES.CUSTOM));
+      if (elements.btcHistoricalModeBtn) elements.btcHistoricalModeBtn.addEventListener('click', () => setBtcGrowthMode(BTC_GROWTH_MODES.HISTORICAL));
+      if (elements.btc5yModeBtn)         elements.btc5yModeBtn.addEventListener('click',         () => setBtcGrowthMode(BTC_GROWTH_MODES.FIVE_YEAR));
+      // Keep customBtcGrowth in sync with the input whenever the user types
+      // while in Custom mode. (If they edit while readonly is set in another
+      // mode, the browser blocks the write — so this is a no-op there.)
+      if (elements.btcGrowthInput) {
+        elements.btcGrowthInput.addEventListener('input', () => {
+          if (btcGrowthMode === BTC_GROWTH_MODES.CUSTOM) {
+            const v = parseFloat(elements.btcGrowthInput.value);
+            if (!isNaN(v)) customBtcGrowth = v;
+          }
+        });
       }
 
       // Historical mode listeners
