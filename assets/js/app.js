@@ -341,7 +341,7 @@
       `Bitcoin still winning. Calculate yours:`,
     ].join(' ');
 
-    const url = 'https://angarlo.com';
+    const url = 'https://sali.angarlo.com';
     const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
     elements.tweetSaliBtn.href = tweetUrl;
   }
