@@ -426,7 +426,19 @@
   }
 
   /**
-   * Generate and download a share card PNG — dark medal design
+   * Generate and download a share card PNG — grade-hero design.
+   * Visual hierarchy:
+   *   1. Grade letter (huge, 280px, in the medal circle) — the headline
+   *   2. Rate (large, 64px, e.g. "-5.2% / yr") — the substantive number
+   *   3. Tagline (small, 16px) — the human-readable summary
+   *   4. Gap (smaller, 13px) — the supporting "what would close the gap" line
+   *   5. Header + footer (tiny, 11-13px) — branding only
+   *
+   * NOTE: This function is currently not bound to any UI button (the prior
+   * "Copy Card" button was removed). It is retained because it is the source
+   * of truth for the canvas design used to regenerate the static OG image
+   * at assets/images/sali-share.png. To re-expose it, bind to a button or
+   * call directly.
    */
   function generateShareCard() {
     const W = 1200, H = 628, DPR = 2;
@@ -440,6 +452,7 @@
     const bgColor = '#0d0d0d';
     const white = '#ffffff';
     const muted = '#888888';
+    const dim   = '#5c5c5c';
     const font = '"Roboto Mono", "Courier New", monospace';
 
     // Grade data — read from live DOM
@@ -459,22 +472,22 @@
     ctx.fillStyle = bgColor;
     ctx.fillRect(0, 0, W, H);
 
-    // Top orange stripe
+    // Top orange stripe (slimmer than before)
     ctx.fillStyle = orange;
-    ctx.fillRect(0, 0, W, 8);
+    ctx.fillRect(0, 0, W, 5);
 
-    // ── Header label ────────────────────────────────────────
-    ctx.fillStyle = orange;
-    ctx.font = `600 13px ${font}`;
+    // ── Header label (small / unobtrusive) ──────────────────
+    ctx.fillStyle = dim;
+    ctx.font = `500 11px ${font}`;
     ctx.textAlign = 'center';
-    ctx.fillText('S A T O S H I   A N N U A L   L A B O R   I N D E X', W / 2, 46);
+    ctx.fillText('S A T O S H I   A N N U A L   L A B O R   I N D E X', W / 2, 32);
 
-    // ── Medal circle ────────────────────────────────────────
-    const cx = W / 2, cy = 278, R = 150;
+    // ── Medal circle (bigger — hero element) ────────────────
+    const cx = W / 2, cy = 232, R = 180;
 
     // Radial glow behind circle
     const glow = ctx.createRadialGradient(cx, cy, R * 0.3, cx, cy, R * 1.8);
-    glow.addColorStop(0, gradeColor + '28');
+    glow.addColorStop(0, gradeColor + '32');
     glow.addColorStop(1, 'transparent');
     ctx.fillStyle = glow;
     ctx.beginPath();
@@ -482,69 +495,63 @@
     ctx.fill();
 
     // Circle fill
-    ctx.fillStyle = gradeColor + '18';
+    ctx.fillStyle = gradeColor + '1c';
     ctx.beginPath();
     ctx.arc(cx, cy, R, 0, Math.PI * 2);
     ctx.fill();
 
     // Circle ring
     ctx.strokeStyle = gradeColor;
-    ctx.lineWidth = 7;
+    ctx.lineWidth = 8;
     ctx.beginPath();
     ctx.arc(cx, cy, R, 0, Math.PI * 2);
     ctx.stroke();
 
-    // Grade letter — centered in circle
+    // Grade letter — centered in circle, MUCH bigger than before
     ctx.fillStyle = gradeColor;
-    ctx.font = `700 200px ${font}`;
+    ctx.font = `700 280px ${font}`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(gradeText, cx, cy + 10);
+    ctx.fillText(gradeText, cx, cy + 12);
     ctx.textBaseline = 'alphabetic';
 
-    // ── Below medal ─────────────────────────────────────────
+    // ── Below medal: rate is the second hero element ────────
     const belowR = cy + R;
 
-    // "SALI GRADE" micro-label
-    ctx.fillStyle = muted;
-    ctx.font = `500 12px ${font}`;
-    ctx.textAlign = 'center';
-    ctx.fillText('S A L I   G R A D E', cx, belowR + 26);
-
-    // Tagline
-    ctx.fillStyle = white;
-    ctx.font = `400 17px ${font}`;
-    ctx.fillText(taglineText, cx, belowR + 54);
-
-    // Stats — rate · gap
+    // The rate (e.g. "-5.2% / yr") — prominent
     const rateClean = rateText.replace(' Bitcoin purchasing power', '');
+    ctx.fillStyle = white;
+    ctx.font = `700 64px ${font}`;
+    ctx.textAlign = 'center';
+    ctx.fillText(rateClean, cx, belowR + 78);
+
+    // Tagline — supporting line, smaller
+    ctx.fillStyle = muted;
+    ctx.font = `400 16px ${font}`;
+    ctx.fillText(taglineText, cx, belowR + 112);
+
+    // Gap — smallest detail, only if present and non-trivial
     const gapClean  = gapText
       .replace('Need ', '')
       .replace(' more salary growth to keep pace', '')
       .replace('Outpacing Bitcoin by ', '+')
       .replace('At break-even with Bitcoin', '= break-even');
-    ctx.fillStyle = muted;
-    ctx.font = `500 13px ${font}`;
-    ctx.fillText(`${rateClean}   ·   ${gapClean}`, cx, belowR + 82);
+    if (gapClean && gapClean !== '—') {
+      ctx.fillStyle = dim;
+      ctx.font = `500 13px ${font}`;
+      ctx.fillText(gapClean, cx, belowR + 138);
+    }
 
-    // ── Footer ──────────────────────────────────────────────
-    // Divider
-    ctx.strokeStyle = '#2a2a2a';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(60, H - 72);
-    ctx.lineTo(W - 60, H - 72);
-    ctx.stroke();
-
+    // ── Footer (small, branding only) ───────────────────────
     ctx.fillStyle = orange;
-    ctx.font = `700 15px ${font}`;
+    ctx.font = `700 13px ${font}`;
     ctx.textAlign = 'left';
-    ctx.fillText('SALI.ANGARLO.COM', 60, H - 40);
+    ctx.fillText('SALI.ANGARLO.COM', 60, H - 32);
 
-    ctx.fillStyle = muted;
-    ctx.font = `400 12px ${font}`;
+    ctx.fillStyle = dim;
+    ctx.font = `400 11px ${font}`;
     ctx.textAlign = 'right';
-    ctx.fillText('Not financial advice.', W - 60, H - 40);
+    ctx.fillText('Not financial advice.', W - 60, H - 32);
 
     // ── Download ────────────────────────────────────────────
     canvas.toBlob(blob => {
