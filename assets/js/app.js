@@ -22,8 +22,9 @@
       name: 'S&P 500', unit: 'S&P units/yr', unitShort: 'S&P units',
       defaultGrowth: 10,
       annual: {
-        2015: 2061, 2016: 2094, 2017: 2449, 2018: 2746, 2019: 2913,
-        2020: 3217, 2021: 4279, 2022: 4097, 2023: 4210, 2024: 5881, 2025: 6846
+        // Year-end closing prices (Dec 31) — must match sp500_annual.json exactly
+        2015: 2043, 2016: 2239, 2017: 2674, 2018: 2507, 2019: 3231,
+        2020: 3756, 2021: 4766, 2022: 3840, 2023: 4770, 2024: 5881, 2025: 6846
       },
       format: v => v.toFixed(3)
     },
@@ -135,8 +136,8 @@
       elements.equivalentsGrid.style.display = 'none';
       return;
     }
-    const satsPerDay = sats / 365;
-    const satsPerHour = sats / 2080;
+    const satsPerDay = sats / 260;   // 260 working days (matches 2080-hour basis)
+    const satsPerHour = sats / 2080; // 40 hrs/week × 52 weeks
     const pctOfBtc = btcEquivalent * 100;
     if (elements.equivSatsDay) elements.equivSatsDay.textContent = formatSats(satsPerDay);
     if (elements.equivSatsHour) elements.equivSatsHour.textContent = formatSats(satsPerHour);
@@ -446,7 +447,7 @@
     ctx.fillStyle = orange;
     ctx.font = `600 18px ${font}`;
     ctx.textAlign = 'left';
-    ctx.fillText('ANGARLO.COM/SALI', 60, H - 52);
+    ctx.fillText('SALI.ANGARLO.COM', 60, H - 52);
 
     ctx.fillStyle = gray;
     ctx.font = `400 13px ${font}`;
