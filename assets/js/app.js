@@ -400,15 +400,20 @@
     let text;
     if (gradeData) {
       const { grade, annualRate, gap } = gradeData;
-      const rateStr = `${annualRate.toFixed(1)}%/yr`;
-      const gapStr = gap > 0.1
-        ? `Need +${gap.toFixed(1)}%/yr more to keep pace`
-        : gap < -0.1
-          ? `Outpacing Bitcoin by ${Math.abs(gap).toFixed(1)}%/yr`
-          : 'At break-even with Bitcoin';
-      text = `My SALI Grade: ${grade} · ${rateStr} Bitcoin purchasing power · ${gapStr} · #Bitcoin #SALI`;
+      const rateStr = annualRate >= 0 ? `+${annualRate.toFixed(1)}%/yr` : `${annualRate.toFixed(1)}%/yr`;
+
+      let hook;
+      if (annualRate >= 0) {
+        hook = `my salary is actually keeping pace with Bitcoin (${rateStr}). Extremely rare.`;
+      } else if (gap > 0.1) {
+        hook = `my salary loses ${rateStr} to Bitcoin every year. I'd need a +${gap.toFixed(1)}%/yr raise just to break even.`;
+      } else {
+        hook = `my salary is right at Bitcoin break-even (${rateStr}). Holding the line.`;
+      }
+
+      text = `🟠 SALI Grade: ${grade} — ${hook}\n\nWhat’s your grade? #Bitcoin #SALI`;
     } else {
-      text = 'How much is your salary worth in Bitcoin? Check your SALI grade → #Bitcoin #SALI';
+      text = `🟠 How much is your salary worth in Bitcoin?\n\nCalculate your SALI Grade → #Bitcoin #SALI`;
     }
 
     const url = 'https://sali.angarlo.com';
@@ -417,17 +422,9 @@
   }
 
   /**
-   * Generate and download a share card PNG
+   * Generate and download a share card PNG — dark medal design
    */
   function generateShareCard() {
-    const salary = parseFloat(elements.salaryInput ? elements.salaryInput.value : 0) || 0;
-    const currency = elements.currencySelect ? elements.currencySelect.value : 'USD';
-    const satsText = elements.saliSatsOutput ? elements.saliSatsOutput.textContent : '—';
-    const btcPriceText = elements.btcPriceDisplay ? elements.btcPriceDisplay.textContent.replace('Spot: ', '') : '—';
-    const histEl = elements.historicalChangeOutput;
-    const histYearEl = elements.historicalChangeYear;
-    const projEl = elements.saliYoyOutput;
-
     const W = 1200, H = 628, DPR = 2;
     const canvas = document.createElement('canvas');
     canvas.width = W * DPR;
@@ -436,127 +433,133 @@
     ctx.scale(DPR, DPR);
 
     const orange = '#F7931A';
-    const black = '#111111';
-    const gray = '#666666';
-    const lightGray = '#f5f5f5';
+    const bgColor = '#0d0d0d';
+    const white = '#ffffff';
+    const muted = '#888888';
     const font = '"Roboto Mono", "Courier New", monospace';
 
-    // Background
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, W, H);
-
-    // Top orange bar
-    ctx.fillStyle = orange;
-    ctx.fillRect(0, 0, W, 8);
-
-    // Left accent bar
-    ctx.fillStyle = orange;
-    ctx.fillRect(60, 60, 6, 180);
-
-    // Label
-    ctx.fillStyle = gray;
-    ctx.font = `600 16px ${font}`;
-    ctx.textAlign = 'left';
-    ctx.fillText('SATOSHI ANNUAL LABOR INDEX', 84, 95);
-
-    // Grade + insights drawn below (in the stats section)
-
-    // Divider
-    ctx.strokeStyle = '#e5e5e5';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(60, 272);
-    ctx.lineTo(W - 60, 272);
-    ctx.stroke();
-
-    // Stats row
-    const statsY = 330;
-    const colW = 280;
-
-    const drawStat = (label, value, x, color) => {
-      ctx.fillStyle = gray;
-      ctx.font = `500 13px ${font}`;
-      ctx.textAlign = 'left';
-      ctx.fillText(label, x, statsY);
-      ctx.fillStyle = color || black;
-      ctx.font = `700 26px ${font}`;
-      ctx.fillText(value, x, statsY + 34);
-    };
-
-    // Grade — read from live DOM
+    // Grade data — read from live DOM
     const gradeEl   = elements.saliScoreGrade;
     const rateEl    = elements.saliScoreRate;
     const gapEl     = elements.saliScoreGap;
-    const gradeText = gradeEl ? gradeEl.textContent.trim() : '—';
-    const rateText  = rateEl  ? rateEl.textContent.trim()  : '—';
-    const gapText   = gapEl   ? gapEl.textContent.trim()   : '—';
+    const tagEl     = elements.saliScoreTagline;
+    const gradeText   = gradeEl ? gradeEl.textContent.trim() : '—';
+    const rateText    = rateEl  ? rateEl.textContent.trim()  : '—';
+    const gapText     = gapEl   ? gapEl.textContent.trim()   : '—';
+    const taglineText = tagEl   ? tagEl.textContent.trim()   : '';
 
-    // Big grade letter in place of the number
     const gradeColors = { S:'#F7931A', A:'#16a34a', B:'#65a30d', C:'#ca8a04', D:'#ea580c', F:'#dc2626' };
     const gradeColor  = gradeColors[gradeText] || orange;
 
+    // ── Background ──────────────────────────────────────────
+    ctx.fillStyle = bgColor;
+    ctx.fillRect(0, 0, W, H);
+
+    // Top orange stripe
+    ctx.fillStyle = orange;
+    ctx.fillRect(0, 0, W, 8);
+
+    // ── Header label ────────────────────────────────────────
+    ctx.fillStyle = orange;
+    ctx.font = `600 13px ${font}`;
+    ctx.textAlign = 'center';
+    ctx.fillText('S A T O S H I   A N N U A L   L A B O R   I N D E X', W / 2, 46);
+
+    // ── Medal circle ────────────────────────────────────────
+    const cx = W / 2, cy = 278, R = 150;
+
+    // Radial glow behind circle
+    const glow = ctx.createRadialGradient(cx, cy, R * 0.3, cx, cy, R * 1.8);
+    glow.addColorStop(0, gradeColor + '28');
+    glow.addColorStop(1, 'transparent');
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(cx, cy, R * 1.8, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Circle fill
+    ctx.fillStyle = gradeColor + '18';
+    ctx.beginPath();
+    ctx.arc(cx, cy, R, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Circle ring
+    ctx.strokeStyle = gradeColor;
+    ctx.lineWidth = 7;
+    ctx.beginPath();
+    ctx.arc(cx, cy, R, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Grade letter — centered in circle
     ctx.fillStyle = gradeColor;
-    ctx.font = `700 72px ${font}`;
-    ctx.textAlign = 'left';
-    ctx.fillText(gradeText, 84, 195);
+    ctx.font = `700 200px ${font}`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(gradeText, cx, cy + 10);
+    ctx.textBaseline = 'alphabetic';
 
-    // "SALI GRADE" label (replaces the sat count)
-    ctx.fillStyle = gray;
-    ctx.font = `400 26px ${font}`;
-    ctx.fillText('SALI Grade', 84, 235);
+    // ── Below medal ─────────────────────────────────────────
+    const belowR = cy + R;
 
-    // Stats row — rate + gap + year + BTC price (no salary)
-    drawStat('BTC PRICE', btcPriceText, 60);
-    drawStat('YEAR', String(CURRENT_YEAR), 60 + colW);
+    // "SALI GRADE" micro-label
+    ctx.fillStyle = muted;
+    ctx.font = `500 12px ${font}`;
+    ctx.textAlign = 'center';
+    ctx.fillText('S A L I   G R A D E', cx, belowR + 26);
 
-    if (rateText && rateText !== '—') {
-      const rColor = rateText.startsWith('-') ? '#dc2626' : '#16a34a';
-      drawStat('BTC PWR/YR', rateText.replace(' Bitcoin purchasing power', ''), 60 + colW * 2, rColor);
-    }
+    // Tagline
+    ctx.fillStyle = white;
+    ctx.font = `400 17px ${font}`;
+    ctx.fillText(taglineText, cx, belowR + 54);
 
-    if (gapText && gapText !== '—') {
-      drawStat('BREAKEVEN GAP', gapText.replace('Need ', '').replace(' more salary growth to keep pace', ''), 60 + colW * 3, gray);
-    }
+    // Stats — rate · gap
+    const rateClean = rateText.replace(' Bitcoin purchasing power', '');
+    const gapClean  = gapText
+      .replace('Need ', '')
+      .replace(' more salary growth to keep pace', '')
+      .replace('Outpacing Bitcoin by ', '+')
+      .replace('At break-even with Bitcoin', '= break-even');
+    ctx.fillStyle = muted;
+    ctx.font = `500 13px ${font}`;
+    ctx.fillText(`${rateClean}   ·   ${gapClean}`, cx, belowR + 82);
 
-    // Orange accent bar below stats
-    ctx.fillStyle = 'rgba(247, 147, 26, 0.08)';
-    ctx.fillRect(0, H - 88, W, 88);
+    // ── Footer ──────────────────────────────────────────────
+    // Divider
+    ctx.strokeStyle = '#2a2a2a';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(60, H - 72);
+    ctx.lineTo(W - 60, H - 72);
+    ctx.stroke();
 
     ctx.fillStyle = orange;
-    ctx.font = `600 18px ${font}`;
+    ctx.font = `700 15px ${font}`;
     ctx.textAlign = 'left';
-    ctx.fillText('SALI.ANGARLO.COM', 60, H - 52);
+    ctx.fillText('SALI.ANGARLO.COM', 60, H - 40);
 
-    ctx.fillStyle = gray;
-    ctx.font = `400 13px ${font}`;
+    ctx.fillStyle = muted;
+    ctx.font = `400 12px ${font}`;
     ctx.textAlign = 'right';
-    ctx.fillText('For informational purposes only. Not financial advice.', W - 60, H - 52);
+    ctx.fillText('Not financial advice.', W - 60, H - 40);
 
-    // Download
+    // ── Download ────────────────────────────────────────────
     canvas.toBlob(blob => {
-      const url = URL.createObjectURL(blob);
+      const dlUrl = URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.href = url;
-      a.download = `sali-${CURRENT_YEAR}.png`;
+      a.href = dlUrl;
+      a.download = `sali-grade-${gradeText}-${CURRENT_YEAR}.png`;
       a.click();
-      URL.revokeObjectURL(url);
+      URL.revokeObjectURL(dlUrl);
     }, 'image/png');
 
-    // Clipboard: copy shareable URL + summary text
+    // ── Clipboard: punchy text + URL ─────────────────────────
     const shareUrl = 'https://sali.angarlo.com';
-    const gradeElSnap  = elements.saliScoreGrade;
-    const rateElSnap   = elements.saliScoreRate;
-    const gapElSnap    = elements.saliScoreGap;
-    const gradeSnap    = gradeElSnap ? gradeElSnap.textContent.trim() : '—';
-    const rateSnap     = rateElSnap  ? rateElSnap.textContent.trim()  : '—';
-    const gapSnap      = gapElSnap   ? gapElSnap.textContent.trim()   : '—';
-    const textSummary  = `My SALI Grade: ${gradeSnap} | ${rateSnap} | ${gapSnap}\n${shareUrl}`;
+    const textSummary = `🟠 SALI Grade: ${gradeText} | ${rateClean} | ${gapClean}\n${shareUrl}`;
     navigator.clipboard.writeText(textSummary).catch(() => {});
 
-    // Update button label briefly to confirm copy
     if (elements.shareSaliBtn) {
       const original = elements.shareSaliBtn.textContent;
-      elements.shareSaliBtn.textContent = '✓ Link & Card Copied';
+      elements.shareSaliBtn.textContent = '✓ Card & Link Copied';
       setTimeout(() => { elements.shareSaliBtn.textContent = original; }, 2500);
     }
   }
