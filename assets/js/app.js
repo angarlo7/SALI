@@ -48,11 +48,12 @@
     }
   };
 
-  // Placeholder FX rates to USD (update for production)
+  // FX rates to USD — updated at init via fetchFxRates() (ECB/Frankfurter).
+  // These fallback values are used only if the live fetch fails.
   const FX_RATES = {
     USD: 1,
-    EUR: 1.08,  // 1 EUR = 1.08 USD (placeholder)
-    MXN: 0.058  // 1 MXN = 0.058 USD (placeholder)
+    EUR: 1.08,  // fallback: 1 EUR ≈ 1.08 USD
+    MXN: 0.058  // fallback: 1 MXN ≈ 0.058 USD
   };
 
   // State
@@ -321,6 +322,28 @@
       `salary <strong style="color:${salaryColor}">${fmt(salaryCumulative)}</strong> (positive) · ` +
       `BTC <strong style="color:${btcColor}">${fmt(btcCumulative)}</strong> impact`;
     el.style.display = 'block';
+  }
+
+  /**
+   * Build and set the "Post on X" href based on the current calculation result
+   */
+  function updateTweetLink(currentYearData) {
+    if (!elements.tweetSaliBtn || !currentYearData) return;
+    const salary = parseFloat(elements.salaryInput ? elements.salaryInput.value : 0) || 0;
+    const currency = elements.currencySelect ? elements.currencySelect.value : 'USD';
+    const sats = Math.round(currentYearData.sats);
+    const btcEq = currentYearData.btcEquivalent.toFixed(2);
+    const salaryFmt = formatCurrency(salary, currency);
+
+    const text = [
+      `My ${CURRENT_YEAR} SALI: ${formatSats(sats)} sats/yr (${btcEq} BTC).`,
+      `Salary: ${salaryFmt}.`,
+      `Bitcoin still winning. Calculate yours:`,
+    ].join(' ');
+
+    const url = 'https://angarlo.com';
+    const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+    elements.tweetSaliBtn.href = tweetUrl;
   }
 
   /**
@@ -1609,8 +1632,9 @@
       // Purchasing power equivalents
       updateEquivalents(currentYearData.sats, currentYearData.btcEquivalent);
 
-      // Show share button once we have a valid result
-      if (elements.shareSaliBtn) elements.shareSaliBtn.style.display = 'block';
+      // Show share buttons once we have a valid result
+      if (elements.shareRow) elements.shareRow.style.display = 'flex';
+      updateTweetLink(currentYearData);
 
       // Decomposition summary
       updateDecompSummary(projections);
@@ -1742,8 +1766,10 @@
       benchmarkPanel: document.getElementById('benchmarkPanel'),
       benchmarkGrowthInput: document.getElementById('benchmarkGrowthInput'),
       benchmarkGrowthLabel: document.getElementById('benchmarkGrowthLabel'),
-      // Share card
+      // Share / tweet
+      shareRow: document.getElementById('shareRow'),
       shareSaliBtn: document.getElementById('shareSaliBtn'),
+      tweetSaliBtn: document.getElementById('tweetSaliBtn'),
       // Decomposition
       decompSummary: document.getElementById('decompSummary'),
       breakdownToggle: document.getElementById('breakdownToggle'),

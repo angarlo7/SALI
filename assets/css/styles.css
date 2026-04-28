@@ -1508,11 +1508,19 @@ a:hover {
   color: var(--color-text);
 }
 
+/* ── Share Row ──────────────────────────────────────────────── */
+.share-row {
+  display: flex;
+  gap: var(--spacing-sm, 0.5rem);
+  margin-top: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
 /* ── Share Button ───────────────────────────────────────────── */
 .btn--share {
-  display: block;
-  width: 100%;
-  margin-top: var(--spacing-md);
+  flex: 1;
+  min-width: 130px;
+  text-align: center;
   padding: 10px var(--spacing-md);
   background: transparent;
   border: 2px solid var(--color-accent);
@@ -1530,6 +1538,44 @@ a:hover {
 .btn--share:hover {
   background: var(--color-accent);
   color: #ffffff;
+}
+
+/* ── Tweet Button ───────────────────────────────────────────── */
+.btn--tweet {
+  flex: 1;
+  min-width: 130px;
+  text-align: center;
+  padding: 10px var(--spacing-md);
+  background: #000000;
+  border: 2px solid #000000;
+  border-radius: var(--radius-md);
+  color: #ffffff;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.btn--tweet:hover {
+  background: #1a1a1a;
+  border-color: #1a1a1a;
+  color: #ffffff;
+  text-decoration: none;
+}
+
+[data-theme="dark"] .btn--tweet {
+  background: #ffffff;
+  border-color: #ffffff;
+  color: #000000;
+}
+
+[data-theme="dark"] .btn--tweet:hover {
+  background: #e0e0e0;
+  border-color: #e0e0e0;
 }
 
 /* ── Breakdown Toggle ───────────────────────────────────────── */

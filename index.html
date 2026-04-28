@@ -5,6 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="SALI — the standard for measuring your labor in Bitcoin terms. Enter your salary, get your satoshi value, and see how it has changed as Bitcoin appreciates.">
   <title>SALI - Satoshi Annual Labor Index | ANGARLO</title>
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://angarlo.com/">
+  <meta property="og:title" content="SALI — How much is your salary worth in Bitcoin?">
+  <meta property="og:description" content="Enter your salary and see it in satoshis — Bitcoin's base unit. Track how your earning power compares to Bitcoin, year over year.">
+  <meta property="og:image" content="https://angarlo.com/assets/images/sali-share.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@angarlo">
+  <meta name="twitter:creator" content="@angarlo">
+  <meta name="twitter:title" content="SALI — How much is your salary worth in Bitcoin?">
+  <meta name="twitter:description" content="Enter your salary and see it in satoshis — Bitcoin's base unit. Track how your earning power compares to Bitcoin, year over year.">
+  <meta name="twitter:image" content="https://angarlo.com/assets/images/sali-share.png">
   <link rel="stylesheet" href="/assets/css/styles.css">
 </head>
 <body>
@@ -79,7 +94,7 @@
               </div>
 
               <div id="fxWarning" class="fx-warning fx-warning--hidden">
-                FX rates are approximate placeholders (EUR ≈ 1.08 USD, MXN ≈ 0.058 USD) and may be outdated. For best accuracy, convert your salary to USD manually and use the USD option.
+                Loading live FX rates (ECB source)... For best accuracy, convert your salary to USD manually and use the USD option.
               </div>
 
               <div class="form-group">
@@ -172,7 +187,10 @@
                 </div>
               </div>
 
-              <button type="button" id="shareSaliBtn" class="btn btn--share" style="display:none">↗ Share My SALI</button>
+              <div class="share-row" id="shareRow" style="display:none">
+                <button type="button" id="shareSaliBtn" class="btn btn--share">↗ Copy Card</button>
+                <a id="tweetSaliBtn" class="btn btn--tweet" href="#" target="_blank" rel="noopener noreferrer">𝕏 Post on X</a>
+              </div>
 
               <!-- Historical Change -->
               <div class="output-group" id="historicalChangeGroup" style="display:none">
@@ -350,7 +368,7 @@
               <div class="sali-callout__year">2025</div>
               <div class="sali-callout__value">59,030,716 <span class="sali-callout__unit">sats/year</span></div>
             </div>
-            <div class="sali-callout__note">Bitcoin appreciated roughly 300× between 2015 and 2025. Measured in sats, the same $60,000 salary buys <strong>99.7% fewer</strong>. That is Bitcoin's appreciation doing exactly what a fixed-supply asset is supposed to do — and it's the number that matters most if you're building a Bitcoin position.</div>
+            <div class="sali-callout__note">Bitcoin appreciated roughly 370× between 2015 and 2025 ($272 → $101,642). Measured in sats, the same $60,000 salary buys <strong>99.7% fewer</strong>. That is Bitcoin's appreciation doing exactly what a fixed-supply asset is supposed to do — and it's the number that matters most if you're building a Bitcoin position.</div>
           </div>
           <p>
             Bitcoin has a fixed supply of 21 million coins. No central bank can issue more. That makes it the hardest unit of account available — and the most demanding benchmark for your labor. SALI uses it by design, not by accident.

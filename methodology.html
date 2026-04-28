@@ -5,6 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="How SALI works — the formula, Bitcoin price methods, projection logic, and why Bitcoin is the right benchmark for measuring labor value.">
   <title>Methodology | SALI - Satoshi Annual Labor Index</title>
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://angarlo.com/methodology.html">
+  <meta property="og:title" content="SALI Methodology — How It Works">
+  <meta property="og:description" content="The formula, Bitcoin price methods, projection logic, and why Bitcoin is the right benchmark for measuring labor value.">
+  <meta property="og:image" content="https://angarlo.com/assets/images/sali-share.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@angarlo">
+  <meta name="twitter:creator" content="@angarlo">
+  <meta name="twitter:title" content="SALI Methodology — How It Works">
+  <meta name="twitter:description" content="The formula, Bitcoin price methods, projection logic, and why Bitcoin is the right benchmark for measuring labor value.">
+  <meta name="twitter:image" content="https://angarlo.com/assets/images/sali-share.png">
   <link rel="stylesheet" href="/assets/css/styles.css">
 </head>
 <body>
@@ -67,7 +82,7 @@
 
           <h3>Spot Price</h3>
           <p>
-            The current market price fetched from CoinGecko's public API. This reflects real-time market conditions but can be volatile. Use this for a snapshot of your current SALI.
+            The current market price fetched from Coinbase's public API. This reflects real-time market conditions but can be volatile. Use this for a snapshot of your current SALI.
           </p>
 
           <h3>Annual Average</h3>
@@ -124,7 +139,7 @@
 
           <h3>The Historical Window Was Extraordinary</h3>
           <p>
-            The available historical data (2015–2025) covers a roughly 300× appreciation in Bitcoin's price — one of the most exceptional runs in modern financial history. Projections built on that window as a baseline may overstate what comes next. Use conservative BTC growth assumptions, run multiple scenarios, and treat the historical chart as context, not as a performance guarantee.
+            The available historical data (2015–2025) covers a roughly 370× appreciation in Bitcoin's price ($272 to $101,642) — one of the most exceptional runs in modern financial history. Projections built on that window as a baseline may overstate what comes next. Use conservative BTC growth assumptions, run multiple scenarios, and treat the historical chart as context, not as a performance guarantee.
           </p>
 
           <h3>SALI Doesn't Measure Cost of Living</h3>
@@ -144,7 +159,7 @@
 
           <h3>Currency Conversion</h3>
           <p>
-            Non-USD salaries are converted using static placeholder exchange rates. For accurate results with EUR, MXN, or other currencies, convert your salary to USD manually and select the USD option.
+            Non-USD salaries are converted using live exchange rates fetched from the European Central Bank (via Frankfurter API) on page load. If the fetch fails, fallback rates are used. For maximum accuracy, convert your salary to USD manually and select the USD option.
           </p>
 
         </div>
