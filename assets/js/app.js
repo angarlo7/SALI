@@ -420,7 +420,15 @@
       text = `🟠 How much is your salary worth in Bitcoin?\n\nCalculate your SALI Grade → #Bitcoin #SALI`;
     }
 
-    const url = 'https://sali.angarlo.com';
+    // Point the share URL at the grade-specific wrapper page so X (and any
+    // other OG-scraping platform) picks up an OG image where the user's
+    // grade dominates. Each /share/{grade}.html has og:image meta tags
+    // pointing to a pre-rendered sali-share-{grade}.png. The wrapper page
+    // immediately redirects humans to the calculator.
+    const validGrades = new Set(['S', 'A', 'B', 'C', 'D', 'F']);
+    const url = (gradeData && validGrades.has(gradeData.grade))
+      ? `https://sali.angarlo.com/share/${gradeData.grade}.html`
+      : 'https://sali.angarlo.com';
     const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
     elements.tweetSaliBtn.href = tweetUrl;
   }
