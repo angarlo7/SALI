@@ -1399,9 +1399,15 @@
     if (!canvas || !section) return;
     if (!annualAverages || !sp500JsonData || !goldJsonData || !cpiJsonData) return;
 
-    // Collect years with data in all 4 sources, from startYear through 2024
+    // Collect years with data in all 4 sources, from startYear through the most recent available year
+    const latestYear = Math.max(
+      ...Object.keys(annualAverages).map(Number).filter(n => !isNaN(n)),
+      ...Object.keys(sp500JsonData).map(Number).filter(n => !isNaN(n)),
+      ...Object.keys(goldJsonData).map(Number).filter(n => !isNaN(n)),
+      ...Object.keys(cpiJsonData).map(Number).filter(n => !isNaN(n))
+    );
     const years = [];
-    for (let y = startYear; y <= 2024; y++) {
+    for (let y = startYear; y <= latestYear; y++) {
       if (
         annualAverages[y] !== undefined &&
         sp500JsonData[y]  !== undefined &&
