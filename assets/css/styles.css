@@ -1941,3 +1941,115 @@ body.dark .fx-warning {
   background: var(--color-bg-secondary);
   border-color: var(--color-border);
 }
+
+/* ── STRC / Salary Under STRETCH ────────────────────────────────────────── */
+
+.strc-form-group {
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--spacing-md);
+  margin-top: var(--spacing-xs);
+}
+
+.strc-enable-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-xs);
+}
+
+.strc-checkbox {
+  width: 15px;
+  height: 15px;
+  accent-color: var(--color-accent);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.strc-enable-label {
+  font-size: 0.875rem;
+  color: var(--color-text);
+  cursor: pointer;
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 400;
+}
+
+.strc-yield-display {
+  font-size: 0.72rem;
+  font-family: var(--font-mono);
+  color: var(--color-text-muted);
+  margin-top: var(--spacing-xs);
+  padding: 4px 6px;
+  background: var(--color-bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+}
+
+.strc-yield-display--live::before {
+  content: '● ';
+  color: #16a34a;
+}
+
+.strc-yield-display--fallback::before {
+  content: '○ ';
+  color: var(--color-text-muted);
+}
+
+/* Output card */
+.strc-output-wrap {
+  margin: var(--spacing-md) 0;
+  padding: var(--spacing-md);
+  background: var(--color-bg-card);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(74, 222, 128, 0.25);
+}
+
+.strc-output__title {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #4ade80;
+  margin-bottom: var(--spacing-sm);
+}
+
+.strc-output__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm) var(--spacing-md);
+}
+
+.strc-output__grid .output-group {
+  margin-bottom: 0;
+}
+
+/* span dividend across both columns so it stands out */
+.strc-output__grid .output-group:nth-child(2) {
+  grid-column: 1 / -1;
+}
+
+.strc-value--dividend {
+  color: #4ade80 !important;
+}
+
+.strc-yield-note {
+  font-size: 0.68rem;
+  font-family: var(--font-mono);
+  color: var(--color-text-muted);
+  margin-top: var(--spacing-sm);
+  padding-top: var(--spacing-xs);
+  border-top: 1px solid var(--color-border);
+}
+
+[data-theme="dark"] .strc-output-wrap {
+  border-color: rgba(74, 222, 128, 0.15);
+}
+
+@media (max-width: 480px) {
+  .strc-output__grid {
+    grid-template-columns: 1fr;
+  }
+  .strc-output__grid .output-group:nth-child(2) {
+    grid-column: auto;
+  }
+}

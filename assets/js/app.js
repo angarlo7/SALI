@@ -58,6 +58,21 @@
     MXN: 0.058  // fallback: 1 MXN ≈ 0.058 USD
   };
 
+  // STRC / Salary Under STRETCH
+  // Variable Rate Series A Perpetual Stretch Preferred Stock — Nasdaq: STRC
+  // Par/liquidation value $100. Rate is variable, adjusted monthly by Strategy (±0.25%/mo)
+  // to keep market price near $100. Rate history: 9% (Jul 2025) → 11.5% (Apr 2026).
+  const STRC_PAR = 100;
+  const STRC_STATED_RATE = 0.115;        // 11.5% current monthly-adjusted rate (Apr 2026)
+  const STRC_ANNUAL_DIV = STRC_PAR * STRC_STATED_RATE; // $11.50/share/yr
+  const STRC_RATE_DATE = 'Apr 2026';     // date of last known rate; update when Strategy announces change
+
+  let strcEnabled = false;
+  let strcPct = 10;
+  let strcCurrentYield = STRC_STATED_RATE;
+  let strcCurrentPrice = STRC_PAR;
+  let strcDataSource = 'fallback'; // 'live' | 'fallback'
+
   // State
   let spotPrice = null;
   let annualAverages = null;
@@ -1889,6 +1904,9 @@
       // Historical SALI (if user has entered a starting point)
       computeHistorical(baseBtcPrice, currency);
 
+      // STRC / Salary Under STRETCH output
+      updateStrcOutput(salary, currency);
+
       // Render table and charts
       renderTable(projections, currency);
       renderChart(projections);
@@ -1942,6 +1960,70 @@
         elements.histStartYear.appendChild(option);
       }
     }
+  }
+
+  /**
+   * Fetch STRC live price from Yahoo Finance's v8 chart endpoint (no key required).
+   * Browser CORS may block this; the catch path falls back to par price + stated rate.
+   * Because STRC's variable rate is set monthly to keep the price near its $100 par,
+   * the stated rate and current yield are nearly identical regardless.
+   */
+  async function fetchStrcData() {
+    try {
+      const res = await fetch(
+        'https://query1.finance.yahoo.com/v8/finance/chart/STRC?interval=1d&range=1d',
+        { signal: AbortSignal.timeout(5000) }
+      );
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      const price = data?.chart?.result?.[0]?.meta?.regularMarketPrice;
+      if (!price || price <= 0) throw new Error('No price');
+      strcCurrentPrice = price;
+      strcCurrentYield = STRC_ANNUAL_DIV / price;
+      strcDataSource = 'live';
+    } catch (_) {
+      strcCurrentPrice = STRC_PAR;
+      strcCurrentYield = STRC_STATED_RATE;
+      strcDataSource = 'fallback';
+    }
+    updateStrcYieldDisplay();
+    if (strcEnabled) compute();
+  }
+
+  function updateStrcYieldDisplay() {
+    const el = elements.strcYieldDisplay || document.getElementById('strcYieldDisplay');
+    if (!el) return;
+    const yieldPct = (strcCurrentYield * 100).toFixed(2);
+    const priceStr = formatUsdCurrency(strcCurrentPrice);
+    const tag = strcDataSource === 'live'
+      ? 'Finnhub live'
+      : `stated rate as of ${STRC_RATE_DATE}`;
+    el.textContent = `$STRC ${priceStr} · ${yieldPct}% yield (${tag})`;
+    el.className = 'strc-yield-display strc-yield-display--' + strcDataSource;
+  }
+
+  function updateStrcOutput(salary, currency) {
+    const wrap = elements.strcOutputWrap;
+    if (!wrap) return;
+    if (!strcEnabled || !salary || salary <= 0) {
+      wrap.style.display = 'none';
+      return;
+    }
+    const alloc = salary * (strcPct / 100);
+    const dividendIncome = alloc * strcCurrentYield;
+    const remaining = salary - alloc;
+    const shares = strcCurrentPrice > 0 ? Math.round(alloc / strcCurrentPrice) : 0;
+
+    if (elements.strcAllocOutput) elements.strcAllocOutput.textContent = formatCurrency(alloc, currency);
+    if (elements.strcDivOutput)   elements.strcDivOutput.textContent   = formatCurrency(dividendIncome, currency) + '/yr';
+    if (elements.strcRemainOutput) elements.strcRemainOutput.textContent = formatCurrency(remaining, currency);
+    if (elements.strcYieldNote) {
+      const yieldPct = (strcCurrentYield * 100).toFixed(2);
+      const srcNote = strcDataSource === 'live' ? 'Yahoo Finance live' : 'stated rate fallback';
+      elements.strcYieldNote.textContent =
+        `${shares.toLocaleString('en-US')} shares · $${STRC_ANNUAL_DIV.toFixed(2)}/share/yr · ${yieldPct}% yield (${srcNote})`;
+    }
+    wrap.style.display = 'block';
   }
 
   /**
@@ -2024,13 +2106,26 @@
       // SALI Tier + Purchasing Power
       saliTierWrap: document.getElementById('saliTierWrap'),
       saliTier: document.getElementById('saliTier'),
-      ppNarrative: document.getElementById('ppNarrative')
+      ppNarrative: document.getElementById('ppNarrative'),
+      // STRC / Salary Under STRETCH
+      strcEnableToggle: document.getElementById('strcEnableToggle'),
+      strcPctGroup: document.getElementById('strcPctGroup'),
+      strcPctInput: document.getElementById('strcPctInput'),
+      strcYieldDisplay: document.getElementById('strcYieldDisplay'),
+      strcOutputWrap: document.getElementById('strcOutputWrap'),
+      strcAllocOutput: document.getElementById('strcAllocOutput'),
+      strcDivOutput: document.getElementById('strcDivOutput'),
+      strcRemainOutput: document.getElementById('strcRemainOutput'),
+      strcYieldNote: document.getElementById('strcYieldNote')
     };
 
     // Check if we're on the calculator page
     if (!elements.salaryInput) {
       return; // Not on calculator page
     }
+
+    // Fire STRC price fetch in background; doesn't block the main calculator init
+    fetchStrcData();
 
     // Load data first, then populate selects
     Promise.all([
@@ -2189,6 +2284,25 @@
           benchmarkGrowthOverride = parseFloat(elements.benchmarkGrowthInput.value) || null;
           compute();
         });
+      }
+
+      // STRC / Salary Under STRETCH listeners
+      if (elements.strcEnableToggle) {
+        elements.strcEnableToggle.addEventListener('change', () => {
+          strcEnabled = elements.strcEnableToggle.checked;
+          if (elements.strcPctGroup) {
+            elements.strcPctGroup.classList.toggle('form-group--hidden', !strcEnabled);
+          }
+          compute();
+        });
+      }
+      if (elements.strcPctInput) {
+        const onStrcPct = () => {
+          strcPct = parseFloat(elements.strcPctInput.value) || 0;
+          compute();
+        };
+        elements.strcPctInput.addEventListener('input', onStrcPct);
+        elements.strcPctInput.addEventListener('change', onStrcPct);
       }
 
       // Breakdown toggle
