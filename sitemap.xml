@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://angarlo.com/</loc>
+    <loc>https://sali.angarlo.com/</loc>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://angarlo.com/methodology.html</loc>
+    <loc>https://sali.angarlo.com/methodology.html</loc>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://angarlo.com/examples.html</loc>
+    <loc>https://sali.angarlo.com/examples.html</loc>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://angarlo.com/podcast.html</loc>
+    <loc>https://sali.angarlo.com/podcast.html</loc>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://angarlo.com/contact.html</loc>
+    <loc>https://sali.angarlo.com/contact.html</loc>
     <priority>0.6</priority>
   </url>
 </urlset>

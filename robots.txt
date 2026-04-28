@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://angarlo.com/sitemap.xml
+Sitemap: https://sali.angarlo.com/sitemap.xml

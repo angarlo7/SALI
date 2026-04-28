@@ -9,7 +9,7 @@
 - **Frontend**: Pure HTML/CSS/JavaScript (no framework dependencies)
 - **Styling**: Dark theme inspired by ultrasound.money with slate background and cyan/orange accents
 - **Charts**: Chart.js v4.4.1 for visualizations
-- **Data**: CoinGecko API for live BTC prices + local JSON for historical annual averages
+- **Data**: Coinbase public API for live BTC spot prices + Frankfurter (ECB) for live FX + local JSON for historical annual averages and benchmark series
 - **Server**: Python HTTP server for local development
 
 ## Project Structure
@@ -25,11 +25,17 @@ SALI/
 ├── README.md
 ├── /assets
 │   ├── /css
-│   │   └── styles.css  # Complete dark theme styling (~836 lines)
-│   └── /js
-│       └── app.js      # Calculator engine (~766 lines)
+│   │   └── styles.css  # Complete dark theme styling (~1,852 lines)
+│   ├── /js
+│   │   ├── app.js      # Calculator engine (~2,071 lines)
+│   │   └── theme.js    # Dark/light theme toggle
+│   └── /images
+│       └── sali-share.png  # OG / Twitter share card
 └── /data
-    └── btc_annual_average_usd.json  # Historical BTC prices (2015-2025)
+    ├── btc_annual_average_usd.json  # Historical BTC prices (2015-2025)
+    ├── sp500_annual.json            # S&P 500 year-end closes
+    ├── gold_annual_avg_usd.json     # Gold annual averages (USD/oz)
+    └── cpi_annual.json              # US CPI-U annual averages
 ```
 
 ## Core Functionality Analysis
@@ -37,7 +43,7 @@ SALI/
 **Calculator Features:**
 - Annual salary input with multi-currency support (USD, EUR, MXN)
 - Three BTC price methods:
-  - Live spot price from CoinGecko API
+  - Live spot price from Coinbase public API
   - Annual average from historical data
   - Manual entry
 - Salary growth rate projections
@@ -68,10 +74,10 @@ SALI (sats/year) = (Annual Salary in USD ÷ BTC Price in USD) × 100,000,000
 - Professional UX with status messages and loading states
 - Chart interactivity with tooltips and hover states
 
-⚠️ **Known Placeholders:**
-- FX rates (EUR, MXN to USD) are hardcoded placeholders (app.js:18-22)
-- BTC annual average data is documented as placeholder (README notes)
-- No live FX API integration yet
+⚠️ **Known Placeholders (resolved 2026-04-27):**
+- ~~FX rates (EUR, MXN to USD) are hardcoded placeholders~~ — Resolved: live ECB rates now fetched at runtime via Frankfurter API. Hardcoded values kept only as fallback.
+- ~~BTC annual average data is documented as placeholder~~ — Resolved: values now sourced from StatMuse cross-referenced with CoinGecko / CoinMarketCap, with `_source` annotation in the JSON.
+- ~~No live FX API integration yet~~ — Resolved: Frankfurter (ECB) integrated.
 
 ## Local Testing Status
 ✅ **Successfully Running:**
@@ -89,13 +95,11 @@ SALI (sats/year) = (Annual Salary in USD ÷ BTC Price in USD) × 100,000,000
 
 ## Git Repository Status
 ✅ **Repo:** https://github.com/angarlo7/SALI.git
-**Branch:** `main`
-**Last commit:** `d29c4ba - Initial commit: SALI calculator`
+**Branch:** `main` (clean working tree as of 2026-04-27)
+**Last commit:** `4b0ddd9 - fix: og:image with visible grade letters, clean labels`
+**Custom domain:** `sali.angarlo.com` (GitHub Pages, via `CNAME` + `.nojekyll`)
 
-⚠️ **Uncommitted changes (as of 2026-03-22, left as-is per user decision):**
-- Modified: `assets/css/styles.css`
-- Modified: `assets/js/app.js`
-- Untracked: `wireframe-mobile.html`, `.claude/`
+✅ **Earlier uncommitted-changes block (2026-03-22) — resolved.** All prior modifications to `styles.css` and `app.js` have since been committed; `wireframe-mobile.html` and `.claude/` are now in `.gitignore`.
 
 ## Running Locally (Quick Start)
 ```bash
@@ -115,8 +119,8 @@ Then open http://localhost:8000 in your browser.
 4. **Deployment**: Consider deploying to Webflow as documented in README
 5. **Analytics**: Add privacy-respecting analytics to understand user engagement
 
-## Files Summary
-- **index.html**: 239 lines - Main calculator interface with form inputs and outputs
-- **app.js**: 766 lines - Complete calculator logic with data fetching, projections, and charting
-- **styles.css**: 836 lines - Professional dark theme with responsive design
-- **btc_annual_average_usd.json**: 13 lines - Historical BTC price data (2015-2025)
+## Files Summary (refreshed 2026-04-27)
+- **index.html**: 454 lines - Main calculator interface with form inputs, multi-benchmark normalized chart, break-even calc, historical reconstruction, and share card
+- **app.js**: 2,071 lines - Calculator engine, FX (ECB/Frankfurter), BTC spot (Coinbase), four-benchmark comparison (BTC, S&P 500, Gold, CPI), projections, SALI Grade badge, share-to-X
+- **styles.css**: 1,852 lines - Professional dark theme with responsive design (light/dark toggle is JS-driven via `theme.js`; no `prefers-color-scheme` media query yet)
+- **btc_annual_average_usd.json**: ~12 lines - Historical BTC price data (2015-2025) with `_source` attribution
