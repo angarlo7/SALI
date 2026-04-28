@@ -326,21 +326,90 @@
   }
 
   /**
-   * Build and set the "Post on X" href based on the current calculation result
+   * Compute SALI grade based on annualized historical SALI decay rate (CAGR).
+   * Returns grade (S/A/B/C/D/F), annual rate %, gap %, tagline.
    */
-  function updateTweetLink(currentYearData) {
-    if (!elements.tweetSaliBtn || !currentYearData) return;
-    const salary = parseFloat(elements.salaryInput ? elements.salaryInput.value : 0) || 0;
-    const currency = elements.currencySelect ? elements.currencySelect.value : 'USD';
-    const sats = Math.round(currentYearData.sats);
-    const btcEq = currentYearData.btcEquivalent.toFixed(2);
-    const salaryFmt = formatCurrency(salary, currency);
+  function computeSaliGrade(projections, btcGrowth, nominalSalaryGrowth) {
+    const first = projections[0];
+    const current = projections.find(p => p.isCurrentYear);
+    if (!first || !current || first.year === current.year) return null;
 
-    const text = [
-      `My ${CURRENT_YEAR} SALI: ${formatSats(sats)} sats/yr (${btcEq} BTC).`,
-      `Salary: ${salaryFmt}.`,
-      `Bitcoin still winning. Calculate yours:`,
-    ].join(' ');
+    const years = current.year - first.year;
+    if (years < 1) return null;
+
+    // Annualized SALI change using actual historical BTC prices (CAGR)
+    const annualRate = (Math.pow(current.sats / first.sats, 1 / years) - 1) * 100;
+
+    // How many more %/yr of salary growth are needed to keep SALI flat
+    const gap = btcGrowth - nominalSalaryGrowth;
+
+    let grade, tagline, colorClass;
+    if (annualRate >= 0)         { grade = 'S'; tagline = 'Keeping pace with Bitcoin — extremely rare'; colorClass = 'sali-score__grade--S'; }
+    else if (annualRate >= -10)  { grade = 'A'; tagline = 'Near-parity with Bitcoin appreciation'; colorClass = 'sali-score__grade--A'; }
+    else if (annualRate >= -20)  { grade = 'B'; tagline = 'Above average — losing ground slowly'; colorClass = 'sali-score__grade--B'; }
+    else if (annualRate >= -35)  { grade = 'C'; tagline = 'Typical salary trajectory vs Bitcoin'; colorClass = 'sali-score__grade--C'; }
+    else if (annualRate >= -50)  { grade = 'D'; tagline = 'Bitcoin outpacing your salary significantly'; colorClass = 'sali-score__grade--D'; }
+    else                         { grade = 'F'; tagline = 'Bitcoin is winning by a wide margin'; colorClass = 'sali-score__grade--F'; }
+
+    return { grade, annualRate, gap, tagline, colorClass };
+  }
+
+  /**
+   * Render the SALI score badge in the outputs panel
+   */
+  function updateSaliScore(gradeData) {
+    const wrap = elements.saliScoreWrap;
+    if (!wrap) return;
+    if (!gradeData) { wrap.style.display = 'none'; return; }
+
+    const { grade, annualRate, gap, tagline, colorClass } = gradeData;
+
+    if (elements.saliScoreGrade) {
+      elements.saliScoreGrade.textContent = grade;
+      elements.saliScoreGrade.className = `sali-score__grade ${colorClass}`;
+    }
+    if (elements.saliScoreRate) {
+      const sign = annualRate >= 0 ? '+' : '';
+      elements.saliScoreRate.textContent =
+        `${sign}${annualRate.toFixed(1)}% / yr Bitcoin purchasing power`;
+    }
+    if (elements.saliScoreGap) {
+      if (gap > 0.1) {
+        elements.saliScoreGap.textContent =
+          `Need +${gap.toFixed(1)}%/yr more salary growth to keep pace`;
+      } else if (gap < -0.1) {
+        elements.saliScoreGap.textContent =
+          `Outpacing Bitcoin by ${Math.abs(gap).toFixed(1)}%/yr`;
+      } else {
+        elements.saliScoreGap.textContent = 'At break-even with Bitcoin';
+      }
+    }
+    if (elements.saliScoreTagline) {
+      elements.saliScoreTagline.textContent = tagline;
+    }
+
+    wrap.style.display = 'block';
+  }
+
+  /**
+   * Build and set the "Post on X" href — shares grade and insights, never salary or sats
+   */
+  function updateTweetLink(gradeData) {
+    if (!elements.tweetSaliBtn) return;
+
+    let text;
+    if (gradeData) {
+      const { grade, annualRate, gap } = gradeData;
+      const rateStr = `${annualRate.toFixed(1)}%/yr`;
+      const gapStr = gap > 0.1
+        ? `Need +${gap.toFixed(1)}%/yr more to keep pace`
+        : gap < -0.1
+          ? `Outpacing Bitcoin by ${Math.abs(gap).toFixed(1)}%/yr`
+          : 'At break-even with Bitcoin';
+      text = `My SALI Grade: ${grade} · ${rateStr} Bitcoin purchasing power · ${gapStr} · #Bitcoin #SALI`;
+    } else {
+      text = 'How much is your salary worth in Bitcoin? Check your SALI grade → #Bitcoin #SALI';
+    }
 
     const url = 'https://sali.angarlo.com';
     const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
@@ -390,16 +459,7 @@
     ctx.textAlign = 'left';
     ctx.fillText('SATOSHI ANNUAL LABOR INDEX', 84, 95);
 
-    // Big number — strip unit suffix for display
-    const bigNum = satsText.replace(' sats/year', '').replace(' BTC/year', '');
-    ctx.fillStyle = orange;
-    ctx.font = `700 72px ${font}`;
-    ctx.fillText(bigNum, 84, 195);
-
-    // Unit
-    ctx.fillStyle = gray;
-    ctx.font = `400 26px ${font}`;
-    ctx.fillText('sats / year', 84, 235);
+    // Grade + insights drawn below (in the stats section)
 
     // Divider
     ctx.strokeStyle = '#e5e5e5';
@@ -423,22 +483,40 @@
       ctx.fillText(value, x, statsY + 34);
     };
 
-    drawStat('SALARY', formatCurrency(salary, currency), 60);
-    drawStat('BTC PRICE', btcPriceText, 60 + colW);
+    // Grade — read from live DOM
+    const gradeEl   = elements.saliScoreGrade;
+    const rateEl    = elements.saliScoreRate;
+    const gapEl     = elements.saliScoreGap;
+    const gradeText = gradeEl ? gradeEl.textContent.trim() : '—';
+    const rateText  = rateEl  ? rateEl.textContent.trim()  : '—';
+    const gapText   = gapEl   ? gapEl.textContent.trim()   : '—';
 
-    if (histEl && histYearEl && histEl.textContent && histEl.textContent !== '—') {
-      const hVal = histEl.textContent;
-      const hColor = hVal.startsWith('-') ? '#dc2626' : '#16a34a';
-      drawStat(`SINCE ${histYearEl.textContent}`, hVal, 60 + colW * 2, hColor);
+    // Big grade letter in place of the number
+    const gradeColors = { S:'#F7931A', A:'#16a34a', B:'#65a30d', C:'#ca8a04', D:'#ea580c', F:'#dc2626' };
+    const gradeColor  = gradeColors[gradeText] || orange;
+
+    ctx.fillStyle = gradeColor;
+    ctx.font = `700 72px ${font}`;
+    ctx.textAlign = 'left';
+    ctx.fillText(gradeText, 84, 195);
+
+    // "SALI GRADE" label (replaces the sat count)
+    ctx.fillStyle = gray;
+    ctx.font = `400 26px ${font}`;
+    ctx.fillText('SALI Grade', 84, 235);
+
+    // Stats row — rate + gap + year + BTC price (no salary)
+    drawStat('BTC PRICE', btcPriceText, 60);
+    drawStat('YEAR', String(CURRENT_YEAR), 60 + colW);
+
+    if (rateText && rateText !== '—') {
+      const rColor = rateText.startsWith('-') ? '#dc2626' : '#16a34a';
+      drawStat('BTC PWR/YR', rateText.replace(' Bitcoin purchasing power', ''), 60 + colW * 2, rColor);
     }
 
-    if (projEl && projEl.textContent && projEl.textContent !== '—') {
-      const pVal = projEl.textContent;
-      const pColor = pVal.startsWith('-') ? '#dc2626' : '#16a34a';
-      drawStat('PROJECTED', pVal, 60 + colW * 3, pColor);
+    if (gapText && gapText !== '—') {
+      drawStat('BREAKEVEN GAP', gapText.replace('Need ', '').replace(' more salary growth to keep pace', ''), 60 + colW * 3, gray);
     }
-
-    drawStat('YEAR', String(CURRENT_YEAR), 60 + colW * 4 > W - 120 ? 60 + colW * 3 : 60 + colW * 4);
 
     // Orange accent bar below stats
     ctx.fillStyle = 'rgba(247, 147, 26, 0.08)';
@@ -465,8 +543,14 @@
     }, 'image/png');
 
     // Clipboard: copy shareable URL + summary text
-    const shareUrl = window.location.href;
-    const textSummary = `My SALI (${CURRENT_YEAR}): ${satsText} | Salary: ${formatCurrency(salary, currency)} | BTC: ${btcPriceText}\n${shareUrl}`;
+    const shareUrl = 'https://sali.angarlo.com';
+    const gradeElSnap  = elements.saliScoreGrade;
+    const rateElSnap   = elements.saliScoreRate;
+    const gapElSnap    = elements.saliScoreGap;
+    const gradeSnap    = gradeElSnap ? gradeElSnap.textContent.trim() : '—';
+    const rateSnap     = rateElSnap  ? rateElSnap.textContent.trim()  : '—';
+    const gapSnap      = gapElSnap   ? gapElSnap.textContent.trim()   : '—';
+    const textSummary  = `My SALI Grade: ${gradeSnap} | ${rateSnap} | ${gapSnap}\n${shareUrl}`;
     navigator.clipboard.writeText(textSummary).catch(() => {});
 
     // Update button label briefly to confirm copy
@@ -1639,9 +1723,13 @@
       // Purchasing power equivalents
       updateEquivalents(currentYearData.sats, currentYearData.btcEquivalent);
 
+      // SALI Grade score
+      const gradeData = computeSaliGrade(projections, btcGrowth, nominalSalaryGrowth);
+      updateSaliScore(gradeData);
+
       // Show share buttons once we have a valid result
       if (elements.shareRow) elements.shareRow.style.display = 'flex';
-      updateTweetLink(currentYearData);
+      updateTweetLink(gradeData);
 
       // Decomposition summary
       updateDecompSummary(projections);
@@ -1780,6 +1868,12 @@
       // Decomposition
       decompSummary: document.getElementById('decompSummary'),
       breakdownToggle: document.getElementById('breakdownToggle'),
+      // SALI Grade Score
+      saliScoreWrap: document.getElementById('saliScoreWrap'),
+      saliScoreGrade: document.getElementById('saliScoreGrade'),
+      saliScoreRate: document.getElementById('saliScoreRate'),
+      saliScoreGap: document.getElementById('saliScoreGap'),
+      saliScoreTagline: document.getElementById('saliScoreTagline'),
       // SALI Tier + Purchasing Power
       saliTierWrap: document.getElementById('saliTierWrap'),
       saliTier: document.getElementById('saliTier'),

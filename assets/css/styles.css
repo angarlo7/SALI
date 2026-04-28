@@ -1781,3 +1781,72 @@ body.dark .fx-warning {
   border-color: var(--color-accent);
   color: var(--color-text);
 }
+
+/* ── SALI Score Badge ───────────────────────────────────────── */
+.sali-score-wrap {
+  margin: var(--spacing-md) 0;
+}
+
+.sali-score {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md) var(--spacing-lg);
+}
+
+.sali-score__left {
+  text-align: center;
+  min-width: 70px;
+  flex-shrink: 0;
+}
+
+.sali-score__label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-text-muted);
+  margin-bottom: 2px;
+}
+
+.sali-score__grade {
+  font-family: var(--font-mono);
+  font-size: 3rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.sali-score__grade--S { color: #F7931A; }
+.sali-score__grade--A { color: #16a34a; }
+.sali-score__grade--B { color: #65a30d; }
+.sali-score__grade--C { color: #ca8a04; }
+.sali-score__grade--D { color: #ea580c; }
+.sali-score__grade--F { color: #dc2626; }
+
+.sali-score__right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.sali-score__stat {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.sali-score__tagline {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+[data-theme="dark"] .sali-score {
+  background: var(--color-bg-secondary);
+  border-color: var(--color-border);
+}
