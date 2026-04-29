@@ -481,17 +481,16 @@
   }
 
   /**
-   * Build and set share hrefs for all four social platforms.
+   * Build and set the X (Twitter) share href.
    * Never includes salary or absolute sats — only grade and rate.
    */
   function updateShareLinks(gradeData) {
-    const validGrades = new Set([‘S’, ‘A’, ‘B’, ‘C’, ‘D’, ‘F’]);
+    const validGrades = new Set(['S', 'A', 'B', 'C', 'D', 'F']);
     const gradeUrl = (gradeData && validGrades.has(gradeData.grade))
       ? `https://sali.angarlo.com/share/${gradeData.grade}.html`
-      : ‘https://sali.angarlo.com’;
-    const baseUrl = ‘https://sali.angarlo.com’;
+      : 'https://sali.angarlo.com';
 
-    let shortText, longText, redditTitle;
+    let shortText;
 
     if (gradeData) {
       const { grade, annualRate, gap } = gradeData;
@@ -513,13 +512,10 @@
         hook = `My salary is right at Bitcoin break-even (${rateStr}). Grade: ${grade}.`;
       }
 
-      const tags = strcEnabled && strcPct > 0 ? ‘#Bitcoin #SALI #STRC’ : ‘#Bitcoin #SALI’;
+      const tags = strcEnabled && strcPct > 0 ? '#Bitcoin #SALI #STRC' : '#Bitcoin #SALI';
       shortText = `🟠 SALI — ${hook}\n\nCalculate yours: ${tags}`;
-      longText  = `🟠 SALI (Satoshi Annual Labor Index) — ${hook}\n\nHow much is your salary worth in Bitcoin? ${tags}`;
-      redditTitle = `My SALI Grade: ${grade} (${rateStr}) — Salary vs. Bitcoin [${new Date().getFullYear()}]`;
     } else {
-      shortText = longText = `🟠 How much is your salary worth in Bitcoin? Calculate your SALI Grade → #Bitcoin #SALI`;
-      redditTitle = `SALI — How much is your salary worth in Bitcoin?`;
+      shortText = `🟠 How much is your salary worth in Bitcoin? Calculate your SALI Grade → #Bitcoin #SALI`;
     }
 
     if (elements.tweetSaliBtn) {
@@ -530,14 +526,6 @@
       elements.gradeShareBtn.href =
         `https://twitter.com/intent/tweet?text=${encodeURIComponent(shortText)}&url=${encodeURIComponent(gradeUrl)}`;
       elements.gradeShareBtn.style.display = 'block';
-    }
-    if (elements.linkedinSaliBtn) {
-      elements.linkedinSaliBtn.href =
-        `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(gradeUrl)}`;
-    }
-    if (elements.redditSaliBtn) {
-      elements.redditSaliBtn.href =
-        `https://www.reddit.com/submit?url=${encodeURIComponent(gradeUrl)}&title=${encodeURIComponent(redditTitle)}`;
     }
   }
 
@@ -2269,8 +2257,6 @@
       gradeShareBtn: document.getElementById('gradeShareBtn'),
       shareRow: document.getElementById('shareRow'),
       tweetSaliBtn: document.getElementById('tweetSaliBtn'),
-      linkedinSaliBtn: document.getElementById('linkedinSaliBtn'),
-      redditSaliBtn: document.getElementById('redditSaliBtn'),
       // Decomposition
       decompSummary: document.getElementById('decompSummary'),
       breakdownToggle: document.getElementById('breakdownToggle'),
