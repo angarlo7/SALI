@@ -61,11 +61,55 @@
   // STRC / Salary Under STRETCH
   // Variable Rate Series A Perpetual Stretch Preferred Stock — Nasdaq: STRC
   // Par/liquidation value $100. Rate is variable, adjusted monthly by Strategy (±0.25%/mo)
-  // to keep market price near $100. Rate history: 9% (Jul 2025) → 11.5% (Apr 2026).
+  // to keep market price near $100.
   const STRC_PAR = 100;
-  const STRC_STATED_RATE = 0.115;        // 11.5% current monthly-adjusted rate (Apr 2026)
-  const STRC_ANNUAL_DIV = STRC_PAR * STRC_STATED_RATE; // $11.50/share/yr
-  const STRC_RATE_DATE = 'Apr 2026';     // date of last known rate; update when Strategy announces change
+  const STRC_STATED_RATE = 0.115;        // 11.5% current rate (Apr 2026)
+  const STRC_ANNUAL_DIV = STRC_PAR * STRC_STATED_RATE; // $11.50/share/yr at current rate
+  const STRC_RATE_DATE = 'Apr 2026';
+  const STRC_LAUNCH = new Date(2025, 6, 29); // July 29, 2025 — IPO close date
+
+  // Known monthly rate snapshots since launch (approximate; ±0.25%/mo adjustments).
+  // Each entry: [year, month (0-indexed), annualRate].
+  // Update the last entry when Strategy announces a rate change.
+  const STRC_RATE_HISTORY = [
+    [2025,  6, 0.0900],  // Jul 2025 — launch at 9.00%
+    [2025,  7, 0.0925],  // Aug 2025
+    [2025,  8, 0.0950],  // Sep 2025
+    [2025,  9, 0.0975],  // Oct 2025
+    [2025, 10, 0.1000],  // Nov 2025
+    [2025, 11, 0.1025],  // Dec 2025
+    [2026,  0, 0.1050],  // Jan 2026
+    [2026,  1, 0.1075],  // Feb 2026
+    [2026,  2, 0.1100],  // Mar 2026
+    [2026,  3, 0.1150],  // Apr 2026 — held steady (first time)
+  ];
+
+  /**
+   * Compute the time-weighted average STRC yield between two dates.
+   * Returns 0 for any period before STRC_LAUNCH.
+   */
+  function strcAvgYield(fromDate, toDate) {
+    const start = fromDate < STRC_LAUNCH ? STRC_LAUNCH : fromDate;
+    const end   = toDate > new Date() ? new Date() : toDate;
+    if (start >= end) return 0;
+
+    let totalMs = 0, weightedRate = 0;
+    for (let i = 0; i < STRC_RATE_HISTORY.length; i++) {
+      const [yr, mo, rate] = STRC_RATE_HISTORY[i];
+      const sliceStart = new Date(yr, mo, 1);
+      const sliceEnd   = i + 1 < STRC_RATE_HISTORY.length
+        ? new Date(STRC_RATE_HISTORY[i + 1][0], STRC_RATE_HISTORY[i + 1][1], 1)
+        : new Date(); // last known rate extends to today
+      const a = Math.max(start, sliceStart);
+      const b = Math.min(end,   sliceEnd);
+      if (b > a) {
+        const ms = b - a;
+        totalMs       += ms;
+        weightedRate  += rate * ms;
+      }
+    }
+    return totalMs > 0 ? weightedRate / totalMs : 0;
+  }
 
   let strcEnabled = false;
   let strcPct = 10;
@@ -361,16 +405,27 @@
     // Annualized SALI change using actual historical BTC prices (CAGR)
     const historicalRate = (Math.pow(current.sats / first.sats, 1 / years) - 1) * 100;
 
-    // STRC income lift: dividend income as % of salary, converted to a rate boost.
-    // e.g. 10% allocation × 11.5% yield = +1.15%/yr effective income growth.
-    const strcBoost = (strcEnabled && strcPct > 0)
-      ? (strcPct / 100) * strcCurrentYield * 100
-      : 0;
+    // STRC income lift — only counted from Jul 2025 (launch), time-weighted
+    // against the full historical window. Uses actual monthly rate history,
+    // not today's rate, for the period STRC was active.
+    let strcBoost = 0;
+    if (strcEnabled && strcPct > 0) {
+      const periodStart = new Date(first.year, 0, 1);
+      const periodEnd   = new Date();
+      const totalMs     = periodEnd - periodStart;
+      const strcMs      = Math.max(0, periodEnd - STRC_LAUNCH);
+      const strcFraction = totalMs > 0 ? strcMs / totalMs : 0;
+      const avgYield    = strcAvgYield(periodStart, periodEnd);
+      strcBoost = (strcPct / 100) * avgYield * 100 * strcFraction;
+    }
 
     const annualRate = historicalRate + strcBoost;
 
-    // Gap: how many %/yr of additional income growth close the BTC gap
-    const gap = btcGrowth - nominalSalaryGrowth - strcBoost;
+    // Gap: BTC rate minus effective income growth (salary + STRC forward yield)
+    const strcForwardBoost = (strcEnabled && strcPct > 0)
+      ? (strcPct / 100) * strcCurrentYield * 100
+      : 0;
+    const gap = btcGrowth - nominalSalaryGrowth - strcForwardBoost;
 
     let grade, tagline, colorClass;
     if (annualRate >= 0)         { grade = 'S'; tagline = 'Keeping pace with Bitcoin — extremely rare'; colorClass = 'sali-score__grade--S'; }
@@ -399,10 +454,10 @@
     }
     if (elements.saliScoreRate) {
       const sign = annualRate >= 0 ? '+' : '';
-      const strcBoost = (strcEnabled && strcPct > 0)
+      const strcForwardBoost = (strcEnabled && strcPct > 0)
         ? (strcPct / 100) * strcCurrentYield * 100
         : 0;
-      const boostNote = strcBoost > 0 ? ` (incl. +${strcBoost.toFixed(2)}% $STRC)` : '';
+      const boostNote = strcForwardBoost > 0 ? ` (incl. +${strcForwardBoost.toFixed(2)}% $STRC fwd)` : '';
       elements.saliScoreRate.textContent =
         `${sign}${annualRate.toFixed(1)}% / yr Bitcoin purchasing power${boostNote}`;
     }
@@ -2017,10 +2072,8 @@
     if (!el) return;
     const yieldPct = (strcCurrentYield * 100).toFixed(2);
     const priceStr = formatUsdCurrency(strcCurrentPrice);
-    const tag = strcDataSource === 'live'
-      ? 'Finnhub live'
-      : `stated rate as of ${STRC_RATE_DATE}`;
-    el.textContent = `$STRC ${priceStr} · ${yieldPct}% yield (${tag})`;
+    const src = strcDataSource === 'live' ? 'live price' : `as of ${STRC_RATE_DATE}`;
+    el.textContent = `$STRC ${priceStr} · ${yieldPct}% yield (${src} · launched Jul 2025 · rate adjusts monthly)`;
     el.className = 'strc-yield-display strc-yield-display--' + strcDataSource;
   }
 
