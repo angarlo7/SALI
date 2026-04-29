@@ -531,10 +531,6 @@
         `https://twitter.com/intent/tweet?text=${encodeURIComponent(shortText)}&url=${encodeURIComponent(gradeUrl)}`;
       elements.gradeShareBtn.style.display = 'block';
     }
-    if (elements.blueskySaliBtn) {
-      elements.blueskySaliBtn.href =
-        `https://bsky.app/intent/compose?text=${encodeURIComponent(shortText + ‘\n’ + baseUrl)}`;
-    }
     if (elements.linkedinSaliBtn) {
       elements.linkedinSaliBtn.href =
         `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(gradeUrl)}`;
@@ -2274,7 +2270,6 @@
       shareRow: document.getElementById('shareRow'),
       tweetSaliBtn: document.getElementById('tweetSaliBtn'),
       linkedinSaliBtn: document.getElementById('linkedinSaliBtn'),
-      blueskySaliBtn: document.getElementById('blueskySaliBtn'),
       redditSaliBtn: document.getElementById('redditSaliBtn'),
       // Decomposition
       decompSummary: document.getElementById('decompSummary'),

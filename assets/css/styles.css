@@ -2162,10 +2162,10 @@ body.dark .fx-warning {
   color: var(--color-text-muted);
 }
 
-/* Social share buttons (2×2 grid) */
+/* Social share buttons (3-column row) */
 .share-row {
   display: grid !important;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: var(--spacing-sm);
   margin-top: var(--spacing-md);
   flex-wrap: unset;
@@ -2204,8 +2204,8 @@ body.dark .fx-warning {
 }
 
 @media (max-width: 500px) {
-  .share-row { grid-template-columns: 1fr 1fr; }
-  .btn--social { font-size: 0.7rem; padding: 0.5rem 0.4rem; letter-spacing: 0.02em; }
+  .share-row { grid-template-columns: 1fr 1fr 1fr; }
+  .btn--social { font-size: 0.68rem; padding: 0.5rem 0.3rem; letter-spacing: 0; }
 }
 
 @media (max-width: 360px) {
