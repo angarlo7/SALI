@@ -2034,6 +2034,16 @@ body.dark .fx-warning {
   color: #4ade80 !important;
 }
 
+.strc-included-note {
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: #4ade80;
+  opacity: 0.8;
+  margin-left: 6px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
 .strc-yield-note {
   font-size: 0.68rem;
   font-family: var(--font-mono);

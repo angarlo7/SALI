@@ -476,6 +476,7 @@
       elements.saliScoreTagline.textContent = tagline;
     }
 
+    document.title = `SALI Grade: ${grade} | Satoshi Annual Labor Index`;
     wrap.style.display = 'block';
   }
 
@@ -1679,7 +1680,7 @@
     const breakevenRate = Math.max(0, btcGrowth - strcForwardBoost);
 
     elements.breakevenRateOutput.textContent = '+' + breakevenRate.toFixed(1) + '%/yr'
-      + (strcForwardBoost > 0 ? ` (reduced by ${strcForwardBoost.toFixed(2)}% $STRC yield)` : '');
+      + (strcForwardBoost > 0 ? ` (reduced by ${strcForwardBoost.toFixed(2)}% $STRC yield — rate adjusts monthly)` : '');
 
     const yearsAhead = 5;
     const salaryBreakEven5 = salary * Math.pow(1 + breakevenRate / 100, yearsAhead);
@@ -2192,8 +2193,9 @@
     if (elements.strcYieldNote) {
       const yieldPct = (strcCurrentYield * 100).toFixed(2);
       const srcNote  = strcDataSource === 'live' ? 'Yahoo Finance live' : 'stated rate fallback';
+      const histNote = 'Grade boost is time-weighted from July 2025 (STRC launch).';
       elements.strcYieldNote.textContent =
-        `${shares.toLocaleString('en-US')} shares · $${STRC_ANNUAL_DIV.toFixed(2)}/share/yr · ${yieldPct}% yield (${srcNote}) · dividends included in your SALI above`;
+        `${shares.toLocaleString('en-US')} shares · $${STRC_ANNUAL_DIV.toFixed(2)}/share/yr · ${yieldPct}% yield (${srcNote}) · ${histNote}`;
     }
     wrap.style.display = 'block';
   }

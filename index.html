@@ -132,7 +132,7 @@
               <div id="realGrowthNote" class="real-growth-note" style="display:none"></div>
 
               <div class="form-group">
-                <label for="startYearSelect">Start Year</label>
+                <label for="startYearSelect">Start Year<span class="info-tip"><button class="info-tip__btn" type="button">?</button><span class="info-tip__content">Your salary is treated as today's value and back-calculated to this year. Past SALI points use actual annual average BTC prices; future points use your growth assumptions.</span></span></label>
                 <select id="startYearSelect">
                   <!-- Options populated by JS, default 2020 -->
                 </select>
@@ -162,7 +162,7 @@
               </div>
 
               <div class="form-group">
-                <label for="btcGrowthInput">BTC<span class="info-tip"><button class="info-tip__btn" type="button">?</button><span class="info-tip__content">BTC is the ticker symbol for Bitcoin — the world's first and largest fixed-supply digital asset. Its total supply is capped at 21 million coins forever. No government or company can create more of it.</span></span> Price Growth Rate (% per year)</label>
+                <label for="btcGrowthInput">BTC<span class="info-tip"><button class="info-tip__btn" type="button">?</button><span class="info-tip__content">Bitcoin's total supply is capped at 21 million coins forever — no government or company can create more. This field is your forward assumption for how much the price grows per year; it is not a prediction.</span></span> Growth Assumption (%/yr)</label>
                 <div class="salary-mode-toggle btc-growth-mode-toggle">
                   <button type="button" id="btcCustomModeBtn" class="mode-btn mode-btn--active">Custom</button>
                   <button type="button" id="btcHistoricalModeBtn" class="mode-btn">Historical CAGR</button>
@@ -236,7 +236,7 @@
                     <div id="strcRemainOutput" class="output-group__value output-group__value--secondary">—</div>
                   </div>
                   <div class="output-group strc-output__dividend-row">
-                    <div class="output-group__label">Annual Dividend Income (included in SALI above)</div>
+                    <div class="output-group__label">Annual Dividend Income <span class="strc-included-note">↑ already in your SALI</span></div>
                     <div id="strcDivOutput" class="output-group__value output-group__value--primary strc-value--dividend">—</div>
                   </div>
                 </div>
