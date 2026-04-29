@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="SALI privacy policy — no analytics, no cookies, no data storage. What external services the calculator contacts and why.">
+  <title>Privacy | SALI - Satoshi Annual Labor Index</title>
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://sali.angarlo.com/privacy.html">
+  <meta property="og:title" content="Privacy — SALI">
+  <meta property="og:description" content="No analytics, no cookies, no data storage. SALI runs entirely in your browser.">
+  <meta property="og:image" content="https://sali.angarlo.com/assets/images/sali-share.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@angarlo">
+  <meta name="twitter:creator" content="@angarlo">
+  <meta name="twitter:title" content="Privacy — SALI">
+  <meta name="twitter:description" content="No analytics, no cookies, no data storage. SALI runs entirely in your browser.">
+  <meta name="twitter:image" content="https://sali.angarlo.com/assets/images/sali-share.png">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=4">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="container nav__inner">
+      <a href="/" class="nav__logo">ANGARLO</a>
+      <ul class="nav__links">
+        <li><a href="/" class="nav__link">Home</a></li>
+        <li><a href="/methodology.html" class="nav__link">Methodology</a></li>
+        <li><a href="/examples.html" class="nav__link">Examples</a></li>
+        <li><a href="/podcast.html" class="nav__link">Podcast</a></li>
+        <li><a href="/contact.html" class="nav__link">Contact</a></li>
+      </ul>
+      <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </nav>
+
+  <main>
+    <div class="page-header">
+      <div class="container">
+        <h1>Privacy</h1>
+        <p class="page-header__subtitle">Last updated: April 2026</p>
+      </div>
+    </div>
+
+    <section class="section">
+      <div class="container">
+        <div class="methodology-content">
+
+          <h2>The short version</h2>
+          <p>
+            SALI collects nothing about you. No cookies. No analytics. No tracking pixels. Your salary inputs never leave your device — the calculator runs entirely in your browser. The only network requests the page makes are for live market data (Bitcoin price, exchange rates, $STRC yield), and those requests carry no identifying information.
+          </p>
+
+          <h2>External services contacted</h2>
+          <p>When you load the calculator, the page makes the following anonymous requests to third-party services:</p>
+
+          <div class="privacy-service-list">
+
+            <div class="privacy-service">
+              <div class="privacy-service__name">Coinbase Public API</div>
+              <div class="privacy-service__purpose">Live Bitcoin spot price (USD). Anonymous HTTP request — no account, no key, no identifying data sent.</div>
+              <div class="privacy-service__url">api.coinbase.com/v2/prices/BTC-USD/spot</div>
+            </div>
+
+            <div class="privacy-service">
+              <div class="privacy-service__name">Frankfurter (European Central Bank)</div>
+              <div class="privacy-service__purpose">Live EUR and MXN exchange rates for multi-currency salary input. Anonymous request.</div>
+              <div class="privacy-service__url">api.frankfurter.app/latest</div>
+            </div>
+
+            <div class="privacy-service">
+              <div class="privacy-service__name">Yahoo Finance</div>
+              <div class="privacy-service__purpose">Live $STRC (Nasdaq) stock price, used to compute the current dividend yield for the "Salary Under $STRC" feature. Anonymous request with a 2-second timeout. If the request fails or is blocked (common due to CORS), the calculator silently falls back to the publicly stated 11.5% rate.</div>
+              <div class="privacy-service__url">query1.finance.yahoo.com/v8/finance/chart/STRC</div>
+            </div>
+
+            <div class="privacy-service">
+              <div class="privacy-service__name">jsDelivr CDN</div>
+              <div class="privacy-service__purpose">Chart.js library file for rendering the SALI chart. Standard CDN request — your IP is visible to jsDelivr as with any CDN.</div>
+              <div class="privacy-service__url">cdn.jsdelivr.net/npm/chart.js</div>
+            </div>
+
+            <div class="privacy-service">
+              <div class="privacy-service__name">YouTube (nocookie mode)</div>
+              <div class="privacy-service__purpose">Embedded podcast video on the Podcast page, loaded via youtube-nocookie.com. In nocookie mode, YouTube does not set tracking cookies unless you interact with the player.</div>
+              <div class="privacy-service__url">www.youtube-nocookie.com</div>
+            </div>
+
+          </div>
+
+          <h2>What is not collected</h2>
+          <ul>
+            <li>Your salary figures — computed and displayed in-browser only, never transmitted anywhere</li>
+            <li>Your name, email address, or any personal identifier</li>
+            <li>Session cookies or persistent cookies of any kind</li>
+            <li>Browser fingerprint, screen size, or behavioral analytics</li>
+            <li>Location data</li>
+          </ul>
+
+          <h2>URL parameters</h2>
+          <p>
+            The calculator encodes your inputs (salary, start year, forecast settings, STRC allocation) as URL query parameters so you can bookmark or share a specific setup. These parameters exist only in the URL string in your browser — no server reads or logs them. Shared links contain only your calculator settings, never data that could identify you personally.
+          </p>
+
+          <h2>Data storage</h2>
+          <p>
+            Nothing is stored on any server. The calculator has no backend, no database, and no user accounts. All computation happens locally in your browser.
+          </p>
+
+          <h2>Hosting</h2>
+          <p>
+            The site is served as static files. The hosting provider may collect standard server access logs (IP address, timestamp, path) as part of normal web hosting operations. These logs are not used for analytics or advertising.
+          </p>
+
+          <h2>Third-party links</h2>
+          <p>
+            External links (to strategy.com, Nasdaq listings, etc.) are provided for reference. SALI has no control over the privacy practices of those sites.
+          </p>
+
+          <h2>Changes</h2>
+          <p>
+            If material changes are made to this policy, the "Last updated" date above will change. The site has no mechanism to notify you directly — check this page periodically if you want to stay current.
+          </p>
+
+          <h2>Contact</h2>
+          <p>
+            Questions about privacy: <a href="mailto:angarlotv@gmail.com">angarlotv@gmail.com</a>
+          </p>
+
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer__content">
+      <p class="footer__disclaimer">
+        SALI is for informational purposes only and not financial advice.
+      </p>
+      <p class="footer__support">
+        Support continued maintenance: <a href="lightning:angarlo@strike.me">⚡ angarlo@strike.me</a> · <a href="/contact.html#support">QR &amp; more &rarr;</a>
+      </p>
+      <p class="footer__privacy">
+        No analytics, no trackers, no advertising cookies. The site loads live BTC prices from Coinbase, FX rates from the European Central Bank (via Frankfurter), $STRC yield from Yahoo Finance, Chart.js from jsDelivr, and the podcast video from youtube-nocookie.com. · <a href="/privacy.html">Privacy Policy</a>
+      </p>
+      <p class="footer__contact">
+        Contact: <a href="mailto:angarlotv@gmail.com">angarlotv@gmail.com</a>
+      </p>
+    </div>
+  </footer>
+  <script src="/assets/js/theme.js"></script>
+</body>
+</html>

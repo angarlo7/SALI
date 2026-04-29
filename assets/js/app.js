@@ -491,15 +491,23 @@
       const rateStr = annualRate >= 0 ? `+${annualRate.toFixed(1)}%/yr` : `${annualRate.toFixed(1)}%/yr`;
 
       let hook;
-      if (annualRate >= 0) {
-        hook = `my salary is actually keeping pace with Bitcoin (${rateStr}). Extremely rare.`;
+      if (strcEnabled && strcPct > 0) {
+        const boost = ((strcPct / 100) * strcCurrentYield * 100).toFixed(1);
+        if (annualRate >= 0) {
+          hook = `with ${strcPct}% in $STRC (${boost}%/yr yield), my salary is now keeping pace with Bitcoin. Grade: ${grade}.`;
+        } else {
+          hook = `${strcPct}% allocated to $STRC adds ${boost}%/yr in dividend income — closing the Bitcoin gap. Grade: ${grade} (${rateStr}).`;
+        }
+      } else if (annualRate >= 0) {
+        hook = `my salary is actually keeping pace with Bitcoin (${rateStr}). Extremely rare. Grade: ${grade}.`;
       } else if (gap > 0.1) {
-        hook = `my salary loses ${rateStr} to Bitcoin every year. I'd need a +${gap.toFixed(1)}%/yr raise just to break even.`;
+        hook = `my salary loses ${rateStr} to Bitcoin every year. I’d need a +${gap.toFixed(1)}%/yr raise just to break even. Grade: ${grade}.`;
       } else {
-        hook = `my salary is right at Bitcoin break-even (${rateStr}). Holding the line.`;
+        hook = `my salary is right at Bitcoin break-even (${rateStr}). Holding the line. Grade: ${grade}.`;
       }
 
-      text = `🟠 SALI Grade: ${grade} — ${hook}\n\nWhat’s your grade? #Bitcoin #SALI`;
+      const tags = strcEnabled && strcPct > 0 ? ‘#Bitcoin #SALI #STRC’ : ‘#Bitcoin #SALI’;
+      text = `🟠 SALI — ${hook}\n\nWhat’s your salary worth in sats? ${tags}`;
     } else {
       text = `🟠 How much is your salary worth in Bitcoin?\n\nCalculate your SALI Grade → #Bitcoin #SALI`;
     }
@@ -634,6 +642,27 @@
       ctx.fillText(gapClean, cx, belowR + 138);
     }
 
+    // ── STRC badge (if active) ───────────────────────────────
+    if (strcEnabled && strcPct > 0) {
+      const boost = ((strcPct / 100) * strcCurrentYield * 100).toFixed(1);
+      const strcLabel = `$STRC ${strcPct}% allocation · +${boost}%/yr dividend yield`;
+      const green = '#4ade80';
+      ctx.fillStyle = green + '22';
+      const badgeW = 420, badgeH = 26, badgeX = (W - badgeW) / 2, badgeY = belowR + 158;
+      ctx.beginPath();
+      ctx.roundRect(badgeX, badgeY, badgeW, badgeH, 4);
+      ctx.fill();
+      ctx.strokeStyle = green + '66';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.roundRect(badgeX, badgeY, badgeW, badgeH, 4);
+      ctx.stroke();
+      ctx.fillStyle = green;
+      ctx.font = `600 11px ${font}`;
+      ctx.textAlign = 'center';
+      ctx.fillText(strcLabel, W / 2, badgeY + 17);
+    }
+
     // ── Footer (small, branding only) ───────────────────────
     ctx.fillStyle = orange;
     ctx.font = `700 13px ${font}`;
@@ -662,9 +691,37 @@
 
     if (elements.shareSaliBtn) {
       const original = elements.shareSaliBtn.textContent;
-      elements.shareSaliBtn.textContent = '✓ Card & Link Copied';
+      elements.shareSaliBtn.textContent = '✓ Downloading…';
       setTimeout(() => { elements.shareSaliBtn.textContent = original; }, 2500);
     }
+  }
+
+  function copyCurrentLink() {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url).then(() => {
+      if (elements.copyLinkBtn) {
+        const original = elements.copyLinkBtn.textContent;
+        elements.copyLinkBtn.textContent = '✓ Copied!';
+        setTimeout(() => { elements.copyLinkBtn.textContent = original; }, 2000);
+      }
+    }).catch(() => {
+      // Clipboard API unavailable — try execCommand fallback
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = url;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        if (elements.copyLinkBtn) {
+          const original = elements.copyLinkBtn.textContent;
+          elements.copyLinkBtn.textContent = '✓ Copied!';
+          setTimeout(() => { elements.copyLinkBtn.textContent = original; }, 2000);
+        }
+      } catch (_) {}
+    });
   }
 
   /**
@@ -2194,6 +2251,7 @@
       // Share / tweet
       shareRow: document.getElementById('shareRow'),
       shareSaliBtn: document.getElementById('shareSaliBtn'),
+      copyLinkBtn: document.getElementById('copyLinkBtn'),
       tweetSaliBtn: document.getElementById('tweetSaliBtn'),
       // Decomposition
       decompSummary: document.getElementById('decompSummary'),
@@ -2421,9 +2479,12 @@
         });
       }
 
-      // Share card
+      // Share card + copy link
       if (elements.shareSaliBtn) {
         elements.shareSaliBtn.addEventListener('click', generateShareCard);
+      }
+      if (elements.copyLinkBtn) {
+        elements.copyLinkBtn.addEventListener('click', copyCurrentLink);
       }
 
       // Resize charts when window resizes (Chart.js ResizeObserver can get stale)
