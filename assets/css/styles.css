@@ -2020,9 +2020,14 @@ body.dark .fx-warning {
   margin-bottom: 0;
 }
 
-/* span dividend across both columns so it stands out */
-.strc-output__grid .output-group:nth-child(2) {
+/* dividend and effective SALI rows span full width */
+.strc-output__dividend-row,
+.strc-output__effsali-row {
   grid-column: 1 / -1;
+}
+
+.strc-value--effsali {
+  color: var(--color-text-secondary);
 }
 
 .strc-value--dividend {

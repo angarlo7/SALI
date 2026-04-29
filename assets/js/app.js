@@ -1905,7 +1905,7 @@
       computeHistorical(baseBtcPrice, currency);
 
       // STRC / Salary Under STRETCH output
-      updateStrcOutput(salary, currency);
+      updateStrcOutput(salary, currency, baseBtcPrice);
 
       // Render table and charts
       renderTable(projections, currency);
@@ -2002,7 +2002,7 @@
     el.className = 'strc-yield-display strc-yield-display--' + strcDataSource;
   }
 
-  function updateStrcOutput(salary, currency) {
+  function updateStrcOutput(salary, currency, btcPrice) {
     const wrap = elements.strcOutputWrap;
     if (!wrap) return;
     if (!strcEnabled || !salary || salary <= 0) {
@@ -2014,12 +2014,25 @@
     const remaining = salary - alloc;
     const shares = strcCurrentPrice > 0 ? Math.round(alloc / strcCurrentPrice) : 0;
 
-    if (elements.strcAllocOutput) elements.strcAllocOutput.textContent = formatCurrency(alloc, currency);
-    if (elements.strcDivOutput)   elements.strcDivOutput.textContent   = formatCurrency(dividendIncome, currency) + '/yr';
+    if (elements.strcAllocOutput)  elements.strcAllocOutput.textContent  = formatCurrency(alloc, currency);
+    if (elements.strcDivOutput)    elements.strcDivOutput.textContent    = formatCurrency(dividendIncome, currency) + '/yr';
     if (elements.strcRemainOutput) elements.strcRemainOutput.textContent = formatCurrency(remaining, currency);
+
+    // Effective SALI: (salary_USD + dividend_USD) / btcPrice * SATS_PER_BTC
+    const effSaliEl = elements.strcEffSaliOutput;
+    if (effSaliEl && btcPrice && btcPrice > 0) {
+      const salaryUsd    = convertToUsd(salary, currency);
+      const effectiveUsd = salaryUsd + dividendIncome; // dividends are USD-denominated
+      const baseSats     = (salaryUsd / btcPrice) * SATS_PER_BTC;
+      const effSats      = (effectiveUsd / btcPrice) * SATS_PER_BTC;
+      const boostPct     = ((effSats - baseSats) / baseSats * 100).toFixed(1);
+      const sign         = boostPct >= 0 ? '+' : '';
+      effSaliEl.textContent = `${formatSats(effSats)} sats/yr (${sign}${boostPct}%)`;
+    }
+
     if (elements.strcYieldNote) {
       const yieldPct = (strcCurrentYield * 100).toFixed(2);
-      const srcNote = strcDataSource === 'live' ? 'Yahoo Finance live' : 'stated rate fallback';
+      const srcNote  = strcDataSource === 'live' ? 'Yahoo Finance live' : 'stated rate fallback';
       elements.strcYieldNote.textContent =
         `${shares.toLocaleString('en-US')} shares · $${STRC_ANNUAL_DIV.toFixed(2)}/share/yr · ${yieldPct}% yield (${srcNote})`;
     }
@@ -2116,6 +2129,7 @@
       strcAllocOutput: document.getElementById('strcAllocOutput'),
       strcDivOutput: document.getElementById('strcDivOutput'),
       strcRemainOutput: document.getElementById('strcRemainOutput'),
+      strcEffSaliOutput: document.getElementById('strcEffSaliOutput'),
       strcYieldNote: document.getElementById('strcYieldNote')
     };
 
