@@ -346,6 +346,8 @@
 
   /**
    * Compute SALI grade based on annualized historical SALI decay rate (CAGR).
+   * When STRC allocation is active, the effective rate is boosted by the
+   * annual dividend income as a % of salary — more allocation → better grade.
    * Returns grade (S/A/B/C/D/F), annual rate %, gap %, tagline.
    */
   function computeSaliGrade(projections, btcGrowth, nominalSalaryGrowth) {
@@ -357,10 +359,18 @@
     if (years < 1) return null;
 
     // Annualized SALI change using actual historical BTC prices (CAGR)
-    const annualRate = (Math.pow(current.sats / first.sats, 1 / years) - 1) * 100;
+    const historicalRate = (Math.pow(current.sats / first.sats, 1 / years) - 1) * 100;
 
-    // How many more %/yr of salary growth are needed to keep SALI flat
-    const gap = btcGrowth - nominalSalaryGrowth;
+    // STRC income lift: dividend income as % of salary, converted to a rate boost.
+    // e.g. 10% allocation × 11.5% yield = +1.15%/yr effective income growth.
+    const strcBoost = (strcEnabled && strcPct > 0)
+      ? (strcPct / 100) * strcCurrentYield * 100
+      : 0;
+
+    const annualRate = historicalRate + strcBoost;
+
+    // Gap: how many %/yr of additional income growth close the BTC gap
+    const gap = btcGrowth - nominalSalaryGrowth - strcBoost;
 
     let grade, tagline, colorClass;
     if (annualRate >= 0)         { grade = 'S'; tagline = 'Keeping pace with Bitcoin — extremely rare'; colorClass = 'sali-score__grade--S'; }
@@ -389,8 +399,12 @@
     }
     if (elements.saliScoreRate) {
       const sign = annualRate >= 0 ? '+' : '';
+      const strcBoost = (strcEnabled && strcPct > 0)
+        ? (strcPct / 100) * strcCurrentYield * 100
+        : 0;
+      const boostNote = strcBoost > 0 ? ` (incl. +${strcBoost.toFixed(2)}% $STRC)` : '';
       elements.saliScoreRate.textContent =
-        `${sign}${annualRate.toFixed(1)}% / yr Bitcoin purchasing power`;
+        `${sign}${annualRate.toFixed(1)}% / yr Bitcoin purchasing power${boostNote}`;
     }
     if (elements.saliScoreGap) {
       if (gap > 0.1) {
