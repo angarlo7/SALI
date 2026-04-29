@@ -429,10 +429,10 @@
 
     let grade, tagline, colorClass;
     if (annualRate >= 0)         { grade = 'S'; tagline = 'Keeping pace with Bitcoin — extremely rare'; colorClass = 'sali-score__grade--S'; }
-    else if (annualRate >= -10)  { grade = 'A'; tagline = 'Near-parity with Bitcoin appreciation'; colorClass = 'sali-score__grade--A'; }
-    else if (annualRate >= -20)  { grade = 'B'; tagline = 'Above average — losing ground slowly'; colorClass = 'sali-score__grade--B'; }
-    else if (annualRate >= -35)  { grade = 'C'; tagline = 'Typical salary trajectory vs Bitcoin'; colorClass = 'sali-score__grade--C'; }
-    else if (annualRate >= -50)  { grade = 'D'; tagline = 'Bitcoin outpacing your salary significantly'; colorClass = 'sali-score__grade--D'; }
+    else if (annualRate >= -10)  { grade = 'A'; tagline = 'Losing ground slowly — better than almost everyone'; colorClass = 'sali-score__grade--A'; }
+    else if (annualRate >= -20)  { grade = 'B'; tagline = 'Above average — real loss, but manageable'; colorClass = 'sali-score__grade--B'; }
+    else if (annualRate >= -35)  { grade = 'C'; tagline = 'Typical — Bitcoin is outpacing your salary'; colorClass = 'sali-score__grade--C'; }
+    else if (annualRate >= -50)  { grade = 'D'; tagline = 'Bitcoin is pulling away significantly'; colorClass = 'sali-score__grade--D'; }
     else                         { grade = 'F'; tagline = 'Bitcoin is winning by a wide margin'; colorClass = 'sali-score__grade--F'; }
 
     return { grade, annualRate, gap, tagline, colorClass };

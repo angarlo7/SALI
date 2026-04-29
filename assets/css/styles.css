@@ -2142,9 +2142,13 @@ body.dark .fx-warning {
   color: #000000;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 500px) {
   .share-row { grid-template-columns: 1fr 1fr; }
-  .btn--social { font-size: 0.72rem; padding: 0.5rem 0.5rem; }
+  .btn--social { font-size: 0.7rem; padding: 0.5rem 0.4rem; letter-spacing: 0.02em; }
+}
+
+@media (max-width: 360px) {
+  .share-row { grid-template-columns: 1fr; }
 }
 
 /* Marcus / STRC persona card */
