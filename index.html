@@ -100,8 +100,9 @@
               <!-- Salary Under $STRC / STRETCH -->
               <div class="form-group strc-form-group">
                 <label>Salary Under $STRC
-                  <span class="info-tip"><button class="info-tip__btn" type="button">?</button><span class="info-tip__content">Strategy's $STRC preferred stock pays a variable dividend (currently ~11%). "UNDER STRETCH" means the portion of your compensation allocated to $STRC — earning dividend income instead of sitting in fiat. The rest stays in dollars. Learn more at <a href="https://www.strategy.com" target="_blank" rel="noopener noreferrer">strategy.com</a>.</span></span>
+                  <span class="info-tip"><button class="info-tip__btn" type="button">?</button><span class="info-tip__content">Strategy's $STRC preferred stock pays a variable dividend (currently ~11.5%). "UNDER STRETCH" means the portion of your compensation allocated to $STRC — earning dividend income instead of sitting in fiat. The rest stays in dollars. Learn more at <a href="https://www.strategy.com" target="_blank" rel="noopener noreferrer">strategy.com</a>.</span></span>
                 </label>
+                <div id="strcYieldDisplay" class="strc-yield-display">Loading $STRC yield…</div>
                 <div class="strc-enable-row">
                   <input type="checkbox" id="strcEnableToggle" class="strc-checkbox">
                   <label for="strcEnableToggle" class="strc-enable-label">Allocate salary to $STRC</label>
@@ -110,7 +111,6 @@
               <div class="form-group form-group--hidden" id="strcPctGroup">
                 <label for="strcPctInput">% of Salary → $STRC</label>
                 <input type="number" id="strcPctInput" value="10" min="0" max="100" step="1" placeholder="e.g. 10">
-                <div id="strcYieldDisplay" class="strc-yield-display">Loading $STRC yield…</div>
               </div>
 
               <div class="form-group">

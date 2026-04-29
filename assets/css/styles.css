@@ -1978,11 +1978,8 @@ body.dark .fx-warning {
   font-size: 0.72rem;
   font-family: var(--font-mono);
   color: var(--color-text-muted);
-  margin-top: var(--spacing-xs);
-  padding: 4px 6px;
-  background: var(--color-bg);
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border);
+  margin-bottom: var(--spacing-xs);
+  line-height: 1.4;
 }
 
 .strc-yield-display--live::before {
