@@ -1819,11 +1819,19 @@
       // Convert salary to USD
       const salaryUsd = convertToUsd(salary, currency);
 
+      // STRC dividend boost: when STRC is enabled, add annual dividend income
+      // to the salary so projections, grade, and sats all reflect the real total.
+      // Dividend scales with salary (it's a % of salary), so it compounds correctly.
+      const strcDividendUsd = (strcEnabled && strcPct > 0)
+        ? salaryUsd * (strcPct / 100) * strcCurrentYield
+        : 0;
+      const effectiveSalaryUsd = salaryUsd + strcDividendUsd;
+
       // Get base BTC price
       const baseBtcPrice = getBtcPrice();
 
       // Generate projections with actual years
-      const projections = generateProjections(salaryUsd, baseBtcPrice, effectiveSalaryGrowth, btcGrowth, startYear, forecastYears);
+      const projections = generateProjections(effectiveSalaryUsd, baseBtcPrice, effectiveSalaryGrowth, btcGrowth, startYear, forecastYears);
 
       // Find current year data for primary output
       const currentYearData = projections.find(p => p.isCurrentYear) || projections[projections.length - 1];
@@ -2018,23 +2026,11 @@
     if (elements.strcDivOutput)    elements.strcDivOutput.textContent    = formatCurrency(dividendIncome, currency) + '/yr';
     if (elements.strcRemainOutput) elements.strcRemainOutput.textContent = formatCurrency(remaining, currency);
 
-    // Effective SALI: (salary_USD + dividend_USD) / btcPrice * SATS_PER_BTC
-    const effSaliEl = elements.strcEffSaliOutput;
-    if (effSaliEl && btcPrice && btcPrice > 0) {
-      const salaryUsd    = convertToUsd(salary, currency);
-      const effectiveUsd = salaryUsd + dividendIncome; // dividends are USD-denominated
-      const baseSats     = (salaryUsd / btcPrice) * SATS_PER_BTC;
-      const effSats      = (effectiveUsd / btcPrice) * SATS_PER_BTC;
-      const boostPct     = ((effSats - baseSats) / baseSats * 100).toFixed(1);
-      const sign         = boostPct >= 0 ? '+' : '';
-      effSaliEl.textContent = `${formatSats(effSats)} sats/yr (${sign}${boostPct}%)`;
-    }
-
     if (elements.strcYieldNote) {
       const yieldPct = (strcCurrentYield * 100).toFixed(2);
       const srcNote  = strcDataSource === 'live' ? 'Yahoo Finance live' : 'stated rate fallback';
       elements.strcYieldNote.textContent =
-        `${shares.toLocaleString('en-US')} shares · $${STRC_ANNUAL_DIV.toFixed(2)}/share/yr · ${yieldPct}% yield (${srcNote})`;
+        `${shares.toLocaleString('en-US')} shares · $${STRC_ANNUAL_DIV.toFixed(2)}/share/yr · ${yieldPct}% yield (${srcNote}) · dividends included in your SALI above`;
     }
     wrap.style.display = 'block';
   }
