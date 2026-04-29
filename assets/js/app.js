@@ -480,12 +480,18 @@
   }
 
   /**
-   * Build and set the "Post on X" href — shares grade and insights, never salary or sats
+   * Build and set share hrefs for all four social platforms.
+   * Never includes salary or absolute sats — only grade and rate.
    */
-  function updateTweetLink(gradeData) {
-    if (!elements.tweetSaliBtn) return;
+  function updateShareLinks(gradeData) {
+    const validGrades = new Set([‘S’, ‘A’, ‘B’, ‘C’, ‘D’, ‘F’]);
+    const gradeUrl = (gradeData && validGrades.has(gradeData.grade))
+      ? `https://sali.angarlo.com/share/${gradeData.grade}.html`
+      : ‘https://sali.angarlo.com’;
+    const baseUrl = ‘https://sali.angarlo.com’;
 
-    let text;
+    let shortText, longText, redditTitle;
+
     if (gradeData) {
       const { grade, annualRate, gap } = gradeData;
       const rateStr = annualRate >= 0 ? `+${annualRate.toFixed(1)}%/yr` : `${annualRate.toFixed(1)}%/yr`;
@@ -494,35 +500,43 @@
       if (strcEnabled && strcPct > 0) {
         const boost = ((strcPct / 100) * strcCurrentYield * 100).toFixed(1);
         if (annualRate >= 0) {
-          hook = `with ${strcPct}% in $STRC (${boost}%/yr yield), my salary is now keeping pace with Bitcoin. Grade: ${grade}.`;
+          hook = `With ${strcPct}% in $STRC (+${boost}%/yr yield), my salary is keeping pace with Bitcoin. Grade: ${grade}.`;
         } else {
-          hook = `${strcPct}% allocated to $STRC adds ${boost}%/yr in dividend income — closing the Bitcoin gap. Grade: ${grade} (${rateStr}).`;
+          hook = `${strcPct}% in $STRC adds ${boost}%/yr dividend income — closing the Bitcoin gap. Grade: ${grade} (${rateStr}).`;
         }
       } else if (annualRate >= 0) {
-        hook = `my salary is actually keeping pace with Bitcoin (${rateStr}). Extremely rare. Grade: ${grade}.`;
+        hook = `My salary is keeping pace with Bitcoin (${rateStr}). Grade: ${grade} — extremely rare.`;
       } else if (gap > 0.1) {
-        hook = `my salary loses ${rateStr} to Bitcoin every year. I’d need a +${gap.toFixed(1)}%/yr raise just to break even. Grade: ${grade}.`;
+        hook = `My salary loses ${rateStr} to Bitcoin every year. A +${gap.toFixed(1)}%/yr raise would just break even. Grade: ${grade}.`;
       } else {
-        hook = `my salary is right at Bitcoin break-even (${rateStr}). Holding the line. Grade: ${grade}.`;
+        hook = `My salary is right at Bitcoin break-even (${rateStr}). Grade: ${grade}.`;
       }
 
       const tags = strcEnabled && strcPct > 0 ? ‘#Bitcoin #SALI #STRC’ : ‘#Bitcoin #SALI’;
-      text = `🟠 SALI — ${hook}\n\nWhat’s your salary worth in sats? ${tags}`;
+      shortText = `🟠 SALI — ${hook}\n\nCalculate yours: ${tags}`;
+      longText  = `🟠 SALI (Satoshi Annual Labor Index) — ${hook}\n\nHow much is your salary worth in Bitcoin? ${tags}`;
+      redditTitle = `My SALI Grade: ${grade} (${rateStr}) — Salary vs. Bitcoin [${new Date().getFullYear()}]`;
     } else {
-      text = `🟠 How much is your salary worth in Bitcoin?\n\nCalculate your SALI Grade → #Bitcoin #SALI`;
+      shortText = longText = `🟠 How much is your salary worth in Bitcoin? Calculate your SALI Grade → #Bitcoin #SALI`;
+      redditTitle = `SALI — How much is your salary worth in Bitcoin?`;
     }
 
-    // Point the share URL at the grade-specific wrapper page so X (and any
-    // other OG-scraping platform) picks up an OG image where the user's
-    // grade dominates. Each /share/{grade}.html has og:image meta tags
-    // pointing to a pre-rendered sali-share-{grade}.png. The wrapper page
-    // immediately redirects humans to the calculator.
-    const validGrades = new Set(['S', 'A', 'B', 'C', 'D', 'F']);
-    const url = (gradeData && validGrades.has(gradeData.grade))
-      ? `https://sali.angarlo.com/share/${gradeData.grade}.html`
-      : 'https://sali.angarlo.com';
-    const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
-    elements.tweetSaliBtn.href = tweetUrl;
+    if (elements.tweetSaliBtn) {
+      elements.tweetSaliBtn.href =
+        `https://twitter.com/intent/tweet?text=${encodeURIComponent(shortText)}&url=${encodeURIComponent(gradeUrl)}`;
+    }
+    if (elements.blueskySaliBtn) {
+      elements.blueskySaliBtn.href =
+        `https://bsky.app/intent/compose?text=${encodeURIComponent(shortText + ‘\n’ + baseUrl)}`;
+    }
+    if (elements.linkedinSaliBtn) {
+      elements.linkedinSaliBtn.href =
+        `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(gradeUrl)}`;
+    }
+    if (elements.redditSaliBtn) {
+      elements.redditSaliBtn.href =
+        `https://www.reddit.com/submit?url=${encodeURIComponent(gradeUrl)}&title=${encodeURIComponent(redditTitle)}`;
+    }
   }
 
   /**
@@ -2045,8 +2059,8 @@
       updateSaliScore(gradeData);
 
       // Show share buttons once we have a valid result
-      if (elements.shareRow) elements.shareRow.style.display = 'flex';
-      updateTweetLink(gradeData);
+      if (elements.shareRow) elements.shareRow.style.display = 'grid';
+      updateShareLinks(gradeData);
 
       // Decomposition summary
       updateDecompSummary(projections);
@@ -2248,11 +2262,12 @@
       benchmarkPanel: document.getElementById('benchmarkPanel'),
       benchmarkGrowthInput: document.getElementById('benchmarkGrowthInput'),
       benchmarkGrowthLabel: document.getElementById('benchmarkGrowthLabel'),
-      // Share / tweet
+      // Share
       shareRow: document.getElementById('shareRow'),
-      shareSaliBtn: document.getElementById('shareSaliBtn'),
-      copyLinkBtn: document.getElementById('copyLinkBtn'),
       tweetSaliBtn: document.getElementById('tweetSaliBtn'),
+      linkedinSaliBtn: document.getElementById('linkedinSaliBtn'),
+      blueskySaliBtn: document.getElementById('blueskySaliBtn'),
+      redditSaliBtn: document.getElementById('redditSaliBtn'),
       // Decomposition
       decompSummary: document.getElementById('decompSummary'),
       breakdownToggle: document.getElementById('breakdownToggle'),
@@ -2479,13 +2494,6 @@
         });
       }
 
-      // Share card + copy link
-      if (elements.shareSaliBtn) {
-        elements.shareSaliBtn.addEventListener('click', generateShareCard);
-      }
-      if (elements.copyLinkBtn) {
-        elements.copyLinkBtn.addEventListener('click', copyCurrentLink);
-      }
 
       // Resize charts when window resizes (Chart.js ResizeObserver can get stale)
       window.addEventListener('resize', () => {

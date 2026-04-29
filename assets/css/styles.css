@@ -2091,21 +2091,50 @@ body.dark .fx-warning {
   color: var(--color-text-muted);
 }
 
-/* Share row */
+/* Social share buttons (2×2 grid) */
 .share-row {
-  flex-direction: column;
+  display: grid !important;
+  grid-template-columns: 1fr 1fr;
   gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+  flex-wrap: unset;
 }
 
-.share-row__actions {
-  display: flex;
-  gap: var(--spacing-sm);
+.btn--social {
+  display: block;
+  text-align: center;
+  padding: 0.55rem var(--spacing-md);
+  border-radius: var(--radius-md);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  transition: filter 0.12s ease, transform 0.1s ease;
 }
 
-.btn--share-util {
-  font-size: 0.8rem;
-  padding: 0.4rem 0.85rem;
-  flex: 1;
+.btn--social:hover {
+  filter: brightness(1.12);
+  transform: translateY(-1px);
+  text-decoration: none;
+}
+
+.btn--social--x        { background: #000000; color: #ffffff; }
+.btn--social--linkedin { background: #0a66c2; color: #ffffff; }
+.btn--social--bluesky  { background: #0085ff; color: #ffffff; }
+.btn--social--reddit   { background: #ff4500; color: #ffffff; }
+
+[data-theme="dark"] .btn--social--x {
+  background: #ffffff;
+  color: #000000;
+}
+
+@media (max-width: 480px) {
+  .share-row { grid-template-columns: 1fr 1fr; }
+  .btn--social { font-size: 0.72rem; padding: 0.5rem 0.5rem; }
 }
 
 /* Marcus / STRC persona card */
