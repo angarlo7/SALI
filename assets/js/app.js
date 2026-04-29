@@ -526,6 +526,11 @@
       elements.tweetSaliBtn.href =
         `https://twitter.com/intent/tweet?text=${encodeURIComponent(shortText)}&url=${encodeURIComponent(gradeUrl)}`;
     }
+    if (elements.gradeShareBtn) {
+      elements.gradeShareBtn.href =
+        `https://twitter.com/intent/tweet?text=${encodeURIComponent(shortText)}&url=${encodeURIComponent(gradeUrl)}`;
+      elements.gradeShareBtn.style.display = 'block';
+    }
     if (elements.blueskySaliBtn) {
       elements.blueskySaliBtn.href =
         `https://bsky.app/intent/compose?text=${encodeURIComponent(shortText + ‘\n’ + baseUrl)}`;
@@ -2265,6 +2270,7 @@
       benchmarkGrowthInput: document.getElementById('benchmarkGrowthInput'),
       benchmarkGrowthLabel: document.getElementById('benchmarkGrowthLabel'),
       // Share
+      gradeShareBtn: document.getElementById('gradeShareBtn'),
       shareRow: document.getElementById('shareRow'),
       tweetSaliBtn: document.getElementById('tweetSaliBtn'),
       linkedinSaliBtn: document.getElementById('linkedinSaliBtn'),

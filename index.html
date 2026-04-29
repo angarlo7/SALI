@@ -182,17 +182,7 @@
                 <button type="button" id="unitToggleBtc" class="unit-toggle__btn">BTC</button>
               </div>
 
-              <div class="output-group">
-                <div class="output-group__label">Your SALI (Current Year)</div>
-                <div id="saliSatsOutput" class="output-group__value output-group__value--primary">— sats/year</div>
-              </div>
-
-              <div class="output-group" id="btcOutputGroup">
-                <div class="output-group__label">BTC Equivalent</div>
-                <div id="saliBtcOutput" class="output-group__value output-group__value--secondary">— BTC/year</div>
-              </div>
-
-              <!-- SALI Score Badge -->
+              <!-- SALI Score Badge — first, it's the headline output -->
               <div id="saliScoreWrap" class="sali-score-wrap" style="display:none">
                 <div class="sali-score">
                   <div class="sali-score__left">
@@ -203,8 +193,19 @@
                     <div id="saliScoreRate" class="sali-score__stat">—</div>
                     <div id="saliScoreGap" class="sali-score__stat">—</div>
                     <div id="saliScoreTagline" class="sali-score__tagline">—</div>
+                    <a id="gradeShareBtn" class="grade-share-link" href="#" target="_blank" rel="noopener noreferrer" style="display:none">Share this grade →</a>
                   </div>
                 </div>
+              </div>
+
+              <div class="output-group">
+                <div class="output-group__label">Your SALI (Current Year)</div>
+                <div id="saliSatsOutput" class="output-group__value output-group__value--primary">— sats/year</div>
+              </div>
+
+              <div class="output-group" id="btcOutputGroup">
+                <div class="output-group__label">BTC Equivalent</div>
+                <div id="saliBtcOutput" class="output-group__value output-group__value--secondary">— BTC/year</div>
               </div>
 
               <!-- Purchasing Power Equivalents -->
@@ -329,12 +330,10 @@
             <p class="table-note">* Projected BTC price based on growth rate assumption</p>
           </div>
 
-          <!-- Historical Analysis -->
-          <div class="history-section" id="historySection">
-            <div class="history-section__header">
-              <h3>Actual SALI History</h3>
-              <p class="history-section__desc">Enter your actual starting point to reconstruct what your SALI really was each year — instead of projecting today's salary backwards.</p>
-            </div>
+          <!-- Historical Analysis — collapsed by default -->
+          <details class="history-accordion" id="historySection">
+            <summary class="history-accordion__trigger">Actual SALI History</summary>
+            <p class="history-section__desc">Enter your actual starting point to reconstruct what your SALI really was each year — instead of projecting today's salary backwards.</p>
             <div class="history-inputs">
               <div class="form-group">
                 <label for="histStartYear">Year You Started</label>
@@ -362,7 +361,7 @@
                 </table>
               </div>
             </div>
-          </div>
+          </details>
         </div>
       </div>
     </section>

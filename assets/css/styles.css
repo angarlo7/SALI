@@ -1406,6 +1406,67 @@ a:hover {
 }
 
 /* Historical Analysis Section */
+/* History accordion */
+.history-accordion {
+  margin-top: var(--spacing-xl);
+  padding-top: var(--spacing-xl);
+  border-top: 1px solid var(--color-border-light);
+}
+
+.history-accordion__trigger {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  user-select: none;
+}
+
+.history-accordion__trigger::-webkit-details-marker { display: none; }
+
+.history-accordion__trigger::after {
+  content: '▸';
+  font-size: 0.65rem;
+  transition: transform 0.15s;
+}
+
+details[open] .history-accordion__trigger::after {
+  transform: rotate(90deg);
+}
+
+.history-accordion__trigger:hover {
+  color: var(--color-text);
+}
+
+/* keep desc + inputs spaced the same as before */
+.history-accordion .history-section__desc {
+  margin-top: var(--spacing-md);
+}
+
+/* Grade inline share link */
+.grade-share-link {
+  display: inline-block;
+  margin-top: var(--spacing-sm);
+  font-size: 0.72rem;
+  font-family: var(--font-mono);
+  color: var(--color-accent);
+  text-decoration: none;
+  opacity: 0.85;
+  transition: opacity 0.12s;
+}
+
+.grade-share-link:hover {
+  opacity: 1;
+  text-decoration: none;
+}
+
+/* legacy class kept for JS compatibility */
 .history-section {
   margin-top: var(--spacing-xl);
   padding-top: var(--spacing-xl);
