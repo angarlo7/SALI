@@ -1111,6 +1111,16 @@
     if (params.has('btcMethod'))   elements.btcPriceMethodSelect.value = params.get('btcMethod');
     if (params.has('btcPrice'))    elements.btcPriceManualInput.value = params.get('btcPrice');
     if (params.has('btcGrowth'))   elements.btcGrowthInput.value     = params.get('btcGrowth');
+    if (params.has('strc')) {
+      const strc = parseFloat(params.get('strc'));
+      if (!isNaN(strc) && strc > 0) {
+        strcEnabled = true;
+        strcPct = Math.min(100, Math.max(0, strc));
+        if (elements.strcEnableToggle) elements.strcEnableToggle.checked = true;
+        if (elements.strcPctInput) elements.strcPctInput.value = strcPct;
+        if (elements.strcPctGroup) elements.strcPctGroup.classList.remove('form-group--hidden');
+      }
+    }
   }
 
   /**
@@ -1132,6 +1142,7 @@
     }
     const btcGrowth = elements.btcGrowthInput.value;
     if (btcGrowth && btcGrowth !== String(DEFAULT_BTC_GROWTH)) params.set('btcGrowth', btcGrowth);
+    if (strcEnabled && strcPct > 0) params.set('strc', strcPct);
     const qs = params.toString();
     window.history.replaceState({}, '', qs ? `${window.location.pathname}?${qs}` : window.location.pathname);
   }
@@ -1588,8 +1599,16 @@
    */
   function updateBreakEven(salary, currency, nominalSalaryGrowth, btcGrowth) {
     if (!elements.breakevenRateOutput) return;
-    const breakevenRate = btcGrowth;
-    elements.breakevenRateOutput.textContent = '+' + breakevenRate.toFixed(1) + '%/yr';
+
+    // When STRC is active its forward yield closes part of the gap,
+    // so the required salary raise to keep SALI flat is reduced.
+    const strcForwardBoost = (strcEnabled && strcPct > 0)
+      ? (strcPct / 100) * strcCurrentYield * 100
+      : 0;
+    const breakevenRate = Math.max(0, btcGrowth - strcForwardBoost);
+
+    elements.breakevenRateOutput.textContent = '+' + breakevenRate.toFixed(1) + '%/yr'
+      + (strcForwardBoost > 0 ? ` (reduced by ${strcForwardBoost.toFixed(2)}% $STRC yield)` : '');
 
     const yearsAhead = 5;
     const salaryBreakEven5 = salary * Math.pow(1 + breakevenRate / 100, yearsAhead);
@@ -1606,12 +1625,14 @@
         const gapStr = Math.abs(gap).toFixed(1);
         const diff5 = Math.abs(salaryBreakEven5 - salaryProjected5);
         if (gap < 0) {
-          elements.breakevenGap.textContent =
-            `To accumulate Bitcoin at the same rate it's appreciating, your salary needs to grow ${gapStr}%/yr faster than it currently is. Over 5 years, that's a ${formatCurrency(diff5, currency)} gap.`;
+          elements.breakevenGap.textContent = strcForwardBoost > 0
+            ? `Even with $STRC income, your salary needs to grow ${gapStr}%/yr faster to fully break even with Bitcoin. Over 5 years, that's a ${formatCurrency(diff5, currency)} gap.`
+            : `To accumulate Bitcoin at the same rate it's appreciating, your salary needs to grow ${gapStr}%/yr faster than it currently is. Over 5 years, that's a ${formatCurrency(diff5, currency)} gap.`;
           elements.breakevenGap.className = 'breakeven-gap breakeven-gap--behind';
         } else {
-          elements.breakevenGap.textContent =
-            `Your salary is growing ${gapStr}%/yr faster than BTC — your SALI is increasing at these assumptions.`;
+          elements.breakevenGap.textContent = strcForwardBoost > 0
+            ? `Your salary growth + $STRC yield (${strcForwardBoost.toFixed(2)}%/yr) is outpacing Bitcoin at these assumptions — your SALI is improving.`
+            : `Your salary is growing ${gapStr}%/yr faster than BTC — your SALI is increasing at these assumptions.`;
           elements.breakevenGap.className = 'breakeven-gap breakeven-gap--ahead';
         }
         elements.breakevenGap.style.display = 'block';
@@ -1942,7 +1963,11 @@
         elements.saliYoyOutput.textContent = formatPercent(trendScore.score);
         elements.saliYoyOutput.className = 'output-group__value output-group__value--secondary score--' + trendScore.trend;
         if (elements.projectedChangeDesc) {
-          elements.projectedChangeDesc.textContent = trendScore.description;
+          let desc = trendScore.description;
+          if (strcEnabled && strcDividendUsd > 0) {
+            desc += ` (Projections include $${Math.round(strcDividendUsd).toLocaleString('en-US')}/yr $STRC dividend income.)`;
+          }
+          elements.projectedChangeDesc.textContent = desc;
         }
         elements.saliYoyOutput.parentElement.style.display = 'block';
       } else {
