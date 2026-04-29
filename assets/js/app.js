@@ -1972,7 +1972,7 @@
     try {
       const res = await fetch(
         'https://query1.finance.yahoo.com/v8/finance/chart/STRC?interval=1d&range=1d',
-        { signal: AbortSignal.timeout(5000) }
+        { signal: AbortSignal.timeout(2000) }
       );
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
@@ -2124,7 +2124,31 @@
       return; // Not on calculator page
     }
 
-    // Fire STRC price fetch in background; doesn't block the main calculator init
+    // Show known STRC rate immediately — no "Loading" state needed.
+    // fetchStrcData() may update this later if Yahoo Finance responds.
+    updateStrcYieldDisplay();
+
+    // Wire STRC toggle/input listeners immediately — they only need the DOM,
+    // not Bitcoin price data, so they must not wait for Promise.all.
+    if (elements.strcEnableToggle) {
+      elements.strcEnableToggle.addEventListener('change', () => {
+        strcEnabled = elements.strcEnableToggle.checked;
+        if (elements.strcPctGroup) {
+          elements.strcPctGroup.classList.toggle('form-group--hidden', !strcEnabled);
+        }
+        if (spotPrice !== null) compute();
+      });
+    }
+    if (elements.strcPctInput) {
+      const onStrcPct = () => {
+        strcPct = parseFloat(elements.strcPctInput.value) || 0;
+        if (spotPrice !== null) compute();
+      };
+      elements.strcPctInput.addEventListener('input', onStrcPct);
+      elements.strcPctInput.addEventListener('change', onStrcPct);
+    }
+
+    // Fire STRC price fetch in background — updates display if live data arrives
     fetchStrcData();
 
     // Load data first, then populate selects
@@ -2284,25 +2308,6 @@
           benchmarkGrowthOverride = parseFloat(elements.benchmarkGrowthInput.value) || null;
           compute();
         });
-      }
-
-      // STRC / Salary Under STRETCH listeners
-      if (elements.strcEnableToggle) {
-        elements.strcEnableToggle.addEventListener('change', () => {
-          strcEnabled = elements.strcEnableToggle.checked;
-          if (elements.strcPctGroup) {
-            elements.strcPctGroup.classList.toggle('form-group--hidden', !strcEnabled);
-          }
-          compute();
-        });
-      }
-      if (elements.strcPctInput) {
-        const onStrcPct = () => {
-          strcPct = parseFloat(elements.strcPctInput.value) || 0;
-          compute();
-        };
-        elements.strcPctInput.addEventListener('input', onStrcPct);
-        elements.strcPctInput.addEventListener('change', onStrcPct);
       }
 
       // Breakdown toggle
