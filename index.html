@@ -20,7 +20,7 @@
   <meta name="twitter:title" content="SALI — How much is your salary worth in Bitcoin?">
   <meta name="twitter:description" content="Enter your salary and see it in satoshis — Bitcoin's base unit. Track how your earning power compares to Bitcoin, year over year.">
   <meta name="twitter:image" content="https://sali.angarlo.com/assets/images/sali-share.png">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=6">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=9">
 </head>
 <body>
   <!-- Navigation -->
@@ -59,12 +59,12 @@
     <section id="benchmarkComparison" class="section section--alt">
       <div class="container">
         <div class="content-section">
-          <h2>Four assets. One clear divergence.</h2>
-          <p class="norm-chart__desc">Every line starts at 100 in your selected start year. Bitcoin (orange) is the primary lens — the other three show how extraordinary its appreciation has been by comparison. Solid lines are real historical data; dashed lines are projections based on your inputs below.</p>
+          <h2>What outran your salary?</h2>
+          <p class="norm-chart__desc">Every line starts at 100 in your selected start year. Higher means that asset, or cost benchmark, became harder for your salary to buy. Bitcoin (orange) is the primary lens — the other three show how extraordinary its appreciation has been by comparison. Solid lines are real historical data; dashed lines are projections based on your inputs below.</p>
           <div class="chart-container chart-container--norm">
             <canvas id="normalizedChart"></canvas>
           </div>
-          <p class="norm-chart__note">Bitcoin (orange) · S&amp;P 500 (blue) · Gold (yellow) · Real purchasing power / CPI (green). Anything below 100 means your salary buys less of that asset than it did in the start year.</p>
+          <p class="norm-chart__note">Bitcoin (orange) · S&amp;P 500 (blue) · Gold (yellow) · Cost of living / CPI (green). Anything above 100 means that benchmark outran your salary. Higher line = stronger appreciation relative to your labor.</p>
         </div>
       </div>
     </section>
@@ -193,7 +193,7 @@
                     <div id="saliScoreRate" class="sali-score__stat">—</div>
                     <div id="saliScoreGap" class="sali-score__stat">—</div>
                     <div id="saliScoreTagline" class="sali-score__tagline">—</div>
-                    <a id="gradeShareBtn" class="grade-share-link" href="#" target="_blank" rel="noopener noreferrer" style="display:none">Share this grade →</a>
+                    <a id="gradeShareBtn" class="grade-share-link btn btn--social btn--social--x" href="#" target="_blank" rel="noopener noreferrer" style="display:none">Post on X</a>
                   </div>
                 </div>
               </div>
@@ -242,10 +242,6 @@
                   </div>
                 </div>
                 <div id="strcYieldNote" class="strc-yield-note"></div>
-              </div>
-
-              <div class="share-row" id="shareRow" style="display:none">
-                <a id="tweetSaliBtn" class="btn btn--social btn--social--x" href="#" target="_blank" rel="noopener noreferrer">Post on 𝕏</a>
               </div>
 
               <!-- Historical Change -->
@@ -496,7 +492,7 @@
           integrity="sha384-9nhczxUqK87bcKHh20fSQcTGD4qq5GhayNYSYWqwBkINBhOfQLg/P5HG5lF1urn4"
           crossorigin="anonymous"
           referrerpolicy="no-referrer"></script>
-  <script src="/assets/js/app.js?v=6"></script>
+  <script src="/assets/js/app.js?v=7"></script>
   <script src="/assets/js/theme.js"></script>
 </body>
 </html>

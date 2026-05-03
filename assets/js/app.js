@@ -1392,8 +1392,9 @@
   }
 
   /**
-   * Render normalized multi-benchmark comparison chart
-   * All four benchmarks normalized to 100 at start year so they can be compared directly.
+   * Render normalized multi-benchmark comparison chart.
+   * All four series start at 100. Higher means the asset/cost benchmark
+   * became harder for the user's salary to buy.
    */
   function renderNormalizedChart(projections) {
     const canvas = document.getElementById('normalizedChart');
@@ -1415,11 +1416,13 @@
     const labels = projections.map(p => p.year.toString());
     const currentYearIndex = projections.findIndex(p => p.isCurrentYear);
 
-    // Normalize: value[year] / value[startYear] × 100
-    const btcData  = projections.map(p => (p.btcEquivalent / btcStart) * 100);
-    const spxData  = spxSeries.map(p  => (p.benchValue / spxStart)  * 100);
-    const goldData = goldSeries.map(p => (p.benchValue / goldStart) * 100);
-    const cpiData  = cpiSeries.map(p  => (p.benchValue / cpiStart)  * 100);
+    // Normalize inverted purchasing power: start value / current value * 100.
+    // This makes the chart match ordinary visual intuition: a higher line means
+    // the benchmark outran the user's salary more.
+    const btcData  = projections.map(p => (btcStart / p.btcEquivalent) * 100);
+    const spxData  = spxSeries.map(p  => (spxStart / p.benchValue)  * 100);
+    const goldData = goldSeries.map(p => (goldStart / p.benchValue) * 100);
+    const cpiData  = cpiSeries.map(p  => (cpiStart / p.benchValue)  * 100);
 
     // Helper: dashed segment for projected years
     function makeSegmentFn(series) {
@@ -1499,7 +1502,7 @@
             segment: makeSegmentFn(goldSeries)
           },
           {
-            label: 'Real (CPI)',
+            label: 'Cost of living (CPI)',
             data: cpiData,
             borderColor: '#6B9E6B',
             backgroundColor: 'transparent',
@@ -1550,7 +1553,7 @@
                 const val = context.parsed.y;
                 const diff = val - 100;
                 const sign = diff >= 0 ? '+' : '';
-                return `${context.dataset.label}: ${val.toFixed(1)}  (${sign}${diff.toFixed(1)}%)`;
+                return `${context.dataset.label}: ${val.toFixed(1)}  (${sign}${diff.toFixed(1)}% vs salary)`;
               }
             }
           }
@@ -1563,7 +1566,7 @@
           },
           y: {
             beginAtZero: false,
-            title: { display: true, text: 'Index (Start Year = 100)', color: '#999999' },
+            title: { display: true, text: 'Pressure vs Salary (Start = 100)', color: '#999999' },
             ticks: {
               color: '#999999',
               callback: v => v.toFixed(0)
