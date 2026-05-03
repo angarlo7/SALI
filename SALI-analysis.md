@@ -1,6 +1,6 @@
 # SALI Project Analysis
 
-*Moved from Claude/3. To Do/Do this.md — originally generated in a prior session.*
+*Moved from Claude/3. To Do/Do this.md - originally generated in a prior session.*
 
 ## Project Overview
 **SALI** (Satoshi Annual Labor Index) is an educational calculator that converts annual salaries into satoshis (the smallest Bitcoin unit) to help users measure whether their labor is gaining or losing real value when priced in Bitcoin terms.
@@ -75,9 +75,9 @@ SALI (sats/year) = (Annual Salary in USD ÷ BTC Price in USD) × 100,000,000
 - Chart interactivity with tooltips and hover states
 
 ⚠️ **Known Placeholders (resolved 2026-04-27):**
-- ~~FX rates (EUR, MXN to USD) are hardcoded placeholders~~ — Resolved: live ECB rates now fetched at runtime via Frankfurter API. Hardcoded values kept only as fallback.
-- ~~BTC annual average data is documented as placeholder~~ — Resolved: values now sourced from StatMuse cross-referenced with CoinGecko / CoinMarketCap, with `_source` annotation in the JSON.
-- ~~No live FX API integration yet~~ — Resolved: Frankfurter (ECB) integrated.
+- ~~FX rates (EUR, MXN to USD) are hardcoded placeholders~~ - Resolved: live ECB rates now fetched at runtime via Frankfurter API. Hardcoded values kept only as fallback.
+- ~~BTC annual average data is documented as placeholder~~ - Resolved: values now sourced from StatMuse cross-referenced with CoinGecko / CoinMarketCap, with `_source` annotation in the JSON.
+- ~~No live FX API integration yet~~ - Resolved: Frankfurter (ECB) integrated.
 
 ## Local Testing Status
 ✅ **Successfully Running:**
@@ -99,7 +99,7 @@ SALI (sats/year) = (Annual Salary in USD ÷ BTC Price in USD) × 100,000,000
 **Last commit:** `4b0ddd9 - fix: og:image with visible grade letters, clean labels`
 **Custom domain:** `sali.angarlo.com` (GitHub Pages, via `CNAME` + `.nojekyll`)
 
-✅ **Earlier uncommitted-changes block (2026-03-22) — resolved.** All prior modifications to `styles.css` and `app.js` have since been committed; `wireframe-mobile.html` and `.claude/` are now in `.gitignore`.
+✅ **Earlier uncommitted-changes block (2026-03-22) - resolved.** All prior modifications to `styles.css` and `app.js` have since been committed; `wireframe-mobile.html` and `.claude/` are now in `.gitignore`.
 
 ## Running Locally (Quick Start)
 ```bash
