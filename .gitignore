@@ -12,6 +12,12 @@
 # Logs
 *.log
 
+# Node / Astro
+node_modules/
+dist/
+.astro/
+public/
+
 # Optional: local dev server files
 .cache/
 

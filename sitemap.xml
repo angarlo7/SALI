@@ -20,4 +20,16 @@
     <loc>https://sali.angarlo.com/contact.html</loc>
     <priority>0.6</priority>
   </url>
+  <url>
+    <loc>https://sali.angarlo.com/privacy.html</loc>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://sali.angarlo.com/notes</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://sali.angarlo.com/notes/first-note</loc>
+    <priority>0.6</priority>
+  </url>
 </urlset>

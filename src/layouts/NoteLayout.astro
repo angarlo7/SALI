@@ -1,0 +1,144 @@
+---
+const {
+  title,
+  description,
+  date,
+  tags = []
+} = Astro.props;
+
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
+const formattedDate = date
+  ? new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric', year: 'numeric' }).format(date)
+  : '';
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content={description}>
+  <link rel="canonical" href={canonicalUrl}>
+  <title>{title} | ANGARLO Notes</title>
+  <meta property="og:type" content="article">
+  <meta property="og:url" content={canonicalUrl}>
+  <meta property="og:title" content={title}>
+  <meta property="og:description" content={description}>
+  <meta property="og:image" content="https://sali.angarlo.com/assets/images/sali-share.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@angarlo">
+  <meta name="twitter:creator" content="@angarlo">
+  <meta name="twitter:title" content={title}>
+  <meta name="twitter:description" content={description}>
+  <meta name="twitter:image" content="https://sali.angarlo.com/assets/images/sali-share.png">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=9">
+  <style>
+    .note-shell {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 4rem 1.5rem;
+    }
+    .note-kicker,
+    .note-date,
+    .note-tags {
+      font-family: var(--font-mono);
+      color: var(--color-text-muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .note-kicker {
+      font-size: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    .note-title {
+      color: var(--color-text);
+      font-size: clamp(2.4rem, 7vw, 4.25rem);
+      line-height: 1.05;
+      margin-bottom: 1rem;
+      letter-spacing: 0;
+    }
+    .note-description {
+      font-size: 1.2rem;
+      line-height: 1.6;
+      color: var(--color-text-secondary);
+      margin-bottom: 1.25rem;
+    }
+    .note-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: 3rem;
+      font-size: 0.75rem;
+    }
+    .note-content {
+      font-size: 1.08rem;
+      line-height: 1.8;
+      color: var(--color-text-secondary);
+    }
+    .note-content :global(h2),
+    .note-content :global(h3) {
+      color: var(--color-text);
+      margin-top: 2.5rem;
+      letter-spacing: 0;
+    }
+    .note-content :global(p),
+    .note-content :global(ul),
+    .note-content :global(ol),
+    .note-content :global(blockquote) {
+      margin-bottom: 1.25rem;
+    }
+    .note-content :global(a) {
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .note-footer {
+      border-top: 1px solid var(--color-border);
+      margin-top: 4rem;
+      padding-top: 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="container nav__inner">
+      <a href="/" class="nav__logo">ANGARLO</a>
+      <ul class="nav__links">
+        <li><a href="/" class="nav__link">Home</a></li>
+        <li><a href="/methodology.html" class="nav__link">Methodology</a></li>
+        <li><a href="/examples.html" class="nav__link">Examples</a></li>
+        <li><a href="/notes" class="nav__link nav__link--active">Notes</a></li>
+        <li><a href="/podcast.html" class="nav__link">Podcast</a></li>
+        <li><a href="/contact.html" class="nav__link">Contact</a></li>
+      </ul>
+      <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </nav>
+
+  <main class="note-shell">
+    <div class="note-kicker">ANGARLO Notes</div>
+    <h1 class="note-title">{title}</h1>
+    <p class="note-description">{description}</p>
+    <div class="note-meta">
+      {formattedDate && <span class="note-date">{formattedDate}</span>}
+      {tags.length > 0 && <span class="note-tags">{tags.join(' / ')}</span>}
+    </div>
+    <article class="note-content">
+      <slot />
+    </article>
+    <div class="note-footer">
+      <a href="/notes">All notes</a>
+      <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(canonicalUrl.toString())}`} target="_blank" rel="noopener noreferrer">Share on X</a>
+    </div>
+  </main>
+
+  <script is:inline src="/assets/js/theme.js"></script>
+  <!-- Cloudflare Web Analytics -->
+  <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"50af8042fed14fbdb35bde67c57585bf"}'></script>
+  <!-- End Cloudflare Web Analytics -->
+</body>
+</html>

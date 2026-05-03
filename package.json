@@ -1,0 +1,20 @@
+{
+  "name": "sali",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "SALI - Satoshi Annual Labor Index with Markdown-powered notes.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "node scripts/sync-static.mjs && astro dev",
+    "build": "node scripts/sync-static.mjs && astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@astrojs/rss": "^4.0.12",
+    "astro": "^4.16.18"
+  },
+  "devDependencies": {}
+}

@@ -1,0 +1,122 @@
+---
+import { getCollection } from 'astro:content';
+
+const notes = (await getCollection('notes'))
+  .filter((note) => !note.data.draft)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Notes, essays, updates, and whatever else ANGARLO wants to publish.">
+  <title>Notes | ANGARLO</title>
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://sali.angarlo.com/notes">
+  <meta property="og:title" content="Notes | ANGARLO">
+  <meta property="og:description" content="Notes, essays, updates, and whatever else ANGARLO wants to publish.">
+  <meta property="og:image" content="https://sali.angarlo.com/assets/images/sali-share.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@angarlo">
+  <meta name="twitter:creator" content="@angarlo">
+  <meta name="twitter:title" content="Notes | ANGARLO">
+  <meta name="twitter:description" content="Notes, essays, updates, and whatever else ANGARLO wants to publish.">
+  <meta name="twitter:image" content="https://sali.angarlo.com/assets/images/sali-share.png">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=9">
+  <style>
+    .notes-shell {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 4rem 1.5rem;
+    }
+    .notes-title {
+      color: var(--color-text);
+      font-size: clamp(2.5rem, 7vw, 4.75rem);
+      line-height: 1.05;
+      margin-bottom: 1rem;
+      letter-spacing: 0;
+    }
+    .notes-subtitle {
+      max-width: 620px;
+      font-size: 1.12rem;
+      color: var(--color-text-secondary);
+      line-height: 1.7;
+      margin-bottom: 3rem;
+    }
+    .notes-list {
+      display: grid;
+      gap: 1rem;
+    }
+    .note-card {
+      display: block;
+      padding: 1.4rem 0;
+      border-top: 1px solid var(--color-border);
+      color: var(--color-text);
+      text-decoration: none;
+    }
+    .note-card:last-child {
+      border-bottom: 1px solid var(--color-border);
+    }
+    .note-card:hover h2 {
+      color: var(--color-accent);
+    }
+    .note-card__meta {
+      font-family: var(--font-mono);
+      color: var(--color-text-muted);
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 0.45rem;
+    }
+    .note-card h2 {
+      color: var(--color-text);
+      margin: 0 0 0.45rem;
+      font-size: 1.55rem;
+      letter-spacing: 0;
+    }
+    .note-card p {
+      margin: 0;
+      max-width: 660px;
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="container nav__inner">
+      <a href="/" class="nav__logo">ANGARLO</a>
+      <ul class="nav__links">
+        <li><a href="/" class="nav__link">Home</a></li>
+        <li><a href="/methodology.html" class="nav__link">Methodology</a></li>
+        <li><a href="/examples.html" class="nav__link">Examples</a></li>
+        <li><a href="/notes" class="nav__link nav__link--active">Notes</a></li>
+        <li><a href="/podcast.html" class="nav__link">Podcast</a></li>
+        <li><a href="/contact.html" class="nav__link">Contact</a></li>
+      </ul>
+      <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </nav>
+
+  <main class="notes-shell">
+    <h1 class="notes-title">Notes</h1>
+    <p class="notes-subtitle">Short thoughts, long thoughts, announcements, experiments, essays, rants, drafts, and whatever else needs a URL.</p>
+    <div class="notes-list">
+      {notes.map((note) => (
+        <a class="note-card" href={`/notes/${note.slug}`}>
+          <div class="note-card__meta">
+            {new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(note.data.date)}
+            {note.data.tags.length > 0 && ` / ${note.data.tags.join(' / ')}`}
+          </div>
+          <h2>{note.data.title}</h2>
+          <p>{note.data.description}</p>
+        </a>
+      ))}
+    </div>
+  </main>
+
+  <script is:inline src="/assets/js/theme.js"></script>
+  <!-- Cloudflare Web Analytics -->
+  <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"50af8042fed14fbdb35bde67c57585bf"}'></script>
+  <!-- End Cloudflare Web Analytics -->
+</body>
+</html>

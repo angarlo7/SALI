@@ -4,14 +4,66 @@ SALI is an educational measurement tool that converts your annual salary into sa
 
 ## Running Locally
 
-Start a simple local server from the project directory:
+Use Node 20 for this project. If you use `nvm`, run:
+
+```bash
+nvm use
+```
+
+If you do not use `nvm`, update Node through your usual installer before building.
+
+Install dependencies once:
 
 ```bash
 cd /path/to/SALI
-python3 -m http.server 8000
+npm install
 ```
 
-Then open [http://localhost:8000](http://localhost:8000) in your browser.
+Start the local site:
+
+```bash
+npm run dev
+```
+
+Then open the local URL Astro prints in your browser, usually [http://localhost:4321](http://localhost:4321).
+
+## Publishing Notes
+
+Notes are plain Markdown files in `src/content/notes`.
+
+Create a file like `src/content/notes/my-new-note.md`:
+
+```md
+---
+title: "My New Note"
+description: "A short preview for the archive and share cards."
+date: 2026-05-03
+tags: ["bitcoin", "labor"]
+draft: false
+---
+
+Write whatever you want here.
+```
+
+That creates:
+
+- `/notes` for the archive
+- `/notes/my-new-note` for the post
+- `/rss.xml` for RSS readers
+
+Set `draft: true` when you want to keep a note out of the published site.
+
+## Building and Deploying
+
+Run a production build:
+
+```bash
+npm run build
+```
+
+Astro copies the existing static site into `public/`, builds the Markdown notes, and outputs the deployable site into `dist/`.
+
+GitHub Actions deploys `dist/` automatically on every push to `main`. In GitHub, set **Settings > Pages > Build and deployment > Source** to **GitHub Actions**.
 
 ## Embedding into Webflow
 
@@ -36,11 +88,19 @@ Then open [http://localhost:8000](http://localhost:8000) in your browser.
 ├── examples.html       # Worked calculation examples
 ├── podcast.html        # Podcast information
 ├── contact.html        # Contact (mailto + social links)
+├── privacy.html        # Privacy notes
+├── astro.config.mjs    # Astro build config
+├── package.json        # Astro scripts and dependencies
 ├── robots.txt          # Search engine directives
 ├── sitemap.xml         # Site map for SEO
 ├── CNAME               # GitHub Pages custom domain (sali.angarlo.com)
 ├── .nojekyll           # Disable Jekyll processing on GitHub Pages
 ├── README.md           # This file
+├── /src
+│   ├── /content
+│   │   └── /notes      # Markdown posts / thoughts
+│   ├── /layouts        # Astro note layout
+│   └── /pages          # Notes archive, post pages, RSS
 ├── /assets
 │   ├── /css
 │   │   └── styles.css  # All styles
