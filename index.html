@@ -31,8 +31,8 @@
         <li><a href="/" class="nav__link nav__link--active">Home</a></li>
         <li><a href="/methodology.html" class="nav__link">Methodology</a></li>
         <li><a href="/examples.html" class="nav__link">Examples</a></li>
-        <li><a href="/podcast.html" class="nav__link">Podcast</a></li>
         <li><a href="/notes" class="nav__link">Notes</a></li>
+        <li><a href="/podcast.html" class="nav__link">Podcast</a></li>
         <li><a href="/contact.html" class="nav__link">Contact</a></li>
       </ul>
       <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
@@ -189,7 +189,7 @@
 
               <div class="output-group">
                 <div class="output-group__label">Your SALI (Current Year)</div>
-                <div id="saliSatsOutput" class="output-group__value output-group__value--primary">— sats/year</div>
+                <div id="saliSatsOutput" content class="output-group__value output-group__value--primary">— sats/year</div>
               </div>
 
               <div class="output-group" id="btcOutputGroup">
@@ -403,7 +403,7 @@
             <div class="breakeven-detail">
               <div class="output-group">
                 <div class="output-group__label">At break-even, your salary in 5 years</div>
-<div id="breakevenSalary5" class="output-group__value output-group__value--secondary">—</div>
+                <div id="breakevenSalary5" class="output-group__value output-group__value--secondary">—</div>
               </div>
               <div class="output-group">
                 <div class="output-group__label">At your projected growth, salary in 5 years</div>
@@ -492,7 +492,7 @@
         Support continued maintenance: <a href="lightning:angarlo@strike.me">⚡ angarlo@strike.me</a> · <a href="/contact.html#support">QR &amp; more &rarr;</a>
       </p>
       <p class="footer__privacy">
-        Privacy-friendly analytics by Cloudflare Web Analytics — no cookies, no ad tracking. The site loads live BTC prices from Coinbase, FX rates from the European Central Bank (via Frankfurter), and the podcast video from youtube-nocookie.com. Chart.js is loaded from jsDelivr CDN (no tracking). · <a href="/privacy.html">Privacy Policy</a>
+        Privacy-friendly analytics by Cloudflare Web Analytics. No cookies, no ad tracking. The site loads live BTC prices from Coinbase, FX rates from the European Central Bank (via Frankfurter), $STRC yield from Yahoo Finance, Chart.js from jsDelivr, and the podcast video from youtube-nocookie.com. · <a href="/privacy.html">Privacy Policy</a>
       </p>
       <p class="footer__contact">
         Contact: <a href="mailto:angarlotv@gmail.com">angarlotv@gmail.com</a>
@@ -501,7 +501,10 @@
   </footer>
 
   <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"
+          integrity="sha384-9nhczxUqK87bcKHh20fSQcTGD4qq5GhayNYSYWqwBkINBhOfQLg/P5HG5lF1urn4"
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"></script>
   <script src="/assets/js/app.js?v=8"></script>
   <script src="/assets/js/theme.js"></script>
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"50af8042fed14fbdb35bde67c57585bf"}'></script>
