@@ -101,6 +101,11 @@ a:hover { color: var(--color-accent-hover); }
 .hero { padding: var(--spacing-xxxl) 0; text-align: center; }
 .hero__product-name { font-family: var(--font-mono); font-size: 3.5rem; font-weight: 700; color: var(--color-accent); line-height: 1; letter-spacing: -0.02em; margin-bottom: 0.2rem; }
 .hero__product-subtitle { font-family: var(--font-mono); font-size: 0.75rem; font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-text-muted); margin-bottom: var(--spacing-xl); }
+.hero__logo-wrap { margin-bottom: var(--spacing-xl); display: flex; justify-content: center; }
+.hero__logo { max-width: 300px; width: 80%; height: auto; }
+.hero__logo--dark { display: none; }
+body.dark .hero__logo--light { display: none; }
+body.dark .hero__logo--dark { display: block; }
 .hero__headline { font-size: 2.5rem; font-weight: 700; margin-bottom: var(--spacing-lg); color: var(--color-text); line-height: 1.2; }
 .hero__highlight { color: var(--color-accent); }
 .hero__subheadline { font-size: 1.125rem; color: var(--color-text-secondary); max-width: 600px; margin: 0 auto var(--spacing-xl); line-height: 1.7; }

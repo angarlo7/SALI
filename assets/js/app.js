@@ -54,7 +54,7 @@
   // These fallback values are used only if the live fetch fails.
   const FX_RATES = {
     USD: 1,
-    EUR: 1.08,  // fallback: 1 EUR ≈ 1.08 USD
+    EUR: 1.18,  // fallback: 1 EUR ≈ 1.18 USD
     MXN: 0.058  // fallback: 1 MXN ≈ 0.058 USD
   };
 
