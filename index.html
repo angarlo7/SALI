@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="SALI - the standard for measuring your labor in Bitcoin terms. Enter your salary, get your satoshi value, and see how it has changed as Bitcoin appreciates.">
+  <meta name="description" content="SALI — the standard for measuring your labor in Bitcoin terms. Enter your salary, get your satoshi value, and see how it has changed as Bitcoin appreciates.">
   <title>SALI - Satoshi Annual Labor Index | ANGARLO</title>
   <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://sali.angarlo.com/">
-  <meta property="og:title" content="SALI - How much is your salary worth in Bitcoin?">
-  <meta property="og:description" content="Enter your salary and see it in satoshis - Bitcoin's base unit. Track how your earning power compares to Bitcoin, year over year.">
+  <meta property="og:title" content="SALI — How much is your salary worth in Bitcoin?">
+  <meta property="og:description" content="Enter your salary and see it in satoshis — Bitcoin's base unit. Track how your earning power compares to Bitcoin, year over year.">
   <meta property="og:image" content="https://sali.angarlo.com/assets/images/sali-share.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -17,10 +17,10 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:site" content="@angarlo">
   <meta name="twitter:creator" content="@angarlo">
-  <meta name="twitter:title" content="SALI - How much is your salary worth in Bitcoin?">
-  <meta name="twitter:description" content="Enter your salary and see it in satoshis - Bitcoin's base unit. Track how your earning power compares to Bitcoin, year over year.">
+  <meta name="twitter:title" content="SALI — How much is your salary worth in Bitcoin?">
+  <meta name="twitter:description" content="Enter your salary and see it in satoshis — Bitcoin's base unit. Track how your earning power compares to Bitcoin, year over year.">
   <meta name="twitter:image" content="https://sali.angarlo.com/assets/images/sali-share.png">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=9">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=6">
 </head>
 <body>
   <!-- Navigation -->
@@ -31,8 +31,8 @@
         <li><a href="/" class="nav__link nav__link--active">Home</a></li>
         <li><a href="/methodology.html" class="nav__link">Methodology</a></li>
         <li><a href="/examples.html" class="nav__link">Examples</a></li>
-        <li><a href="/notes" class="nav__link">Notes</a></li>
         <li><a href="/podcast.html" class="nav__link">Podcast</a></li>
+        <li><a href="/notes" class="nav__link">Notes</a></li>
         <li><a href="/contact.html" class="nav__link">Contact</a></li>
       </ul>
       <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
@@ -47,7 +47,7 @@
         <div class="hero__product-subtitle">Satoshi Annual Labor Index</div>
         <h1 class="hero__headline">You got a raise. Bitcoin got bigger.<br>Find out who won.</h1>
         <p class="hero__subheadline">
-          Enter your salary and see it expressed in satoshis - Bitcoin's base unit. Track how your earning power compares to Bitcoin, year over year.
+          Enter your salary and see it expressed in satoshis — Bitcoin's base unit. Track how your earning power compares to Bitcoin, year over year.
         </p>
         <div class="hero__actions">
           <a href="#calculator" class="btn btn--primary">Calculate My SALI</a>
@@ -60,12 +60,12 @@
     <section id="benchmarkComparison" class="section section--alt">
       <div class="container">
         <div class="content-section">
-          <h2>What outran your salary?</h2>
-          <p class="norm-chart__desc">Every line starts at 100 in your selected start year. Higher means that asset, or cost benchmark, became harder for your salary to buy. Bitcoin (orange) is the primary lens - the other three show how extraordinary its appreciation has been by comparison. Solid lines are real historical data; dashed lines are projections based on your inputs below.</p>
+          <h2>Four assets. One clear divergence.</h2>
+          <p class="norm-chart__desc">Every line starts at 100 in your selected start year. Bitcoin (orange) is the primary lens — the other three show how extraordinary its appreciation has been by comparison. Solid lines are real historical data; dashed lines are projections based on your inputs below.</p>
           <div class="chart-container chart-container--norm">
             <canvas id="normalizedChart"></canvas>
           </div>
-          <p class="norm-chart__note">Bitcoin (orange) · S&amp;P 500 (blue) · Gold (yellow) · Cost of living / CPI (green). Anything above 100 means that benchmark outran your salary. Higher line = stronger appreciation relative to your labor.</p>
+          <p class="norm-chart__note">Bitcoin (orange) · S&amp;P 500 (blue) · Gold (yellow) · Real purchasing power / CPI (green). Anything below 100 means your salary buys less of that asset than it did in the start year.</p>
         </div>
       </div>
     </section>
@@ -74,14 +74,18 @@
     <section id="calculator" class="section">
       <div class="container">
         <div class="calculator">
-          <h2 class="calculator__title">SALI Calculator<span class="info-tip"><button class="info-tip__btn" type="button">?</button><span class="info-tip__content">SALI - Satoshi Annual Labor Index - measures your annual salary expressed in satoshis, showing how much Bitcoin your labor could acquire each year. It's an index, like CPI, but denominated in Bitcoin instead of a basket of goods.</span></span></h2>
-          <p class="calculator__context">SALI measures your salary in satoshis - Bitcoin's unit of account. It does not measure cost of living or inflation. It measures one thing: your labor's value in Bitcoin terms.</p>
+          <h2 class="calculator__title">SALI Calculator<span class="info-tip"><button class="info-tip__btn" type="button">?</button><span class="info-tip__content">SALI — Satoshi Annual Labor Index — measures your annual salary expressed in satoshis, showing how much Bitcoin your labor could acquire each year. It's an index, like CPI, but denominated in Bitcoin instead of a basket of goods.</span></span></h2>
+          <p class="calculator__context">SALI measures your salary in satoshis — Bitcoin's unit of account. It does not measure cost of living or inflation. It measures one thing: your labor's value in Bitcoin terms.</p>
 
           <div class="calculator__grid">
             <!-- Inputs -->
             <div class="calculator__inputs">
               <div class="form-group">
-                <label for="salaryInput">Annual Salary</label>
+                <label for="salaryInput">Salary</label>
+                <div class="salary-mode-toggle" id="salaryFreqToggle">
+                  <button type="button" id="salaryAnnualBtn" class="mode-btn mode-btn--active">Annual</button>
+                  <button type="button" id="salaryMonthlyBtn" class="mode-btn">Monthly</button>
+                </div>
                 <input type="number" id="salaryInput" placeholder="e.g., 60000" min="0" step="1000" value="60000">
               </div>
 
@@ -101,9 +105,8 @@
               <!-- Salary Under $STRC / STRETCH -->
               <div class="form-group strc-form-group">
                 <label>Salary Under $STRC
-                  <span class="info-tip"><button class="info-tip__btn" type="button">?</button><span class="info-tip__content">Strategy's $STRC preferred stock (Nasdaq) launched July 2025. It pays a variable dividend that adjusts monthly - started at 9% and has risen to 11.5% (Apr 2026). "UNDER STRETCH" means the portion of your income allocated to $STRC earning dividend income instead of sitting in fiat. The SALI grade boost is time-weighted: only the months since Jul 2025 count. The forward yield assumption uses today's stated rate. Learn more at <a href="https://www.strategy.com" target="_blank" rel="noopener noreferrer">strategy.com</a>.</span></span>
+                  <span class="info-tip"><button class="info-tip__btn" type="button">?</button><span class="info-tip__content">Strategy's $STRC preferred stock pays a variable dividend (currently ~11%). "UNDER STRETCH" means the portion of your compensation allocated to $STRC — earning dividend income instead of sitting in fiat. The rest stays in dollars. Learn more at <a href="https://www.strategy.com" target="_blank" rel="noopener noreferrer">strategy.com</a>.</span></span>
                 </label>
-                <div id="strcYieldDisplay" class="strc-yield-display">Loading $STRC yield…</div>
                 <div class="strc-enable-row">
                   <input type="checkbox" id="strcEnableToggle" class="strc-checkbox">
                   <label for="strcEnableToggle" class="strc-enable-label">Allocate salary to $STRC</label>
@@ -112,6 +115,7 @@
               <div class="form-group form-group--hidden" id="strcPctGroup">
                 <label for="strcPctInput">% of Salary → $STRC</label>
                 <input type="number" id="strcPctInput" value="10" min="0" max="100" step="1" placeholder="e.g. 10">
+                <div id="strcYieldDisplay" class="strc-yield-display">Loading $STRC yield…</div>
               </div>
 
               <div class="form-group">
@@ -133,21 +137,21 @@
               <div id="realGrowthNote" class="real-growth-note" style="display:none"></div>
 
               <div class="form-group">
-                <label for="startYearSelect">Start Year<span class="info-tip"><button class="info-tip__btn" type="button">?</button><span class="info-tip__content">Your salary is treated as today's value and back-calculated to this year. Past SALI points use actual annual average BTC prices; future points use your growth assumptions.</span></span></label>
+                <label for="startYearSelect">Start Year</label>
                 <select id="startYearSelect">
                   <!-- Options populated by JS, default 2020 -->
                 </select>
               </div>
 
               <div class="form-group">
-                <label for="yearsSelect">Forecast Horizon (years)</label>
+                <label for="yearsSelect">Forecast Horizon</label>
                 <select id="yearsSelect">
                   <!-- Options populated by JS, default 10 -->
                 </select>
               </div>
 
               <div class="form-group">
-                <label for="btcPriceMethodSelect">Bitcoin Price Method<span class="info-tip"><button class="info-tip__btn" type="button">?</button><span class="info-tip__content"><strong>Spot:</strong> live price now. <strong>Annual Average:</strong> the average of Bitcoin's daily closing prices across the full calendar year - smooths out day-to-day volatility for more stable historical comparisons. <strong>Manual:</strong> enter any price you want.</span></span></label>
+                <label for="btcPriceMethodSelect">Bitcoin Price Method<span class="info-tip"><button class="info-tip__btn" type="button">?</button><span class="info-tip__content"><strong>Spot:</strong> live price now. <strong>Annual Average:</strong> the average of Bitcoin's daily closing prices across the full calendar year — smooths out day-to-day volatility for more stable historical comparisons. <strong>Manual:</strong> enter any price you want.</span></span></label>
                 <select id="btcPriceMethodSelect">
                   <option value="spot" selected>Spot (Live)</option>
                   <option value="annual">Annual Average</option>
@@ -163,14 +167,14 @@
               </div>
 
               <div class="form-group">
-                <label for="btcGrowthInput">BTC<span class="info-tip"><button class="info-tip__btn" type="button">?</button><span class="info-tip__content">Bitcoin's total supply is capped at 21 million coins forever - no government or company can create more. This field is your forward assumption for how much the price grows per year; it is not a prediction.</span></span> Growth Assumption (%/yr)</label>
+                <label for="btcGrowthInput">BTC<span class="info-tip"><button class="info-tip__btn" type="button">?</button><span class="info-tip__content">BTC is the ticker symbol for Bitcoin — the world's first and largest fixed-supply digital asset. Its total supply is capped at 21 million coins forever. No government or company can create more of it.</span></span> Price Growth Rate (% per year)</label>
                 <div class="salary-mode-toggle btc-growth-mode-toggle">
                   <button type="button" id="btcCustomModeBtn" class="mode-btn mode-btn--active">Custom</button>
                   <button type="button" id="btcHistoricalModeBtn" class="mode-btn">Historical CAGR</button>
                   <button type="button" id="btc5yModeBtn" class="mode-btn">5-Year CAGR</button>
                 </div>
                 <input type="number" id="btcGrowthInput" value="5" min="-100" max="1000" step="0.5">
-                <div class="input-note">Default 5% reflects a gold-like store-of-value scenario - conservative, not a forecast. Historical and 5-year rates are math on past data; Bitcoin's early years skew the long-run figure and are not a guide to the future.</div>
+                <div class="input-note">Default 5% reflects a gold-like store-of-value scenario — conservative, not a forecast. Historical and 5-year rates are math on past data; Bitcoin's early years skew the long-run figure and are not a guide to the future.</div>
               </div>
 
             </div>
@@ -183,44 +187,43 @@
                 <button type="button" id="unitToggleBtc" class="unit-toggle__btn">BTC</button>
               </div>
 
-              <!-- SALI Score Badge - first, it's the headline output -->
-              <div id="saliScoreWrap" class="sali-score-wrap" style="display:none">
-                <div class="sali-score">
-                  <div class="sali-score__left">
-                    <div class="sali-score__label">SALI Grade</div>
-                    <div id="saliScoreGrade" class="sali-score__grade sali-score__grade--C">-</div>
-                  </div>
-                  <div class="sali-score__right">
-                    <div id="saliScoreRate" class="sali-score__stat">-</div>
-                    <div id="saliScoreGap" class="sali-score__stat">-</div>
-                    <div id="saliScoreTagline" class="sali-score__tagline">-</div>
-                    <a id="gradeShareBtn" class="grade-share-link btn btn--social btn--social--x" href="#" target="_blank" rel="noopener noreferrer" style="display:none">Post on X</a>
-                  </div>
-                </div>
-              </div>
-
               <div class="output-group">
                 <div class="output-group__label">Your SALI (Current Year)</div>
-                <div id="saliSatsOutput" class="output-group__value output-group__value--primary">- sats/year</div>
+                <div id="saliSatsOutput" class="output-group__value output-group__value--primary">— sats/year</div>
               </div>
 
               <div class="output-group" id="btcOutputGroup">
                 <div class="output-group__label">BTC Equivalent</div>
-                <div id="saliBtcOutput" class="output-group__value output-group__value--secondary">- BTC/year</div>
+                <div id="saliBtcOutput" class="output-group__value output-group__value--secondary">— BTC/year</div>
+              </div>
+
+              <!-- SALI Score Badge -->
+              <div id="saliScoreWrap" class="sali-score-wrap" style="display:none">
+                <div class="sali-score">
+                  <div class="sali-score__left">
+                    <div class="sali-score__label">SALI Grade</div>
+                    <div id="saliScoreGrade" class="sali-score__grade sali-score__grade--C">—</div>
+                  </div>
+                  <div class="sali-score__right">
+                    <div id="saliScoreRate" class="sali-score__stat">—</div>
+                    <div id="saliScoreGap" class="sali-score__stat">—</div>
+                    <div id="saliScoreTagline" class="sali-score__tagline">—</div>
+                  </div>
+                </div>
               </div>
 
               <!-- Purchasing Power Equivalents -->
               <div class="equivalents-grid" id="equivalentsGrid" style="display:none">
                 <div class="equiv-item">
-                  <span class="equiv-value" id="equivSatsDay">-</span>
+                  <span class="equiv-value" id="equivSatsDay">—</span>
                   <span class="equiv-label">sats / work day</span>
                 </div>
                 <div class="equiv-item">
-                  <span class="equiv-value" id="equivSatsHour">-</span>
+                  <span class="equiv-value" id="equivSatsHour">—</span>
                   <span class="equiv-label">sats / hour</span>
                 </div>
                 <div class="equiv-item">
-                  <span class="equiv-value" id="equivPctBtc">-</span>
+                  <span class="equiv-value" id="equivPctBtc">—</span>
                   <span class="equiv-label">% of 1 BTC</span>
                 </div>
               </div>
@@ -231,30 +234,37 @@
                 <div class="strc-output__grid">
                   <div class="output-group">
                     <div class="output-group__label">STRC Allocation</div>
-                    <div id="strcAllocOutput" class="output-group__value output-group__value--secondary">-</div>
+                    <div id="strcAllocOutput" class="output-group__value output-group__value--secondary">—</div>
+                  </div>
+                  <div class="output-group">
+                    <div class="output-group__label">Annual Dividend Income</div>
+                    <div id="strcDivOutput" class="output-group__value output-group__value--primary strc-value--dividend">—</div>
                   </div>
                   <div class="output-group">
                     <div class="output-group__label">Remaining Salary (USD)</div>
-                    <div id="strcRemainOutput" class="output-group__value output-group__value--secondary">-</div>
-                  </div>
-                  <div class="output-group strc-output__dividend-row">
-                    <div class="output-group__label">Annual Dividend Income <span class="strc-included-note">↑ already in your SALI</span></div>
-                    <div id="strcDivOutput" class="output-group__value output-group__value--primary strc-value--dividend">-</div>
+                    <div id="strcRemainOutput" class="output-group__value output-group__value--secondary">—</div>
                   </div>
                 </div>
                 <div id="strcYieldNote" class="strc-yield-note"></div>
               </div>
 
+              <div class="share-row" id="shareRow" style="display:none">
+                <a id="tweetSaliBtn" class="btn btn--social btn--social--x" href="#" target="_blank" rel="noopener noreferrer">Post on 𝕏</a>
+                <a id="fbShareBtn" class="btn btn--social btn--social--fb" href="#" target="_blank" rel="noopener noreferrer">Facebook</a>
+                <a id="liShareBtn" class="btn btn--social btn--social--li" href="#" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+                <a id="redditShareBtn" class="btn btn--social btn--social--reddit" href="#" target="_blank" rel="noopener noreferrer">Reddit</a>
+              </div>
+
               <!-- Historical Change -->
               <div class="output-group" id="historicalChangeGroup" style="display:none">
-                <div class="output-group__label">Historical Change (since <span id="historicalChangeYear">-</span>)</div>
-                <div id="historicalChangeOutput" class="output-group__value output-group__value--secondary">-</div>
+                <div class="output-group__label">Historical Change (since <span id="historicalChangeYear">—</span>)</div>
+                <div id="historicalChangeOutput" class="output-group__value output-group__value--secondary">—</div>
                 <div class="output-group__desc">Change in your BTC-denominated salary using actual annual average prices</div>
               </div>
 
               <div class="output-group">
                 <div class="output-group__label" id="projectedChangeLabel">Projected Change</div>
-                <div id="saliYoyOutput" class="output-group__value output-group__value--secondary">-</div>
+                <div id="saliYoyOutput" class="output-group__value output-group__value--secondary">—</div>
                 <div id="projectedChangeDesc" class="output-group__desc"></div>
               </div>
 
@@ -263,7 +273,7 @@
               <!-- SALI Tier -->
               <div id="saliTierWrap" style="display:none">
                 <div class="sali-tier__label">Your SALI Tier<span class="info-tip"><button class="info-tip__btn" type="button">?</button><span class="info-tip__content">Compares your Bitcoin-denominated salary to US income benchmarks at today's BTC price. Gives you an immediate anchor: is my satoshi number high or low relative to other earners?</span></span></div>
-                <div id="saliTier" class="sali-tier">-</div>
+                <div id="saliTier" class="sali-tier">—</div>
               </div>
 
               <!-- Purchasing Power Narrative -->
@@ -279,7 +289,7 @@
               <h3 id="chartTitle">SALI Over Time</h3>
               <div class="chart-legend">
                 <span class="chart-legend__item chart-legend__item--historical">&#9135; Historical</span>
-                <span class="chart-legend__item chart-legend__item--projected">Dashed Projected</span>
+                <span class="chart-legend__item chart-legend__item--projected">- - Projected</span>
               </div>
             </div>
             <div class="benchmark-toggle">
@@ -324,10 +334,12 @@
             <p class="table-note">* Projected BTC price based on growth rate assumption</p>
           </div>
 
-          <!-- Historical Analysis - collapsed by default -->
-          <details class="history-accordion" id="historySection">
-            <summary class="history-accordion__trigger">Actual SALI History</summary>
-            <p class="history-section__desc">Enter your actual starting point to reconstruct what your SALI really was each year - instead of projecting today's salary backwards.</p>
+          <!-- Historical Analysis -->
+          <div class="history-section" id="historySection">
+            <div class="history-section__header">
+              <h3>Actual SALI History</h3>
+              <p class="history-section__desc">Enter your actual starting point to reconstruct what your SALI really was each year — instead of projecting today's salary backwards.</p>
+            </div>
             <div class="history-inputs">
               <div class="form-group">
                 <label for="histStartYear">Year You Started</label>
@@ -355,7 +367,7 @@
                 </table>
               </div>
             </div>
-          </details>
+          </div>
         </div>
       </div>
     </section>
@@ -364,7 +376,7 @@
     <section class="section benchmark-section" id="benchmarkSection" style="display:none;">
       <div class="container">
         <h2 class="section-title">How Your Era Compares</h2>
-        <p class="section-subtitle">Bitcoin vs S&amp;P 500, Gold, and Inflation - normalized to 100 at your start year</p>
+        <p class="section-subtitle">Bitcoin vs S&amp;P 500, Gold, and Inflation — normalized to 100 at your start year</p>
         <div class="chart-container" style="position:relative; height:350px;">
           <canvas id="benchmarkChart"></canvas>
         </div>
@@ -379,23 +391,23 @@
       <div class="container">
         <div class="calculator">
           <h2 class="calculator__title">Break-Even Salary Calculator</h2>
-          <p class="breakeven-intro">What annual raise would you need to accumulate Bitcoin at the same rate it appreciates - keeping your SALI flat?</p>
+          <p class="breakeven-intro">What annual raise would you need to accumulate Bitcoin at the same rate it appreciates — keeping your SALI flat?</p>
           <div class="breakeven-grid">
             <div class="breakeven-main">
               <div class="output-group">
                 <div class="output-group__label">Break-Even Annual Raise</div>
-                <div id="breakevenRateOutput" class="output-group__value output-group__value--primary">-</div>
-                <div class="output-group__desc">Equal to your BTC growth rate assumption - at break-even, your SALI stays flat</div>
+                <div id="breakevenRateOutput" class="output-group__value output-group__value--primary">—</div>
+                <div class="output-group__desc">Equal to your BTC growth rate assumption — at break-even, your SALI stays flat</div>
               </div>
             </div>
             <div class="breakeven-detail">
               <div class="output-group">
                 <div class="output-group__label">At break-even, your salary in 5 years</div>
-                <div id="breakevenSalary5" class="output-group__value output-group__value--secondary">-</div>
+<div id="breakevenSalary5" class="output-group__value output-group__value--secondary">—</div>
               </div>
               <div class="output-group">
                 <div class="output-group__label">At your projected growth, salary in 5 years</div>
-                <div id="projectedSalary5" class="output-group__value output-group__value--secondary">-</div>
+                <div id="projectedSalary5" class="output-group__value output-group__value--secondary">—</div>
               </div>
               <div id="breakevenGap" class="breakeven-gap" style="display:none"></div>
             </div>
@@ -419,13 +431,13 @@
               <div class="sali-callout__year">2025 avg</div>
               <div class="sali-callout__value">59,030,716 <span class="sali-callout__unit">sats/year</span></div>
             </div>
-            <div class="sali-callout__note">Bitcoin appreciated roughly 370× from 2015 to 2025 ($272 → $101,642 annual average). Measured in sats, the same $60,000 salary buys <strong>99.7% fewer</strong>. That is Bitcoin's appreciation doing exactly what a fixed-supply asset is supposed to do - and it's the number that matters most if you're building a Bitcoin position.</div>
+            <div class="sali-callout__note">Bitcoin appreciated roughly 370× from 2015 to 2025 ($272 → $101,642 annual average). Measured in sats, the same $60,000 salary buys <strong>99.7% fewer</strong>. That is Bitcoin's appreciation doing exactly what a fixed-supply asset is supposed to do — and it's the number that matters most if you're building a Bitcoin position.</div>
           </div>
           <p>
-            Bitcoin has a fixed supply of 21 million coins. No central bank can issue more. That makes it the hardest unit of account available - and the most demanding benchmark for your labor. SALI uses it by design, not by accident.
+            Bitcoin has a fixed supply of 21 million coins. No central bank can issue more. That makes it the hardest unit of account available — and the most demanding benchmark for your labor. SALI uses it by design, not by accident.
           </p>
           <p>
-            <strong>You could measure your salary in gold or the S&P 500.</strong> SALI includes those comparisons so you can see the divergence clearly. Gold and stocks have appreciated. Bitcoin has appreciated more - by orders of magnitude. The chart above exists to show that contrast, not to suggest the benchmarks are interchangeable.
+            <strong>You could measure your salary in gold or the S&P 500.</strong> SALI includes those comparisons so you can see the divergence clearly. Gold and stocks have appreciated. Bitcoin has appreciated more — by orders of magnitude. The chart above exists to show that contrast, not to suggest the benchmarks are interchangeable.
           </p>
           <p>
             <strong>SALI is measurement, not prediction.</strong> It doesn't forecast Bitcoin's price or tell you what to do. It converts your income into a satoshi-denominated record so you can observe, track, and think clearly about your labor's value in Bitcoin terms.
@@ -446,7 +458,7 @@
             SALI (sats/year) = (Annual Salary in USD ÷ BTC Price in USD) × 100,000,000
           </div>
           <p>
-            One satoshi (sat) is one hundred-millionth of a Bitcoin - the smallest unit in the Bitcoin protocol. SALI converts your salary into its Bitcoin equivalent and expresses it in sats, making year-over-year comparisons concrete and consistent regardless of Bitcoin's price.
+            One satoshi (sat) is one hundred-millionth of a Bitcoin — the smallest unit in the Bitcoin protocol. SALI converts your salary into its Bitcoin equivalent and expresses it in sats, making year-over-year comparisons concrete and consistent regardless of Bitcoin's price.
           </p>
           <p>
             <a href="/methodology.html">Read the full methodology →</a>
@@ -480,7 +492,7 @@
         Support continued maintenance: <a href="lightning:angarlo@strike.me">⚡ angarlo@strike.me</a> · <a href="/contact.html#support">QR &amp; more &rarr;</a>
       </p>
       <p class="footer__privacy">
-        Privacy-friendly analytics by Cloudflare Web Analytics. No cookies, no ad tracking. The site loads live BTC prices from Coinbase, FX rates from the European Central Bank (via Frankfurter), $STRC yield from Yahoo Finance, Chart.js from jsDelivr, and the podcast video from youtube-nocookie.com. · <a href="/privacy.html">Privacy Policy</a>
+        Privacy-friendly analytics by Cloudflare Web Analytics — no cookies, no ad tracking. The site loads live BTC prices from Coinbase, FX rates from the European Central Bank (via Frankfurter), and the podcast video from youtube-nocookie.com. Chart.js is served locally. · <a href="/privacy.html">Privacy Policy</a>
       </p>
       <p class="footer__contact">
         Contact: <a href="mailto:angarlotv@gmail.com">angarlotv@gmail.com</a>
@@ -489,14 +501,9 @@
   </footer>
 
   <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"
-          integrity="sha384-9nhczxUqK87bcKHh20fSQcTGD4qq5GhayNYSYWqwBkINBhOfQLg/P5HG5lF1urn4"
-          crossorigin="anonymous"
-          referrerpolicy="no-referrer"></script>
-  <script src="/assets/js/app.js?v=7"></script>
+  <script src="/assets/js/chart.umd.js"></script>
+  <script src="/assets/js/app.js?v=8"></script>
   <script src="/assets/js/theme.js"></script>
-  <!-- Cloudflare Web Analytics -->
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"50af8042fed14fbdb35bde67c57585bf"}'></script>
-  <!-- End Cloudflare Web Analytics -->
 </body>
 </html>
