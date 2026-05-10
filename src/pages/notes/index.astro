@@ -28,7 +28,7 @@ const notes = (await getCollection('notes'))
   <link rel="alternate" hreflang="es" href="https://sali.angarlo.com/es/notas">
   <link rel="alternate" hreflang="x-default" href="https://sali.angarlo.com/notes">
   <link rel="alternate" type="application/rss+xml" title="SALI Notes" href="https://sali.angarlo.com/rss.xml">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=11">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=12">
   <style>
     .notes-shell {
       max-width: 920px;
@@ -108,7 +108,9 @@ const notes = (await getCollection('notes'))
     <h1 class="notes-title">Notes</h1>
     <p class="notes-subtitle">Short thoughts, long thoughts, announcements, experiments, essays, rants, drafts, and whatever else needs a URL.</p>
     <div class="notes-list">
-      {notes.map((note) => (
+      {notes.length === 0 ? (
+        <p style="color: var(--color-text-muted); font-size: 0.95rem;">No notes yet — check back soon.</p>
+      ) : notes.map((note) => (
         <a class="note-card" href={`/notes/${note.slug}`}>
           <div class="note-card__meta">
             {new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(note.data.date)}
