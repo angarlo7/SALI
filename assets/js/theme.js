@@ -26,45 +26,21 @@
     });
   }
 
-  function injectHamburger() {
-    var nav = document.querySelector('.nav');
-    var navInner = document.querySelector('.nav__inner');
-    if (!nav || !navInner || navInner.querySelector('.nav__hamburger')) return;
-
-    var hamburger = document.createElement('button');
-    hamburger.className = 'nav__hamburger';
-    hamburger.setAttribute('aria-label', 'Toggle navigation');
-    hamburger.setAttribute('aria-expanded', 'false');
-    hamburger.textContent = '☰';
-
-    var logo = navInner.querySelector('.nav__logo');
-    if (logo && logo.nextSibling) {
-      navInner.insertBefore(hamburger, logo.nextSibling);
-    } else {
-      navInner.appendChild(hamburger);
-    }
-
-    hamburger.addEventListener('click', function (e) {
+  var navToggle = document.getElementById('navToggle');
+  var nav = document.querySelector('.nav');
+  if (navToggle && nav) {
+    navToggle.addEventListener('click', function (e) {
       e.stopPropagation();
       var isOpen = nav.classList.toggle('nav--open');
-      hamburger.textContent = isOpen ? '✕' : '☰';
-      hamburger.setAttribute('aria-expanded', String(isOpen));
+      navToggle.textContent = isOpen ? '✕' : '☰';
+      navToggle.setAttribute('aria-expanded', String(isOpen));
     });
-
     document.addEventListener('click', function (e) {
       if (!nav.contains(e.target)) {
         nav.classList.remove('nav--open');
-        hamburger.textContent = '☰';
-        hamburger.setAttribute('aria-expanded', 'false');
+        navToggle.textContent = '☰';
+        navToggle.setAttribute('aria-expanded', 'false');
       }
     });
-  }
-
-  // Script runs at end of body — DOM is already parsed.
-  // readyState check handles both inline and deferred loading.
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', injectHamburger);
-  } else {
-    injectHamburger();
   }
 })();
