@@ -30,6 +30,26 @@ const formattedDate = date
   <meta name="twitter:title" content={title}>
   <meta name="twitter:description" content={description}>
   <meta name="twitter:image" content="https://sali.angarlo.com/assets/images/sali-share.png">
+  <link rel="alternate" type="application/rss+xml" title="SALI Notes" href="https://sali.angarlo.com/rss.xml">
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": title,
+    "description": description,
+    "url": canonicalUrl.toString(),
+    ...(date ? { "datePublished": date.toISOString() } : {}),
+    "author": {
+      "@type": "Person",
+      "name": "Angarlo",
+      "url": "https://sali.angarlo.com/",
+      "sameAs": ["https://twitter.com/angarlo"]
+    },
+    "publisher": {
+      "@type": "Person",
+      "name": "Angarlo",
+      "url": "https://sali.angarlo.com/"
+    }
+  })}></script>
   <link rel="stylesheet" href="/assets/css/styles.css?v=9">
   <style>
     .note-shell {
