@@ -76,8 +76,6 @@ a:hover { color: var(--color-accent-hover); }
 .nav__inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--spacing-md); }
 .nav__logo { font-family: var(--font-mono); font-weight: 700; font-size: 1.25rem; color: var(--color-text); text-decoration: none; letter-spacing: -0.02em; display: flex; flex-direction: column; line-height: 1.2; }
 .nav__logo:hover { color: var(--color-accent); }
-.nav__logo-tagline { font-size: 0.6rem; font-weight: 400; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-text-muted); font-family: var(--font-sans); }
-.nav__logo:hover .nav__logo-tagline { color: var(--color-accent); }
 .nav__links { display: flex; gap: var(--spacing-lg); list-style: none; }
 .nav__link { color: var(--color-text-muted); font-size: 0.875rem; font-weight: 500; transition: color 0.2s ease; }
 .nav__link:hover { color: var(--color-text); }
@@ -156,6 +154,9 @@ body.dark .hero__logo--dark { display: block; }
 .status--info { background: var(--color-accent-dim); color: var(--color-accent); border: 1px solid rgba(247, 147, 26, 0.3); }
 .status--error { background: rgba(255, 107, 107, 0.08); color: var(--color-red-loss); border: 1px solid rgba(255, 107, 107, 0.25); }
 .status--success { background: rgba(34, 197, 94, 0.08); color: var(--color-green); border: 1px solid rgba(34, 197, 94, 0.25); }
+body.dark .status--info { background: rgba(247, 147, 26, 0.12); border-color: rgba(247, 147, 26, 0.4); }
+body.dark .status--error { background: rgba(255, 107, 107, 0.12); border-color: rgba(255, 107, 107, 0.35); }
+body.dark .status--success { background: rgba(34, 197, 94, 0.12); border-color: rgba(34, 197, 94, 0.35); }
 .status:empty { display: none; }
 
 .btc-price-display { font-family: var(--font-mono); font-size: 0.875rem; color: var(--color-text-secondary); padding: var(--spacing-sm); background: var(--color-bg); border: 1px solid var(--color-border); border-radius: var(--radius-sm); font-variant-numeric: tabular-nums; }
@@ -237,6 +238,9 @@ body.dark .hero__logo--dark { display: block; }
   .persona-sali__arrow { transform: rotate(90deg); }
   .persona-sali__change { text-align: left; font-size: 1.25rem; }
   .persona-card__header { flex-direction: column; gap: var(--spacing-sm); }
+}
+@media (max-width: 380px) {
+  .persona-card__stats { grid-template-columns: 1fr; }
 }
 
 .sali-callout { background: var(--color-bg-secondary); border: 1px solid var(--color-border); border-left: 3px solid var(--color-accent); border-radius: var(--radius-sm); padding: var(--spacing-lg); margin: var(--spacing-lg) 0; }
@@ -361,6 +365,10 @@ body.dark .btn--tweet:hover { background: #e0e0e0; border-color: #e0e0e0; }
 .info-tip__content { display: none; position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); width: 240px; background: var(--color-bg-card); border: 1px solid var(--color-border); border-radius: var(--radius-sm); box-shadow: 0 4px 20px rgba(0,0,0,0.12); padding: 0.625rem 0.75rem; font-size: 0.75rem; line-height: 1.5; color: var(--color-text-secondary); z-index: 200; text-align: left; pointer-events: none; }
 .info-tip__content::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 5px solid transparent; border-top-color: var(--color-border); }
 .info-tip:hover .info-tip__content, .info-tip__btn:focus + .info-tip__content { display: block; }
+@media (max-width: 480px) {
+  .info-tip__content { width: 200px; bottom: auto; top: calc(100% + 6px); left: 0; transform: none; }
+  .info-tip__content::after { top: auto; bottom: 100%; border-top-color: transparent; border-bottom-color: var(--color-border); }
+}
 
 .sali-tier { display: inline-flex; align-items: center; gap: 0.4rem; margin-top: var(--spacing-sm); padding: 0.3rem 0.65rem; border-radius: 99px; border: 1px solid var(--color-border); background: var(--color-bg-secondary); font-size: 0.75rem; font-weight: 600; font-family: var(--font-mono); color: var(--color-text); }
 .sali-tier__label { font-size: 0.7rem; color: var(--color-text-muted); font-weight: 400; font-family: var(--font-sans); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 0.2rem; }

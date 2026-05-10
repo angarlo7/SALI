@@ -355,6 +355,7 @@
 
   // State
   let spotPrice = null;
+  let spotPriceFailed = false;
   let annualAverages = null;
   let chartInstance = null;
   let normalizedChartInstance = null;
@@ -834,6 +835,7 @@
       return spotPrice;
     } catch (error) {
       console.error('Failed to fetch spot price:', error);
+      spotPriceFailed = true;
       setStatus(S.errSpotFetch, 'error');
       return null;
     }
@@ -1076,6 +1078,8 @@
     if (method === 'spot') {
       if (spotPrice !== null) {
         displayText = S.btcSpot(formatUsdCurrency(spotPrice));
+      } else if (spotPriceFailed) {
+        displayText = S.errSpotFetch;
       } else {
         displayText = S.btcLoadingSpot;
       }
