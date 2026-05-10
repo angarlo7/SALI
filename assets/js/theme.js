@@ -26,11 +26,10 @@
     });
   }
 
-  // Hamburger menu — injected so no HTML changes needed across pages
-  document.addEventListener('DOMContentLoaded', function () {
+  function injectHamburger() {
     var nav = document.querySelector('.nav');
     var navInner = document.querySelector('.nav__inner');
-    if (!nav || !navInner) return;
+    if (!nav || !navInner || navInner.querySelector('.nav__hamburger')) return;
 
     var hamburger = document.createElement('button');
     hamburger.className = 'nav__hamburger';
@@ -59,5 +58,13 @@
         hamburger.setAttribute('aria-expanded', 'false');
       }
     });
-  });
+  }
+
+  // Script runs at end of body — DOM is already parsed.
+  // readyState check handles both inline and deferred loading.
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', injectHamburger);
+  } else {
+    injectHamburger();
+  }
 })();
