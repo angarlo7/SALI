@@ -8,6 +8,242 @@
 (function() {
   'use strict';
 
+  // i18n: detect page language, fall back to English
+  const LANG = (document.documentElement.lang || 'en').split('-')[0];
+  const STRINGS = {
+    en: {
+      gradeS: 'Keeping pace with Bitcoin - extremely rare',
+      gradeA: 'Losing ground slowly - better than almost everyone',
+      gradeB: 'Above average - real loss, but manageable',
+      gradeC: 'Typical - Bitcoin is outpacing your salary',
+      gradeD: 'Bitcoin is pulling away significantly',
+      gradeF: 'Bitcoin is winning by a wide margin',
+      scoreRateSuffix: '/ yr Bitcoin purchasing power',
+      scoreStrcFwd: p => `incl. +${p}% $STRC fwd`,
+      scoreNeedMore: g => `Need +${g}%/yr more salary growth to keep pace`,
+      scoreOutpacing: g => `Outpacing Bitcoin by ${g}%/yr`,
+      scoreBreakEven: 'At break-even with Bitcoin',
+      docTitle: g => `SALI Grade: ${g} | Satoshi Annual Labor Index`,
+      errSpotFetch: 'Unable to fetch live BTC price. Using Manual mode or try again later.',
+      errAnnualLoad: 'Unable to load annual average data.',
+      errSalary: 'Please enter a valid salary.',
+      errSalaryGrowth: 'Salary growth rate must be between -100% and 1000%.',
+      errBtcGrowth: 'BTC growth rate must be between -100% and 1000%.',
+      errSpotNA: 'Spot price not available. Try Manual mode.',
+      errAnnualNA: 'Annual average data not loaded.',
+      errAnnualNoData: 'No annual average data available.',
+      errBtcPrice: 'Please enter a valid BTC price.',
+      errMethod: 'Unknown price method.',
+      fxLive: (date, eur, mxn) => `Live FX rates (ECB, ${date}): 1 EUR ≈ ${eur} USD · 1 MXN ≈ ${mxn} USD`,
+      btcSpot: p => `Spot: ${p}`,
+      btcLoadingSpot: 'Loading spot price...',
+      btcAnnualStale: (y, p) => `${y} Avg: ${p} - most recent full year`,
+      btcAnnual: (y, p) => `${y} Avg: ${p}`,
+      btcLoadingAnnual: 'Loading annual data...',
+      trendNotEnough: 'Not enough data',
+      trendGaining: 'At these assumptions, your salary is outpacing BTC appreciation',
+      trendLosing: 'At these assumptions, BTC is appreciating faster than your salary',
+      trendNeutral: 'At these assumptions, your salary and BTC are appreciating at roughly the same rate',
+      tableHeaderSaliSats: 'SALI (sats)',
+      tableHeaderSaliBtc: 'SALI (BTC)',
+      tableHeaderSalary: 'Salary',
+      tableHeaderSalaryReal: 'Salary (Real)',
+      tableNow: y => `${y} (Now)`,
+      chartToday: 'Today',
+      chartTitleSali: 'SALI Over Time',
+      chartTitleBench: n => `Salary vs ${n} Over Time`,
+      chartAxisYear: 'Year',
+      chartAxisSats: 'Sats per Year',
+      chartAxisBtc: 'BTC per Year',
+      chartCurrent: ' (Current)',
+      chartProjected: ' (Projected)',
+      chartBtcPrice: p => `BTC Price: ${p}`,
+      chartBenchPrice: (n, p) => `${n} price: ${p}`,
+      normAxisY: 'Pressure vs Salary (Start = 100)',
+      normBitcoin: 'Bitcoin',
+      normSP500: 'S&P 500',
+      normGold: 'Gold',
+      normCpi: 'Cost of living (CPI)',
+      benchCpi: 'CPI Inflation',
+      benchAxisY: 'Indexed Value (Start = 100)',
+      benchTitle: y => `Normalized Growth Since ${y} (Base = 100)`,
+      tierTop10: 'Top 10%',
+      tierTop25: 'Top 25%',
+      tierMedian: 'Median',
+      tierAbove: 'Above Median',
+      tierBelow: 'Below Median',
+      ppHeadline: y => `Purchasing Power Change since ${y}`,
+      ppEqual: 'Your salary is roughly keeping pace with Bitcoin appreciation at these assumptions.',
+      ppLess: (pct, y) => `Your salary is buying ${pct}% less Bitcoin than it did in ${y} - Bitcoin has appreciated faster than wages.`,
+      ppMore: (pct, y) => `Your salary is buying ${pct}% more Bitcoin than it did in ${y} - your earnings have outpaced Bitcoin's price.`,
+      ppNarr: (y, sal, fb, cb, dir, pct, interp) =>
+        `In ${y}, your ${sal} salary could acquire <strong>${fb} BTC/year</strong>. ` +
+        `Today it acquires <strong>${cb} BTC/year</strong> - ` +
+        `<strong>${dir} ${pct}%</strong> in Bitcoin terms. ${interp}`,
+      ppGained: 'gained',
+      ppLost: 'lost',
+      inflNote: (nom, real, inf) => `Nominal ${nom}% → real ${real}% after ${inf}% inflation`,
+      bkStrcReduced: b => ` (reduced by ${b}% $STRC yield - rate adjusts monthly)`,
+      bkBehindStrc: (g, d) => `Even with $STRC income, your salary needs to grow ${g}%/yr faster to fully break even with Bitcoin. Over 5 years, that's a ${d} gap.`,
+      bkBehind: (g, d) => `To accumulate Bitcoin at the same rate it's appreciating, your salary needs to grow ${g}%/yr faster than it currently is. Over 5 years, that's a ${d} gap.`,
+      bkAheadStrc: b => `Your salary growth + $STRC yield (${b}%/yr) is outpacing Bitcoin at these assumptions - your SALI is improving.`,
+      bkAhead: g => `Your salary is growing ${g}%/yr faster than BTC - your SALI is increasing at these assumptions.`,
+      histSummary: (sy, sal, ey, dir, pct, ss, es) =>
+        `From ${sy} (<strong>${sal}</strong>) to ${ey}, your BTC purchasing power <strong>${dir} ${pct}%</strong>. SALI: <strong>${ss}</strong> → <strong>${es} sats/yr</strong>.`,
+      histGained: 'gained',
+      histLost: 'lost',
+      histNow: ' (Now)',
+      decompSummary: (tot, tc, yr, sal, sc, btc, bc) =>
+        `SALI changed <strong style="color:${tc}">${tot}</strong> since ${yr}: ` +
+        `salary <strong style="color:${sc}">${sal}</strong> (positive) · ` +
+        `BTC <strong style="color:${bc}">${btc}</strong> impact`,
+      shareSameStrc: (pct, boost, grade) => `With ${pct}% in $STRC (+${boost}%/yr yield), my salary is keeping pace with Bitcoin. Grade: ${grade}.`,
+      shareGapStrc: (pct, boost, grade, rate) => `${pct}% in $STRC adds ${boost}%/yr dividend income - closing the Bitcoin gap. Grade: ${grade} (${rate}).`,
+      shareSame: (rate, grade) => `My salary is keeping pace with Bitcoin (${rate}). Grade: ${grade} - extremely rare.`,
+      shareLosing: (rate, gap, grade) => `My salary loses ${rate} to Bitcoin every year. A +${gap}%/yr raise would just break even. Grade: ${grade}.`,
+      shareBreakEven: (rate, grade) => `My salary is right at Bitcoin break-even (${rate}). Grade: ${grade}.`,
+      shareFallback: '🟠 How much is your salary worth in Bitcoin? Calculate your SALI Grade → #Bitcoin #SALI',
+      shareReddit: g => `My SALI Grade: ${g} — How much is your salary worth in Bitcoin?`,
+      shareRedditFallback: 'How much is your salary worth in Bitcoin? — SALI Calculator',
+      shareCopied: '✓ Copied!',
+      breakdownShow: 'Show breakdown →',
+      breakdownHide: 'Hide breakdown ←',
+      yearForecast1: '1 year',
+      yearForecastN: n => `${n} years`,
+      strcYieldLive: 'live price',
+      strcYieldDate: d => `as of ${d}`,
+      strcYieldDisplay: (price, pct, src) => `$STRC ${price} · ${pct}% yield (${src} · launched Jul 2025 · rate adjusts monthly)`,
+      strcNoteLive: 'Yahoo Finance live',
+      strcNoteFallback: 'stated rate fallback',
+      strcNoteHist: 'Grade boost is time-weighted from July 2025 (STRC launch).',
+      strcNoteText: (sh, div, yld, src, hist) => `${sh} shares · $${div}/share/yr · ${yld}% yield (${src}) · ${hist}`,
+      projStrcDiv: d => ` (Projections include $${d}/yr $STRC dividend income.)`,
+      benchGrowthLabel: n => `${n} Growth Rate (% per year)`,
+      btcHistoricalBtn: p => `Historical CAGR (${p}%)`,
+      btcHistoricalTitle: (a, b) => `${a}–${b} compound annual growth rate of BTC annual averages.`,
+      btc5yBtn: p => `5-Year CAGR (${p}%)`,
+      btc5yTitle: (a, b) => `${a}–${b} compound annual growth rate of BTC annual averages.`,
+      salaryPlaceholderAnnual: 'e.g., 60000',
+      salaryPlaceholderMonthly: 'e.g., 5000',
+    },
+    es: {
+      gradeS: 'Mantiene el ritmo con Bitcoin — extremadamente raro',
+      gradeA: 'Pierde terreno lentamente — mejor que casi todos',
+      gradeB: 'Por encima de la media — pérdida real, pero manejable',
+      gradeC: 'Típico — Bitcoin supera tu salario',
+      gradeD: 'Bitcoin se aleja significativamente',
+      gradeF: 'Bitcoin gana por amplio margen',
+      scoreRateSuffix: '/ año de poder adquisitivo en Bitcoin',
+      scoreStrcFwd: p => `incl. +${p}% $STRC adelante`,
+      scoreNeedMore: g => `Necesitas +${g}%/año más de crecimiento salarial para mantener el ritmo`,
+      scoreOutpacing: g => `Superando a Bitcoin por ${g}%/año`,
+      scoreBreakEven: 'En equilibrio con Bitcoin',
+      docTitle: g => `Calificación SALI: ${g} | Índice Anual de Labor en Satoshis`,
+      errSpotFetch: 'No se pudo obtener el precio en vivo de BTC. Usa el modo Manual o inténtalo más tarde.',
+      errAnnualLoad: 'No se pudieron cargar los datos del promedio anual.',
+      errSalary: 'Por favor ingresa un salario válido.',
+      errSalaryGrowth: 'La tasa de crecimiento del salario debe estar entre -100% y 1000%.',
+      errBtcGrowth: 'La tasa de crecimiento de BTC debe estar entre -100% y 1000%.',
+      errSpotNA: 'Precio en tiempo real no disponible. Prueba el modo Manual.',
+      errAnnualNA: 'Datos del promedio anual no cargados.',
+      errAnnualNoData: 'No hay datos del promedio anual disponibles.',
+      errBtcPrice: 'Por favor ingresa un precio de BTC válido.',
+      errMethod: 'Método de precio desconocido.',
+      fxLive: (date, eur, mxn) => `Tasas de cambio en vivo (ECB, ${date}): 1 EUR ≈ ${eur} USD · 1 MXN ≈ ${mxn} USD`,
+      btcSpot: p => `Spot: ${p}`,
+      btcLoadingSpot: 'Cargando precio en tiempo real...',
+      btcAnnualStale: (y, p) => `Promedio ${y}: ${p} — año completo más reciente`,
+      btcAnnual: (y, p) => `Promedio ${y}: ${p}`,
+      btcLoadingAnnual: 'Cargando datos anuales...',
+      trendNotEnough: 'Datos insuficientes',
+      trendGaining: 'Con estos supuestos, tu salario supera la apreciación de BTC',
+      trendLosing: 'Con estos supuestos, BTC se aprecia más rápido que tu salario',
+      trendNeutral: 'Con estos supuestos, tu salario y BTC se aprecian a tasas similares',
+      tableHeaderSaliSats: 'SALI (sats)',
+      tableHeaderSaliBtc: 'SALI (BTC)',
+      tableHeaderSalary: 'Salario',
+      tableHeaderSalaryReal: 'Salario (Real)',
+      tableNow: y => `${y} (Ahora)`,
+      chartToday: 'Hoy',
+      chartTitleSali: 'SALI a lo largo del tiempo',
+      chartTitleBench: n => `Salario vs ${n} a lo largo del tiempo`,
+      chartAxisYear: 'Año',
+      chartAxisSats: 'Sats por año',
+      chartAxisBtc: 'BTC por año',
+      chartCurrent: ' (Actual)',
+      chartProjected: ' (Proyectado)',
+      chartBtcPrice: p => `Precio BTC: ${p}`,
+      chartBenchPrice: (n, p) => `Precio ${n}: ${p}`,
+      normAxisY: 'Presión vs Salario (Inicio = 100)',
+      normBitcoin: 'Bitcoin',
+      normSP500: 'S&P 500',
+      normGold: 'Oro',
+      normCpi: 'Costo de vida (IPC)',
+      benchCpi: 'Inflación IPC',
+      benchAxisY: 'Valor indexado (Inicio = 100)',
+      benchTitle: y => `Crecimiento normalizado desde ${y} (Base = 100)`,
+      tierTop10: 'Top 10%',
+      tierTop25: 'Top 25%',
+      tierMedian: 'Mediana',
+      tierAbove: 'Por encima de la mediana',
+      tierBelow: 'Por debajo de la mediana',
+      ppHeadline: y => `Cambio de poder adquisitivo desde ${y}`,
+      ppEqual: 'Tu salario mantiene aproximadamente el ritmo con la apreciación de Bitcoin con estos supuestos.',
+      ppLess: (pct, y) => `Tu salario compra ${pct}% menos Bitcoin que en ${y} — Bitcoin se ha apreciado más rápido que los salarios.`,
+      ppMore: (pct, y) => `Tu salario compra ${pct}% más Bitcoin que en ${y} — tus ingresos han superado el precio de Bitcoin.`,
+      ppNarr: (y, sal, fb, cb, dir, pct, interp) =>
+        `En ${y}, tu salario de ${sal} podía adquirir <strong>${fb} BTC/año</strong>. ` +
+        `Hoy adquiere <strong>${cb} BTC/año</strong> — ` +
+        `<strong>${dir} ${pct}%</strong> en términos de Bitcoin. ${interp}`,
+      ppGained: 'ganó',
+      ppLost: 'perdió',
+      inflNote: (nom, real, inf) => `Nominal ${nom}% → real ${real}% tras ${inf}% de inflación`,
+      bkStrcReduced: b => ` (reducido por ${b}% de rendimiento $STRC — tasa ajusta mensualmente)`,
+      bkBehindStrc: (g, d) => `Incluso con ingresos de $STRC, tu salario necesita crecer ${g}%/año más rápido para igualar a Bitcoin. En 5 años, eso es una brecha de ${d}.`,
+      bkBehind: (g, d) => `Para acumular Bitcoin al mismo ritmo que se aprecia, tu salario necesita crecer ${g}%/año más rápido. En 5 años, eso es una brecha de ${d}.`,
+      bkAheadStrc: b => `Tu crecimiento salarial + rendimiento $STRC (${b}%/año) supera a Bitcoin con estos supuestos — tu SALI está mejorando.`,
+      bkAhead: g => `Tu salario crece ${g}%/año más rápido que BTC — tu SALI está aumentando con estos supuestos.`,
+      histSummary: (sy, sal, ey, dir, pct, ss, es) =>
+        `De ${sy} (<strong>${sal}</strong>) a ${ey}, tu poder adquisitivo en BTC <strong>${dir} ${pct}%</strong>. SALI: <strong>${ss}</strong> → <strong>${es} sats/año</strong>.`,
+      histGained: 'ganó',
+      histLost: 'perdió',
+      histNow: ' (Ahora)',
+      decompSummary: (tot, tc, yr, sal, sc, btc, bc) =>
+        `SALI cambió <strong style="color:${tc}">${tot}</strong> desde ${yr}: ` +
+        `salario <strong style="color:${sc}">${sal}</strong> (positivo) · ` +
+        `BTC <strong style="color:${bc}">${btc}</strong> impacto`,
+      shareSameStrc: (pct, boost, grade) => `Con ${pct}% en $STRC (+${boost}%/año de rendimiento), mi salario mantiene el ritmo con Bitcoin. Calificación: ${grade}.`,
+      shareGapStrc: (pct, boost, grade, rate) => `${pct}% en $STRC agrega ${boost}%/año de dividendos — cerrando la brecha con Bitcoin. Calificación: ${grade} (${rate}).`,
+      shareSame: (rate, grade) => `Mi salario mantiene el ritmo con Bitcoin (${rate}). Calificación: ${grade} — extremadamente raro.`,
+      shareLosing: (rate, gap, grade) => `Mi salario pierde ${rate} ante Bitcoin cada año. Un aumento de +${gap}%/año sería el punto de equilibrio. Calificación: ${grade}.`,
+      shareBreakEven: (rate, grade) => `Mi salario está en el punto de equilibrio con Bitcoin (${rate}). Calificación: ${grade}.`,
+      shareFallback: '🟠 ¿Cuánto vale tu salario en Bitcoin? Calcula tu Calificación SALI → #Bitcoin #SALI',
+      shareReddit: g => `Mi Calificación SALI: ${g} — ¿Cuánto vale tu salario en Bitcoin?`,
+      shareRedditFallback: '¿Cuánto vale tu salario en Bitcoin? — Calculadora SALI',
+      shareCopied: '✓ ¡Copiado!',
+      breakdownShow: 'Ver desglose →',
+      breakdownHide: 'Ocultar desglose ←',
+      yearForecast1: '1 año',
+      yearForecastN: n => `${n} años`,
+      strcYieldLive: 'precio en vivo',
+      strcYieldDate: d => `al ${d}`,
+      strcYieldDisplay: (price, pct, src) => `$STRC ${price} · ${pct}% rendimiento (${src} · lanzado Jul 2025 · tasa ajusta mensualmente)`,
+      strcNoteLive: 'Yahoo Finance en vivo',
+      strcNoteFallback: 'tasa declarada de respaldo',
+      strcNoteHist: 'El boost de calificación está ponderado por tiempo desde julio 2025 (lanzamiento STRC).',
+      strcNoteText: (sh, div, yld, src, hist) => `${sh} acciones · $${div}/acción/año · ${yld}% rendimiento (${src}) · ${hist}`,
+      projStrcDiv: d => ` (Las proyecciones incluyen $${d}/año de dividendos $STRC.)`,
+      benchGrowthLabel: n => `Tasa de crecimiento de ${n} (% por año)`,
+      btcHistoricalBtn: p => `CAGR Histórico (${p}%)`,
+      btcHistoricalTitle: (a, b) => `CAGR de promedios anuales de BTC ${a}–${b}.`,
+      btc5yBtn: p => `CAGR 5 años (${p}%)`,
+      btc5yTitle: (a, b) => `CAGR de promedios anuales de BTC ${a}–${b}.`,
+      salaryPlaceholderAnnual: 'ej. 60000',
+      salaryPlaceholderMonthly: 'ej. 5000',
+    }
+  };
+  const S = STRINGS[LANG] || STRINGS.en;
+
   // Constants
   const SATS_PER_BTC = 100000000;
   const DEFAULT_START_YEAR = 2020;
@@ -272,7 +508,7 @@
    */
   function calculateTrendScore(projections) {
     if (projections.length < 2) {
-      return { score: null, trend: 'neutral', description: 'Not enough data' };
+      return { score: null, trend: 'neutral', description: S.trendNotEnough };
     }
 
     const currentYearData = projections.find(p => p.year === CURRENT_YEAR);
@@ -280,7 +516,7 @@
     const lastYearData = projections[projections.length - 1];
 
     if (!currentYearData || !firstYearData) {
-      return { score: null, trend: 'neutral', description: 'Not enough data' };
+      return { score: null, trend: 'neutral', description: S.trendNotEnough };
     }
 
     const historicalChange = ((currentYearData.sats - firstYearData.sats) / firstYearData.sats) * 100;
@@ -289,13 +525,13 @@
     let trend, description;
     if (projectedChange > 10) {
       trend = 'gaining';
-      description = 'At these assumptions, your salary is outpacing BTC appreciation';
+      description = S.trendGaining;
     } else if (projectedChange < -10) {
       trend = 'losing';
-      description = 'At these assumptions, BTC is appreciating faster than your salary';
+      description = S.trendLosing;
     } else {
       trend = 'neutral';
-      description = 'At these assumptions, your salary and BTC are appreciating at roughly the same rate';
+      description = S.trendNeutral;
     }
 
     return {
@@ -370,10 +606,7 @@
     const btcColor = btcCumulative >= 0 ? '#16a34a' : '#dc2626';
     const totalColor = totalSaliChange >= 0 ? '#16a34a' : '#dc2626';
 
-    el.innerHTML =
-      `SALI changed <strong style="color:${totalColor}">${fmt(totalSaliChange)}</strong> since ${first.year}: ` +
-      `salary <strong style="color:${salaryColor}">${fmt(salaryCumulative)}</strong> (positive) · ` +
-      `BTC <strong style="color:${btcColor}">${fmt(btcCumulative)}</strong> impact`;
+    el.innerHTML = S.decompSummary(fmt(totalSaliChange), totalColor, first.year, fmt(salaryCumulative), salaryColor, fmt(btcCumulative), btcColor);
     el.style.display = 'block';
   }
 
@@ -409,12 +642,12 @@
     const gap = btcGrowth - nominalSalaryGrowth - strcForwardBoost;
 
     let grade, tagline, colorClass;
-    if (annualRate >= 0)         { grade = 'S'; tagline = 'Keeping pace with Bitcoin - extremely rare'; colorClass = 'sali-score__grade--S'; }
-    else if (annualRate >= -10)  { grade = 'A'; tagline = 'Losing ground slowly - better than almost everyone'; colorClass = 'sali-score__grade--A'; }
-    else if (annualRate >= -20)  { grade = 'B'; tagline = 'Above average - real loss, but manageable'; colorClass = 'sali-score__grade--B'; }
-    else if (annualRate >= -35)  { grade = 'C'; tagline = 'Typical - Bitcoin is outpacing your salary'; colorClass = 'sali-score__grade--C'; }
-    else if (annualRate >= -50)  { grade = 'D'; tagline = 'Bitcoin is pulling away significantly'; colorClass = 'sali-score__grade--D'; }
-    else                         { grade = 'F'; tagline = 'Bitcoin is winning by a wide margin'; colorClass = 'sali-score__grade--F'; }
+    if (annualRate >= 0)         { grade = 'S'; tagline = S.gradeS; colorClass = 'sali-score__grade--S'; }
+    else if (annualRate >= -10)  { grade = 'A'; tagline = S.gradeA; colorClass = 'sali-score__grade--A'; }
+    else if (annualRate >= -20)  { grade = 'B'; tagline = S.gradeB; colorClass = 'sali-score__grade--B'; }
+    else if (annualRate >= -35)  { grade = 'C'; tagline = S.gradeC; colorClass = 'sali-score__grade--C'; }
+    else if (annualRate >= -50)  { grade = 'D'; tagline = S.gradeD; colorClass = 'sali-score__grade--D'; }
+    else                         { grade = 'F'; tagline = S.gradeF; colorClass = 'sali-score__grade--F'; }
 
     return { grade, annualRate, gap, tagline, colorClass };
   }
@@ -438,26 +671,24 @@
       const strcForwardBoost = (strcEnabled && strcPct > 0)
         ? (strcPct / 100) * strcCurrentYield * 100
         : 0;
-      const boostNote = strcForwardBoost > 0 ? ` (incl. +${strcForwardBoost.toFixed(2)}% $STRC fwd)` : '';
+      const boostNote = strcForwardBoost > 0 ? ` (${S.scoreStrcFwd(strcForwardBoost.toFixed(2))})` : '';
       elements.saliScoreRate.textContent =
-        `${sign}${annualRate.toFixed(1)}% / yr Bitcoin purchasing power${boostNote}`;
+        `${sign}${annualRate.toFixed(1)}% ${S.scoreRateSuffix}${boostNote}`;
     }
     if (elements.saliScoreGap) {
       if (gap > 0.1) {
-        elements.saliScoreGap.textContent =
-          `Need +${gap.toFixed(1)}%/yr more salary growth to keep pace`;
+        elements.saliScoreGap.textContent = S.scoreNeedMore(gap.toFixed(1));
       } else if (gap < -0.1) {
-        elements.saliScoreGap.textContent =
-          `Outpacing Bitcoin by ${Math.abs(gap).toFixed(1)}%/yr`;
+        elements.saliScoreGap.textContent = S.scoreOutpacing(Math.abs(gap).toFixed(1));
       } else {
-        elements.saliScoreGap.textContent = 'At break-even with Bitcoin';
+        elements.saliScoreGap.textContent = S.scoreBreakEven;
       }
     }
     if (elements.saliScoreTagline) {
       elements.saliScoreTagline.textContent = tagline;
     }
 
-    document.title = `SALI Grade: ${grade} | Satoshi Annual Labor Index`;
+    document.title = S.docTitle(grade);
     wrap.style.display = 'block';
   }
 
@@ -492,22 +723,22 @@
       if (strcEnabled && strcPct > 0) {
         const boost = ((strcPct / 100) * strcCurrentYield * 100).toFixed(1);
         if (annualRate >= 0) {
-          hook = `With ${strcPct}% in $STRC (+${boost}%/yr yield), my salary is keeping pace with Bitcoin. Grade: ${grade}.`;
+          hook = S.shareSameStrc(strcPct, boost, grade);
         } else {
-          hook = `${strcPct}% in $STRC adds ${boost}%/yr dividend income - closing the Bitcoin gap. Grade: ${grade} (${rateStr}).`;
+          hook = S.shareGapStrc(strcPct, boost, grade, rateStr);
         }
       } else if (annualRate >= 0) {
-        hook = `My salary is keeping pace with Bitcoin (${rateStr}). Grade: ${grade} - extremely rare.`;
+        hook = S.shareSame(rateStr, grade);
       } else if (gap > 0.1) {
-        hook = `My salary loses ${rateStr} to Bitcoin every year. A +${gap.toFixed(1)}%/yr raise would just break even. Grade: ${grade}.`;
+        hook = S.shareLosing(rateStr, gap.toFixed(1), grade);
       } else {
-        hook = `My salary is right at Bitcoin break-even (${rateStr}). Grade: ${grade}.`;
+        hook = S.shareBreakEven(rateStr, grade);
       }
 
       const tags = strcEnabled && strcPct > 0 ? '#Bitcoin #SALI #STRC' : '#Bitcoin #SALI';
       shortText = `🟠 SALI - ${hook}\n\nCalculate yours: ${tags}`;
     } else {
-      shortText = `🟠 How much is your salary worth in Bitcoin? Calculate your SALI Grade → #Bitcoin #SALI`;
+      shortText = S.shareFallback;
     }
 
     if (elements.tweetSaliBtn) {
@@ -527,8 +758,8 @@
     }
     if (elements.redditShareBtn) {
       const redditTitle = gradeData
-        ? `My SALI Grade: ${gradeData.grade} — How much is your salary worth in Bitcoin?`
-        : 'How much is your salary worth in Bitcoin? — SALI Calculator';
+        ? S.shareReddit(gradeData.grade)
+        : S.shareRedditFallback;
       elements.redditShareBtn.href = `https://www.reddit.com/submit?url=${encodeURIComponent(gradeUrl)}&title=${encodeURIComponent(redditTitle)}`;
     }
   }
@@ -538,7 +769,7 @@
     navigator.clipboard.writeText(url).then(() => {
       if (elements.copyLinkBtn) {
         const original = elements.copyLinkBtn.textContent;
-        elements.copyLinkBtn.textContent = '✓ Copied!';
+        elements.copyLinkBtn.textContent = S.shareCopied;
         setTimeout(() => { elements.copyLinkBtn.textContent = original; }, 2000);
       }
     }).catch(() => {
@@ -553,7 +784,7 @@
         document.body.removeChild(ta);
         if (elements.copyLinkBtn) {
           const original = elements.copyLinkBtn.textContent;
-          elements.copyLinkBtn.textContent = '✓ Copied!';
+          elements.copyLinkBtn.textContent = S.shareCopied;
           setTimeout(() => { elements.copyLinkBtn.textContent = original; }, 2000);
         }
       } catch (_) {}
@@ -573,8 +804,7 @@
       if (data.rates && data.rates.EUR) FX_RATES.EUR = 1 / data.rates.EUR;
       if (data.rates && data.rates.MXN) FX_RATES.MXN = 1 / data.rates.MXN;
       if (elements.fxWarning) {
-        elements.fxWarning.textContent =
-          `Live FX rates (ECB, ${data.date}): 1 EUR ≈ ${FX_RATES.EUR.toFixed(4)} USD · 1 MXN ≈ ${FX_RATES.MXN.toFixed(5)} USD`;
+        elements.fxWarning.textContent = S.fxLive(data.date, FX_RATES.EUR.toFixed(4), FX_RATES.MXN.toFixed(5));
       }
     } catch (error) {
       console.warn('FX rate fetch failed, using fallback rates:', error);
@@ -604,7 +834,7 @@
       return spotPrice;
     } catch (error) {
       console.error('Failed to fetch spot price:', error);
-      setStatus(`Unable to fetch live BTC price. Using Manual mode or try again later.`, 'error');
+      setStatus(S.errSpotFetch, 'error');
       return null;
     }
   }
@@ -627,7 +857,7 @@
       return annualAverages;
     } catch (error) {
       console.error('Failed to load annual averages:', error);
-      setStatus('Unable to load annual average data.', 'error');
+      setStatus(S.errAnnualLoad, 'error');
       return null;
     }
   }
@@ -729,13 +959,13 @@
     if (!btcCagrCache) return;
     if (elements.btcHistoricalModeBtn && btcCagrCache.historical !== null) {
       const [a, b] = btcCagrCache.historicalSpan;
-      elements.btcHistoricalModeBtn.textContent = `Historical CAGR (${btcCagrCache.historical.toFixed(1)}%)`;
-      elements.btcHistoricalModeBtn.title = `${a}–${b} compound annual growth rate of BTC annual averages.`;
+      elements.btcHistoricalModeBtn.textContent = S.btcHistoricalBtn(btcCagrCache.historical.toFixed(1));
+      elements.btcHistoricalModeBtn.title = S.btcHistoricalTitle(a, b);
     }
     if (elements.btc5yModeBtn && btcCagrCache.fiveYear !== null) {
       const [a, b] = btcCagrCache.fiveYearSpan;
-      elements.btc5yModeBtn.textContent = `5-Year CAGR (${btcCagrCache.fiveYear.toFixed(1)}%)`;
-      elements.btc5yModeBtn.title = `${a}–${b} compound annual growth rate of BTC annual averages.`;
+      elements.btc5yModeBtn.textContent = S.btc5yBtn(btcCagrCache.fiveYear.toFixed(1));
+      elements.btc5yModeBtn.title = S.btc5yTitle(a, b);
     }
   }
 
@@ -792,29 +1022,29 @@
     switch (method) {
       case 'spot':
         if (spotPrice === null) {
-          throw new Error('Spot price not available. Try Manual mode.');
+          throw new Error(S.errSpotNA);
         }
         return spotPrice;
 
       case 'annual':
         if (!annualAverages) {
-          throw new Error('Annual average data not loaded.');
+          throw new Error(S.errAnnualNA);
         }
         const recentYear = getMostRecentAverageYear();
         if (!recentYear) {
-          throw new Error('No annual average data available.');
+          throw new Error(S.errAnnualNoData);
         }
         return annualAverages[recentYear];
 
       case 'manual':
         const manualPrice = parseFloat(elements.btcPriceManualInput.value);
         if (isNaN(manualPrice) || manualPrice <= 0) {
-          throw new Error('Please enter a valid BTC price.');
+          throw new Error(S.errBtcPrice);
         }
         return manualPrice;
 
       default:
-        throw new Error('Unknown price method.');
+        throw new Error(S.errMethod);
     }
   }
 
@@ -845,19 +1075,21 @@
 
     if (method === 'spot') {
       if (spotPrice !== null) {
-        displayText = `Spot: ${formatUsdCurrency(spotPrice)}`;
+        displayText = S.btcSpot(formatUsdCurrency(spotPrice));
       } else {
-        displayText = 'Loading spot price...';
+        displayText = S.btcLoadingSpot;
       }
     } else if (method === 'annual') {
       if (annualAverages) {
         const recentYear = getMostRecentAverageYear();
         if (recentYear) {
           const isStale = recentYear < CURRENT_YEAR;
-          displayText = `${recentYear} Avg: ${formatUsdCurrency(annualAverages[recentYear])}${isStale ? ' - most recent full year' : ''}`;
+          displayText = isStale
+            ? S.btcAnnualStale(recentYear, formatUsdCurrency(annualAverages[recentYear]))
+            : S.btcAnnual(recentYear, formatUsdCurrency(annualAverages[recentYear]));
         }
       } else {
-        displayText = 'Loading annual data...';
+        displayText = S.btcLoadingAnnual;
       }
     }
 
@@ -894,18 +1126,18 @@
   function validateInputs() {
     const salaryRaw = parseFloat(elements.salaryInput.value);
     if (isNaN(salaryRaw) || salaryRaw <= 0) {
-      throw new Error('Please enter a valid salary.');
+      throw new Error(S.errSalary);
     }
     const salary = salaryFrequency === 'monthly' ? salaryRaw * 12 : salaryRaw;
 
     const salaryGrowth = parseFloat(elements.salaryGrowthInput.value) || 0;
     if (salaryGrowth < -100 || salaryGrowth > 1000) {
-      throw new Error('Salary growth rate must be between -100% and 1000%.');
+      throw new Error(S.errSalaryGrowth);
     }
 
     const btcGrowth = parseFloat(elements.btcGrowthInput.value) || 0;
     if (btcGrowth < -100 || btcGrowth > 1000) {
-      throw new Error('BTC growth rate must be between -100% and 1000%.');
+      throw new Error(S.errBtcGrowth);
     }
 
     const startYear = parseInt(elements.startYearSelect.value);
@@ -922,8 +1154,8 @@
 
     const headerRow = document.querySelector('#mainProjectionTable thead tr');
     if (headerRow) {
-      if (headerRow.cells[3]) headerRow.cells[3].textContent = displayUnit === 'btc' ? 'SALI (BTC)' : 'SALI (sats)';
-      if (headerRow.cells[1]) headerRow.cells[1].textContent = salaryGrowthMode === 'real' ? 'Salary (Real)' : 'Salary';
+      if (headerRow.cells[3]) headerRow.cells[3].textContent = displayUnit === 'btc' ? S.tableHeaderSaliBtc : S.tableHeaderSaliSats;
+      if (headerRow.cells[1]) headerRow.cells[1].textContent = salaryGrowthMode === 'real' ? S.tableHeaderSalaryReal : S.tableHeaderSalary;
     }
 
     const breakdownThs = document.querySelectorAll('#mainProjectionTable thead .breakdown-col');
@@ -934,7 +1166,7 @@
     elements.projectionTableBody.innerHTML = projections.map((p, idx) => {
       let rowClass = p.isCurrentYear ? 'current-year-row' : (p.isHistorical ? '' : 'projected-row');
       if (idx === firstFutureIdx) rowClass += ' first-projected-row';
-      const yearLabel = p.isCurrentYear ? `${p.year} (Now)` : p.year;
+      const yearLabel = p.isCurrentYear ? S.tableNow(p.year) : p.year;
       const saliDisplay = displayUnit === 'btc' ? formatBtc(p.btcEquivalent) : formatSats(p.sats);
       const dispStyle = showBreakdown ? '' : 'style="display:none"';
 
@@ -1041,7 +1273,7 @@
       chartData = displayUnit === 'btc'
         ? projections.map(p => p.btcEquivalent)
         : projections.map(p => Math.round(p.sats));
-      yAxisLabel = displayUnit === 'btc' ? 'BTC per Year' : 'Sats per Year';
+      yAxisLabel = displayUnit === 'btc' ? S.chartAxisBtc : S.chartAxisSats;
       datasetLabel = displayUnit === 'btc'
         ? `SALI (BTC/year${salaryGrowthMode === 'real' ? ' · real' : ''})`
         : `SALI (sats/year${salaryGrowthMode === 'real' ? ' · real' : ''})`;
@@ -1060,8 +1292,8 @@
     const titleEl = document.getElementById('chartTitle');
     if (titleEl) {
       titleEl.textContent = activeBenchmark === 'btc'
-        ? 'SALI Over Time'
-        : `Salary vs ${BENCHMARK_DATA[activeBenchmark].name} Over Time`;
+        ? S.chartTitleSali
+        : S.chartTitleBench(BENCHMARK_DATA[activeBenchmark].name);
     }
 
     const labels = chartProjections.map(p => p.year.toString());
@@ -1097,7 +1329,7 @@
         c.fillStyle = '#F7931A';
         c.font = '10px "Roboto Mono", monospace';
         c.textAlign = 'center';
-        c.fillText('Today', x, chartArea.top + 12);
+        c.fillText(S.chartToday, x, chartArea.top + 12);
         c.restore();
       }
     };
@@ -1150,8 +1382,8 @@
                 const idx = context[0].dataIndex;
                 const p = chartProjections[idx];
                 let title = p.year.toString();
-                if (p.isCurrentYear) title += ' (Current)';
-                else if (!p.isHistorical) title += ' (Projected)';
+                if (p.isCurrentYear) title += S.chartCurrent;
+                else if (!p.isHistorical) title += S.chartProjected;
                 return title;
               },
               label: function(context) {
@@ -1159,16 +1391,16 @@
               },
               afterLabel: function(context) {
                 const p = chartProjections[context.dataIndex];
-                if (activeBenchmark === 'btc') return `BTC Price: ${formatUsdCurrency(p.btcPrice)}`;
+                if (activeBenchmark === 'btc') return S.chartBtcPrice(formatUsdCurrency(p.btcPrice));
                 const bConfig = BENCHMARK_DATA[activeBenchmark];
-                return `${bConfig.name} price: ${formatUsdCurrency(p.benchPrice)}`;
+                return S.chartBenchPrice(bConfig.name, formatUsdCurrency(p.benchPrice));
               }
             }
           }
         },
         scales: {
           x: {
-            title: { display: true, text: 'Year', color: textMuted },
+            title: { display: true, text: S.chartAxisYear, color: textMuted },
             ticks: { color: textMuted },
             grid: { color: 'rgba(0, 0, 0, 0.06)' }
           },
@@ -1244,7 +1476,7 @@
         c.fillStyle = '#888888';
         c.font = '10px "Roboto Mono", monospace';
         c.textAlign = 'center';
-        c.fillText('Today', x, chartArea.top + 12);
+        c.fillText(S.chartToday, x, chartArea.top + 12);
         c.restore();
       }
     };
@@ -1259,7 +1491,7 @@
         labels,
         datasets: [
           {
-            label: 'Bitcoin',
+            label: S.normBitcoin,
             data: btcData,
             borderColor: '#F7931A',
             backgroundColor: 'transparent',
@@ -1271,7 +1503,7 @@
             segment: makeSegmentFn(projections)
           },
           {
-            label: 'S&P 500',
+            label: S.normSP500,
             data: spxData,
             borderColor: '#4A90D9',
             backgroundColor: 'transparent',
@@ -1283,7 +1515,7 @@
             segment: makeSegmentFn(spxSeries)
           },
           {
-            label: 'Gold',
+            label: S.normGold,
             data: goldData,
             borderColor: '#C9A84C',
             backgroundColor: 'transparent',
@@ -1295,7 +1527,7 @@
             segment: makeSegmentFn(goldSeries)
           },
           {
-            label: 'Cost of living (CPI)',
+            label: S.normCpi,
             data: cpiData,
             borderColor: '#6B9E6B',
             backgroundColor: 'transparent',
@@ -1338,8 +1570,8 @@
                 const idx = context[0].dataIndex;
                 const p = projections[idx];
                 let title = p.year.toString();
-                if (p.isCurrentYear) title += ' (Current)';
-                else if (!p.isHistorical) title += ' (Projected)';
+                if (p.isCurrentYear) title += S.chartCurrent;
+                else if (!p.isHistorical) title += S.chartProjected;
                 return title;
               },
               label: function(context) {
@@ -1353,13 +1585,13 @@
         },
         scales: {
           x: {
-            title: { display: true, text: 'Year', color: normTheme.textMuted },
+            title: { display: true, text: S.chartAxisYear, color: normTheme.textMuted },
             ticks: { color: normTheme.textMuted },
             grid: { color: normTheme.grid }
           },
           y: {
             beginAtZero: false,
-            title: { display: true, text: 'Pressure vs Salary (Start = 100)', color: normTheme.textMuted },
+            title: { display: true, text: S.normAxisY, color: normTheme.textMuted },
             ticks: {
               color: normTheme.textMuted,
               callback: v => v.toFixed(0)
@@ -1387,12 +1619,12 @@
     const top10     = saliFor(150000);
 
     let tier, dot;
-    if (userSats >= top10)       { tier = 'Top 10%';      dot = '🔵'; }
-    else if (userSats >= top25)  { tier = 'Top 25%';      dot = '🟡'; }
+    if (userSats >= top10)       { tier = S.tierTop10; dot = '🔵'; }
+    else if (userSats >= top25)  { tier = S.tierTop25; dot = '🟡'; }
     else if (userSats >= median * 0.9 && userSats <= median * 1.1)
-                                 { tier = 'Median';        dot = '⚪'; }
-    else if (userSats > median)  { tier = 'Above Median'; dot = '🟠'; }
-    else                         { tier = 'Below Median'; dot = '🟤'; }
+                                 { tier = S.tierMedian; dot = '⚪'; }
+    else if (userSats > median)  { tier = S.tierAbove; dot = '🟠'; }
+    else                         { tier = S.tierBelow; dot = '🟤'; }
 
     badge.textContent = `${dot} ${tier}`;
     wrap.style.display = 'block';
@@ -1411,26 +1643,23 @@
 
     const pctChange = ((current.sats - first.sats) / first.sats) * 100;
     const absPct = Math.abs(pctChange).toFixed(1);
-    const direction = pctChange >= 0 ? 'gained' : 'lost';
+    const direction = pctChange >= 0 ? S.ppGained : S.ppLost;
 
     const firstBtc = first.btcEquivalent.toFixed(4);
     const currBtc  = current.btcEquivalent.toFixed(4);
 
     let interpretation;
     if (Math.abs(pctChange) < 5) {
-      interpretation = 'Your salary is roughly keeping pace with Bitcoin appreciation at these assumptions.';
+      interpretation = S.ppEqual;
     } else if (pctChange < 0) {
-      interpretation = `Your salary is buying ${absPct}% less Bitcoin than it did in ${first.year} - Bitcoin has appreciated faster than wages.`;
+      interpretation = S.ppLess(absPct, first.year);
     } else {
-      interpretation = `Your salary is buying ${absPct}% more Bitcoin than it did in ${first.year} - your earnings have outpaced Bitcoin's price.`;
+      interpretation = S.ppMore(absPct, first.year);
     }
 
     el.innerHTML =
-      `<div class="pp-narrative__headline">Purchasing Power Change since ${first.year}</div>` +
-      `In ${first.year}, your ${formatCurrency(first.salary, currency)} salary could acquire <strong>${firstBtc} BTC/year</strong>. ` +
-      `Today it acquires <strong>${currBtc} BTC/year</strong> - ` +
-      `<strong>${direction} ${absPct}%</strong> in Bitcoin terms. ` +
-      interpretation;
+      `<div class="pp-narrative__headline">${S.ppHeadline(first.year)}</div>` +
+      S.ppNarr(first.year, formatCurrency(first.salary, currency), firstBtc, currBtc, direction, absPct, interpretation);
     el.style.display = 'block';
   }
 
@@ -1444,8 +1673,7 @@
       return;
     }
     const realGrowth = ((1 + nominalGrowth / 100) / (1 + inflationRate / 100) - 1) * 100;
-    elements.realGrowthNote.textContent =
-      `Nominal ${nominalGrowth.toFixed(1)}% → real ${realGrowth.toFixed(2)}% after ${inflationRate.toFixed(1)}% inflation`;
+    elements.realGrowthNote.textContent = S.inflNote(nominalGrowth.toFixed(1), realGrowth.toFixed(2), inflationRate.toFixed(1));
     elements.realGrowthNote.style.display = 'block';
   }
 
@@ -1461,7 +1689,7 @@
     const breakevenRate = Math.max(0, btcGrowth - strcForwardBoost);
 
     elements.breakevenRateOutput.textContent = '+' + breakevenRate.toFixed(1) + '%/yr'
-      + (strcForwardBoost > 0 ? ` (reduced by ${strcForwardBoost.toFixed(2)}% $STRC yield - rate adjusts monthly)` : '');
+      + (strcForwardBoost > 0 ? S.bkStrcReduced(strcForwardBoost.toFixed(2)) : '');
 
     const yearsAhead = 5;
     const salaryBreakEven5 = salary * Math.pow(1 + breakevenRate / 100, yearsAhead);
@@ -1479,13 +1707,13 @@
         const diff5 = Math.abs(salaryBreakEven5 - salaryProjected5);
         if (gap < 0) {
           elements.breakevenGap.textContent = strcForwardBoost > 0
-            ? `Even with $STRC income, your salary needs to grow ${gapStr}%/yr faster to fully break even with Bitcoin. Over 5 years, that's a ${formatCurrency(diff5, currency)} gap.`
-            : `To accumulate Bitcoin at the same rate it's appreciating, your salary needs to grow ${gapStr}%/yr faster than it currently is. Over 5 years, that's a ${formatCurrency(diff5, currency)} gap.`;
+            ? S.bkBehindStrc(gapStr, formatCurrency(diff5, currency))
+            : S.bkBehind(gapStr, formatCurrency(diff5, currency));
           elements.breakevenGap.className = 'breakeven-gap breakeven-gap--behind';
         } else {
           elements.breakevenGap.textContent = strcForwardBoost > 0
-            ? `Your salary growth + $STRC yield (${strcForwardBoost.toFixed(2)}%/yr) is outpacing Bitcoin at these assumptions - your SALI is improving.`
-            : `Your salary is growing ${gapStr}%/yr faster than BTC - your SALI is increasing at these assumptions.`;
+            ? S.bkAheadStrc(strcForwardBoost.toFixed(2))
+            : S.bkAhead(gapStr);
           elements.breakevenGap.className = 'breakeven-gap breakeven-gap--ahead';
         }
         elements.breakevenGap.style.display = 'block';
@@ -1535,14 +1763,14 @@
     const first = historyData[0];
     const last = historyData[historyData.length - 1];
     const totalChange = ((last.sats - first.sats) / first.sats) * 100;
-    const direction = totalChange >= 0 ? 'gained' : 'lost';
+    const direction = totalChange >= 0 ? S.histGained : S.histLost;
     const absPct = Math.abs(totalChange).toFixed(1);
 
     if (elements.historySummary) {
-      elements.historySummary.innerHTML =
-        `From ${first.year} (<strong>${formatCurrency(startSalaryRaw, currency)}</strong>) to ${last.year}, ` +
-        `your BTC purchasing power <strong>${direction} ${absPct}%</strong>. ` +
-        `SALI: <strong>${formatSats(first.sats)}</strong> → <strong>${formatSats(last.sats)} sats/yr</strong>.`;
+      elements.historySummary.innerHTML = S.histSummary(
+        first.year, formatCurrency(startSalaryRaw, currency), last.year,
+        direction, absPct, formatSats(first.sats), formatSats(last.sats)
+      );
     }
 
     if (elements.historyTableBody) {
@@ -1554,7 +1782,7 @@
         const isLast = idx === historyData.length - 1;
         return `
           <tr class="${isLast ? 'current-year-row' : ''}">
-            <td>${row.year}${isLast ? ' (Now)' : ''}</td>
+            <td>${row.year}${isLast ? S.histNow : ''}</td>
             <td>${formatCurrency(row.salary, currency)}</td>
             <td>${formatUsdCurrency(row.btcPrice)}${row.isSpotYear ? '*' : ''}</td>
             <td>${formatSats(row.sats)}</td>
@@ -1628,7 +1856,7 @@
         labels,
         datasets: [
           {
-            label: 'Bitcoin',
+            label: S.normBitcoin,
             data: btcNorm,
             borderColor: '#F7931A',
             backgroundColor: 'transparent',
@@ -1639,7 +1867,7 @@
             pointHoverRadius: 7
           },
           {
-            label: 'S&P 500',
+            label: S.normSP500,
             data: sp500Norm,
             borderColor: '#4CAF50',
             backgroundColor: 'transparent',
@@ -1650,7 +1878,7 @@
             pointHoverRadius: 7
           },
           {
-            label: 'Gold',
+            label: S.normGold,
             data: goldNorm,
             borderColor: '#FFD700',
             backgroundColor: 'transparent',
@@ -1661,7 +1889,7 @@
             pointHoverRadius: 7
           },
           {
-            label: 'CPI Inflation',
+            label: S.benchCpi,
             data: cpiNorm,
             borderColor: '#9E9E9E',
             backgroundColor: 'transparent',
@@ -1681,7 +1909,7 @@
         plugins: {
           title: {
             display: true,
-            text: `Normalized Growth Since ${startYear} (Base = 100)`,
+            text: S.benchTitle(startYear),
             color: '#111111',
             font: { family: '"Roboto Mono", monospace', size: 13 }
           },
@@ -1716,13 +1944,13 @@
         },
         scales: {
           x: {
-            title: { display: true, text: 'Year', color: '#999999' },
+            title: { display: true, text: S.chartAxisYear, color: '#999999' },
             ticks: { color: '#999999' },
             grid: { color: 'rgba(0, 0, 0, 0.06)' }
           },
           y: {
             beginAtZero: false,
-            title: { display: true, text: 'Indexed Value (Start = 100)', color: '#999999' },
+            title: { display: true, text: S.benchAxisY, color: '#999999' },
             ticks: {
               color: '#999999',
               callback: v => v.toFixed(0)
@@ -1803,7 +2031,7 @@
         if (elements.projectedChangeDesc) {
           let desc = trendScore.description;
           if (strcEnabled && strcDividendUsd > 0) {
-            desc += ` (Projections include $${Math.round(strcDividendUsd).toLocaleString('en-US')}/yr $STRC dividend income.)`;
+            desc += S.projStrcDiv(Math.round(strcDividendUsd).toLocaleString('en-US'));
           }
           elements.projectedChangeDesc.textContent = desc;
         }
@@ -1862,7 +2090,7 @@
     for (let i = 1; i <= 30; i++) {
       const option = document.createElement('option');
       option.value = i;
-      option.textContent = i + (i === 1 ? ' year' : ' years');
+      option.textContent = i === 1 ? S.yearForecast1 : S.yearForecastN(i);
       if (i === DEFAULT_FORECAST_YEARS) option.selected = true;
       elements.yearsSelect.appendChild(option);
     }
@@ -1908,8 +2136,8 @@
     if (!el) return;
     const yieldPct = (strcCurrentYield * 100).toFixed(2);
     const priceStr = formatUsdCurrency(strcCurrentPrice);
-    const src = strcDataSource === 'live' ? 'live price' : `as of ${STRC_RATE_DATE}`;
-    el.textContent = `$STRC ${priceStr} · ${yieldPct}% yield (${src} · launched Jul 2025 · rate adjusts monthly)`;
+    const src = strcDataSource === 'live' ? S.strcYieldLive : S.strcYieldDate(STRC_RATE_DATE);
+    el.textContent = S.strcYieldDisplay(priceStr, yieldPct, src);
     el.className = 'strc-yield-display strc-yield-display--' + strcDataSource;
   }
 
@@ -1931,10 +2159,9 @@
 
     if (elements.strcYieldNote) {
       const yieldPct = (strcCurrentYield * 100).toFixed(2);
-      const srcNote  = strcDataSource === 'live' ? 'Yahoo Finance live' : 'stated rate fallback';
-      const histNote = 'Grade boost is time-weighted from July 2025 (STRC launch).';
-      elements.strcYieldNote.textContent =
-        `${shares.toLocaleString('en-US')} shares · $${STRC_ANNUAL_DIV.toFixed(2)}/share/yr · ${yieldPct}% yield (${srcNote}) · ${histNote}`;
+      const srcNote  = strcDataSource === 'live' ? S.strcNoteLive : S.strcNoteFallback;
+      const histNote = S.strcNoteHist;
+      elements.strcYieldNote.textContent = S.strcNoteText(shares.toLocaleString('en-US'), STRC_ANNUAL_DIV.toFixed(2), yieldPct, srcNote, histNote);
     }
     wrap.style.display = 'block';
   }
@@ -2174,7 +2401,7 @@
         }
         if (b !== 'btc' && elements.benchmarkGrowthLabel && elements.benchmarkGrowthInput) {
           const bConfig = BENCHMARK_DATA[b];
-          elements.benchmarkGrowthLabel.textContent = `${bConfig.name} Growth Rate (% per year)`;
+          elements.benchmarkGrowthLabel.textContent = S.benchGrowthLabel(bConfig.name);
           elements.benchmarkGrowthInput.value = bConfig.defaultGrowth;
         }
         compute();
@@ -2193,7 +2420,7 @@
       if (elements.breakdownToggle) {
         elements.breakdownToggle.addEventListener('click', () => {
           showBreakdown = !showBreakdown;
-          elements.breakdownToggle.textContent = showBreakdown ? 'Hide breakdown ←' : 'Show breakdown →';
+          elements.breakdownToggle.textContent = showBreakdown ? S.breakdownHide : S.breakdownShow;
           compute();
         });
       }
@@ -2204,7 +2431,7 @@
             const v = parseFloat(elements.salaryInput.value);
             if (!isNaN(v)) elements.salaryInput.value = Math.round(v * 12);
             elements.salaryInput.step = 1000;
-            elements.salaryInput.placeholder = 'e.g., 60000';
+            elements.salaryInput.placeholder = S.salaryPlaceholderAnnual;
           }
           salaryFrequency = 'annual';
           elements.salaryAnnualBtn.classList.add('mode-btn--active');
@@ -2218,7 +2445,7 @@
             const v = parseFloat(elements.salaryInput.value);
             if (!isNaN(v)) elements.salaryInput.value = Math.round(v / 12);
             elements.salaryInput.step = 100;
-            elements.salaryInput.placeholder = 'e.g., 5000';
+            elements.salaryInput.placeholder = S.salaryPlaceholderMonthly;
           }
           salaryFrequency = 'monthly';
           elements.salaryMonthlyBtn.classList.add('mode-btn--active');

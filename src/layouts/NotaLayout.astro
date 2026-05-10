@@ -8,17 +8,17 @@ const {
 
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
 const formattedDate = date
-  ? new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric', year: 'numeric' }).format(date)
+  ? new Intl.DateTimeFormat('es-ES', { month: 'long', day: 'numeric', year: 'numeric' }).format(date)
   : '';
 ---
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content={description}>
   <link rel="canonical" href={canonicalUrl}>
-  <title>{title} | ANGARLO Notes</title>
+  <title>{title} | ANGARLO Notas</title>
   <meta property="og:type" content="article">
   <meta property="og:url" content={canonicalUrl}>
   <meta property="og:title" content={title}>
@@ -30,7 +30,7 @@ const formattedDate = date
   <meta name="twitter:title" content={title}>
   <meta name="twitter:description" content={description}>
   <meta name="twitter:image" content="https://sali.angarlo.com/assets/images/sali-share.png">
-  <link rel="alternate" type="application/rss+xml" title="SALI Notes" href="https://sali.angarlo.com/rss.xml">
+  <link rel="alternate" type="application/rss+xml" title="SALI Notas" href="https://sali.angarlo.com/rss.xml">
   <script type="application/ld+json" set:html={JSON.stringify({
     "@context": "https://schema.org",
     "@type": "Article",
@@ -126,22 +126,22 @@ const formattedDate = date
 <body>
   <nav class="nav">
     <div class="container nav__inner">
-      <a href="/" class="nav__logo">ANGARLO</a>
+      <a href="/es/" class="nav__logo">ANGARLO</a>
       <ul class="nav__links">
-        <li><a href="/" class="nav__link">Home</a></li>
-        <li><a href="/methodology.html" class="nav__link">Methodology</a></li>
-        <li><a href="/examples.html" class="nav__link">Examples</a></li>
-        <li><a href="/notes" class="nav__link nav__link--active">Notes</a></li>
-        <li><a href="/podcast.html" class="nav__link">Podcast</a></li>
-        <li><a href="/contact.html" class="nav__link">Contact</a></li>
-        <li><a href="/es/notas" class="nav__link nav__link--lang">ES</a></li>
+        <li><a href="/es/" class="nav__link">Inicio</a></li>
+        <li><a href="/es/methodology.html" class="nav__link">Metodología</a></li>
+        <li><a href="/es/examples.html" class="nav__link">Ejemplos</a></li>
+        <li><a href="/es/notas" class="nav__link nav__link--active">Notas</a></li>
+        <li><a href="/es/podcast.html" class="nav__link">Podcast</a></li>
+        <li><a href="/es/contact.html" class="nav__link">Contacto</a></li>
+        <li><a href="/notes" class="nav__link nav__link--lang">EN</a></li>
       </ul>
-      <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+      <button id="themeToggle" class="theme-toggle" aria-label="Cambiar modo oscuro">🌙</button>
     </div>
   </nav>
 
   <main class="note-shell">
-    <div class="note-kicker">ANGARLO Notes</div>
+    <div class="note-kicker">ANGARLO Notas</div>
     <h1 class="note-title">{title}</h1>
     <p class="note-description">{description}</p>
     <div class="note-meta">
@@ -152,8 +152,8 @@ const formattedDate = date
       <slot />
     </article>
     <div class="note-footer">
-      <a href="/notes">All notes</a>
-      <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(canonicalUrl.toString())}`} target="_blank" rel="noopener noreferrer">Share on X</a>
+      <a href="/es/notas">Todas las notas</a>
+      <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(canonicalUrl.toString())}`} target="_blank" rel="noopener noreferrer">Compartir en X</a>
     </div>
   </main>
 

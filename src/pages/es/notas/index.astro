@@ -1,30 +1,32 @@
 ---
 import { getCollection } from 'astro:content';
 
-const notes = (await getCollection('notes'))
-  .filter((note) => !note.data.draft)
+const notas = (await getCollection('notas'))
+  .filter((nota) => !nota.data.draft)
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 ---
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Notes, essays, updates, and whatever else ANGARLO wants to publish.">
-  <title>Notes | ANGARLO</title>
+  <meta name="description" content="Notas, ensayos, actualizaciones, y todo lo que ANGARLO quiera publicar.">
+  <title>Notas | ANGARLO</title>
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://sali.angarlo.com/notes">
-  <meta property="og:title" content="Notes | ANGARLO">
-  <meta property="og:description" content="Notes, essays, updates, and whatever else ANGARLO wants to publish.">
+  <meta property="og:url" content="https://sali.angarlo.com/es/notas">
+  <meta property="og:title" content="Notas | ANGARLO">
+  <meta property="og:description" content="Notas, ensayos, actualizaciones, y todo lo que ANGARLO quiera publicar.">
   <meta property="og:image" content="https://sali.angarlo.com/assets/images/sali-share.png">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:site" content="@angarlo">
   <meta name="twitter:creator" content="@angarlo">
-  <meta name="twitter:title" content="Notes | ANGARLO">
-  <meta name="twitter:description" content="Notes, essays, updates, and whatever else ANGARLO wants to publish.">
+  <meta name="twitter:title" content="Notas | ANGARLO">
+  <meta name="twitter:description" content="Notas, ensayos, actualizaciones, y todo lo que ANGARLO quiera publicar.">
   <meta name="twitter:image" content="https://sali.angarlo.com/assets/images/sali-share.png">
-  <link rel="canonical" href="https://sali.angarlo.com/notes">
-  <link rel="alternate" type="application/rss+xml" title="SALI Notes" href="https://sali.angarlo.com/rss.xml">
+  <link rel="canonical" href="https://sali.angarlo.com/es/notas">
+  <link rel="alternate" hreflang="en" href="https://sali.angarlo.com/notes">
+  <link rel="alternate" hreflang="es" href="https://sali.angarlo.com/es/notas">
+  <link rel="alternate" type="application/rss+xml" title="SALI Notas" href="https://sali.angarlo.com/rss.xml">
   <link rel="stylesheet" href="/assets/css/styles.css?v=9">
   <style>
     .notes-shell {
@@ -86,32 +88,32 @@ const notes = (await getCollection('notes'))
 <body>
   <nav class="nav">
     <div class="container nav__inner">
-      <a href="/" class="nav__logo">ANGARLO</a>
+      <a href="/es/" class="nav__logo">ANGARLO</a>
       <ul class="nav__links">
-        <li><a href="/" class="nav__link">Home</a></li>
-        <li><a href="/methodology.html" class="nav__link">Methodology</a></li>
-        <li><a href="/examples.html" class="nav__link">Examples</a></li>
-        <li><a href="/notes" class="nav__link nav__link--active">Notes</a></li>
-        <li><a href="/podcast.html" class="nav__link">Podcast</a></li>
-        <li><a href="/contact.html" class="nav__link">Contact</a></li>
-        <li><a href="/es/notas" class="nav__link nav__link--lang">ES</a></li>
+        <li><a href="/es/" class="nav__link">Inicio</a></li>
+        <li><a href="/es/methodology.html" class="nav__link">Metodología</a></li>
+        <li><a href="/es/examples.html" class="nav__link">Ejemplos</a></li>
+        <li><a href="/es/notas" class="nav__link nav__link--active">Notas</a></li>
+        <li><a href="/es/podcast.html" class="nav__link">Podcast</a></li>
+        <li><a href="/es/contact.html" class="nav__link">Contacto</a></li>
+        <li><a href="/notes" class="nav__link nav__link--lang">EN</a></li>
       </ul>
-      <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+      <button id="themeToggle" class="theme-toggle" aria-label="Cambiar modo oscuro">🌙</button>
     </div>
   </nav>
 
   <main class="notes-shell">
-    <h1 class="notes-title">Notes</h1>
-    <p class="notes-subtitle">Short thoughts, long thoughts, announcements, experiments, essays, rants, drafts, and whatever else needs a URL.</p>
+    <h1 class="notes-title">Notas</h1>
+    <p class="notes-subtitle">Pensamientos cortos, pensamientos largos, anuncios, experimentos, ensayos, reflexiones, borradores, y todo lo que necesite una URL.</p>
     <div class="notes-list">
-      {notes.map((note) => (
-        <a class="note-card" href={`/notes/${note.slug}`}>
+      {notas.map((nota) => (
+        <a class="note-card" href={`/es/notas/${nota.slug}`}>
           <div class="note-card__meta">
-            {new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(note.data.date)}
-            {note.data.tags.length > 0 && ` / ${note.data.tags.join(' / ')}`}
+            {new Intl.DateTimeFormat('es-ES', { month: 'short', day: 'numeric', year: 'numeric' }).format(nota.data.date)}
+            {nota.data.tags.length > 0 && ` / ${nota.data.tags.join(' / ')}`}
           </div>
-          <h2>{note.data.title}</h2>
-          <p>{note.data.description}</p>
+          <h2>{nota.data.title}</h2>
+          <p>{nota.data.description}</p>
         </a>
       ))}
     </div>

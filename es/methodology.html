@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Cómo funciona SALI — la fórmula, métodos de precio de Bitcoin, lógica de proyección, y por qué Bitcoin es el benchmark correcto para medir el valor del trabajo.">
+  <title>Metodología | SALI - Índice Anual de Labor en Satoshis</title>
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://sali.angarlo.com/es/methodology.html">
+  <meta property="og:title" content="Metodología SALI - Cómo Funciona">
+  <meta property="og:description" content="La fórmula, métodos de precio de Bitcoin, lógica de proyección, y por qué Bitcoin es el benchmark correcto para medir el valor del trabajo.">
+  <meta property="og:image" content="https://sali.angarlo.com/assets/images/sali-share.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@angarlo">
+  <meta name="twitter:creator" content="@angarlo">
+  <meta name="twitter:title" content="Metodología SALI - Cómo Funciona">
+  <meta name="twitter:description" content="La fórmula, métodos de precio de Bitcoin, lógica de proyección, y por qué Bitcoin es el benchmark correcto para medir el valor del trabajo.">
+  <meta name="twitter:image" content="https://sali.angarlo.com/assets/images/sali-share.png">
+  <link rel="canonical" href="https://sali.angarlo.com/es/methodology.html">
+  <link rel="alternate" hreflang="en" href="https://sali.angarlo.com/methodology.html">
+  <link rel="alternate" hreflang="es" href="https://sali.angarlo.com/es/methodology.html">
+  <link rel="alternate" type="application/rss+xml" title="SALI Notas" href="https://sali.angarlo.com/rss.xml">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=9">
+</head>
+<body>
+  <!-- Navegación -->
+  <nav class="nav">
+    <div class="container nav__inner">
+      <a href="/es/" class="nav__logo">ANGARLO</a>
+      <ul class="nav__links">
+        <li><a href="/es/" class="nav__link">Inicio</a></li>
+        <li><a href="/es/methodology.html" class="nav__link nav__link--active">Metodología</a></li>
+        <li><a href="/es/examples.html" class="nav__link">Ejemplos</a></li>
+        <li><a href="/es/notas" class="nav__link">Notas</a></li>
+        <li><a href="/es/podcast.html" class="nav__link">Podcast</a></li>
+        <li><a href="/es/contact.html" class="nav__link">Contacto</a></li>
+        <li><a href="/methodology.html" class="nav__link nav__link--lang">EN</a></li>
+      </ul>
+      <button id="themeToggle" class="theme-toggle" aria-label="Cambiar modo oscuro">🌙</button>
+    </div>
+  </nav>
+
+  <main>
+    <div class="page-header">
+      <div class="container">
+        <h1>Metodología</h1>
+        <p class="page-header__subtitle">Cómo funciona SALI, por qué Bitcoin es el benchmark, y qué significan los números</p>
+      </div>
+    </div>
+
+    <section class="section">
+      <div class="container">
+        <div class="content-section">
+
+          <h2>¿Qué es SALI?</h2>
+          <p>
+            SALI — el Índice Anual de Labor en Satoshis — es el estándar para medir tu labor en términos de Bitcoin. Convierte tus ingresos anuales en satoshis (sats), la unidad más pequeña de Bitcoin: un sat equivale a la cienmillonésima parte de una moneda, o 0.00000001 BTC. Al expresar tu salario en sats, SALI te proporciona una unidad de cuenta consistente que no se infla, expande ni devalúa.
+          </p>
+          <p>
+            SALI responde una pregunta específica: <em>¿cómo cambia mi salario denominado en Bitcoin año tras año?</em> No mide el poder adquisitivo en bienes y servicios, y no reemplaza los salarios reales ajustados por IPC. Esas son preguntas diferentes. SALI es un índice de ingresos denominado en Bitcoin — la herramienta correcta si lo que buscas es entender el valor de tu labor en relación a un activo de oferta fija.
+          </p>
+
+          <h2>La Fórmula</h2>
+          <div class="formula">
+            SALI (sats/año) = (Salario Anual en USD ÷ Precio de BTC en USD) × 100,000,000
+          </div>
+          <p>
+            El cálculo es directo:
+          </p>
+          <ol>
+            <li>Toma tu salario anual en tu moneda local</li>
+            <li>Conviértelo a USD (si no está ya en USD)</li>
+            <li>Divide por el precio actual de Bitcoin en USD</li>
+            <li>Multiplica por 100,000,000 para expresarlo en satoshis</li>
+          </ol>
+          <p>
+            El resultado te dice cuántos satoshis podría adquirir teóricamente tu labor anual al precio de Bitcoin dado.
+          </p>
+
+          <h2>Selección de Precio de Bitcoin</h2>
+          <p>
+            SALI ofrece tres métodos para seleccionar el precio de Bitcoin usado en los cálculos:
+          </p>
+
+          <h3>Precio Spot</h3>
+          <p>
+            El precio de mercado actual obtenido de la API pública de Coinbase. Refleja las condiciones del mercado en tiempo real pero puede ser volátil. Úsalo para una instantánea de tu SALI actual.
+          </p>
+
+          <h3>Promedio Anual</h3>
+          <p>
+            Los precios promedio anuales históricos suavizan la volatilidad diaria. La calculadora usa el promedio del año más reciente como base. Este método es útil para comparaciones año tras año que no estén distorsionadas por oscilaciones de precio a corto plazo.
+          </p>
+
+          <h3>Entrada Manual</h3>
+          <p>
+            Ingresa cualquier precio de Bitcoin manualmente. Esto es útil para:
+          </p>
+          <ul>
+            <li>Cálculos históricos usando precios pasados específicos</li>
+            <li>Análisis de escenarios ("¿Y si BTC estuviera a $X?")</li>
+            <li>Usar precios de otras fuentes o exchanges</li>
+            <li>Uso sin conexión cuando las llamadas a la API fallan</li>
+          </ul>
+
+          <h2>Proyecciones</h2>
+          <p>
+            La función de proyección extiende tu cálculo SALI a lo largo de múltiples años usando supuestos de capitalización compuesta anclados al <em>año actual</em>:
+          </p>
+          <div class="formula">
+            Salario (Año N) = Salario Actual × (1 + Tasa de Crecimiento Salarial)^(N − Año Actual)<br><br>
+            Precio BTC (Año N) = Precio BTC Actual × (1 + Tasa de Crecimiento BTC)^(N − Año Actual)
+          </div>
+          <p>
+            El salario que ingresas se trata como tu salario <em>hoy</em>. Los años pasados se calculan hacia atrás (deflactados) desde ese valor, y los años futuros crecen hacia adelante. Los años históricos usan datos reales de precios promedio anuales de BTC; el año actual y los años futuros usan tu método de precio de BTC seleccionado (spot, promedio anual o manual) como base.
+          </p>
+          <p>
+            Estas no son predicciones. Son extrapolaciones mecánicas que muestran cómo evolucionaría tu SALI <em>si</em> las tasas de crecimiento que especificas se mantuvieran constantes. Los aumentos salariales en el mundo real y los precios de Bitcoin son mucho más variables.
+          </p>
+          <p>
+            El resultado de <em>Cambio Proyectado</em> muestra la diferencia porcentual entre tu SALI hoy y tu SALI proyectado al final del horizonte de proyección — midiendo si se espera que el poder adquisitivo de BTC de tu labor crezca o se reduzca dados tus supuestos.
+          </p>
+
+          <h2>Salario Bajo $STRC</h2>
+          <p>
+            La calculadora incluye una función opcional para $STRC (Acciones Preferentes Perpetuas de Tasa Variable STRETCH de Strategy, Nasdaq: STRC). Cuando está habilitado, especificas qué porcentaje de tu salario asignas a $STRC. Esa asignación gana un dividendo mensual variable — actualmente 11.5% anualizado (abr. 2026), pagado mensualmente. Los ingresos por dividendos se añaden a tu salario efectivo, lo que aumenta tu SALI y puede mejorar tu calificación.
+          </p>
+          <p>
+            Dos decisiones de diseño a entender:
+          </p>
+          <ul>
+            <li><strong>Boost de calificación ponderado por tiempo.</strong> $STRC se lanzó el 29 de julio de 2025. El boost de calificación es proporcional a cuánto de tu ventana histórica seleccionada ha existido realmente STRC — así que un año de inicio de 2015 ve un boost pequeño (STRC cubre ~12% de la ventana) mientras que un año de inicio de 2025 ve un boost mucho mayor. Esto evita que la función infle retroactivamente las calificaciones como si STRC siempre hubiera existido.</li>
+            <li><strong>Tasa variable.</strong> Strategy ajusta la tasa de dividendo mensualmente (±0.25 puntos porcentuales). El cálculo de punto de equilibrio usa la tasa declarada actual como supuesto prospectivo. Si la tasa cambia, tus ingresos reales de STRC diferirán de la proyección.</li>
+          </ul>
+          <p>
+            $STRC no es Bitcoin. Es un instrumento de capital preferente emitido por una empresa que mantiene Bitcoin en su balance. Proporciona ingresos mensuales en efectivo regulares a una tasa variable; no te da exposición directa a Bitcoin ni al alza de la apreciación de Bitcoin. Considéralo como una forma de reducir la tasa de crecimiento salarial requerida para equilibrarte con Bitcoin — no como un sustituto de la tenencia de Bitcoin.
+          </p>
+
+          <h2>Lo que SALI No Es</h2>
+          <p>
+            SALI es preciso sobre su alcance. Saber lo que no hace es tan importante como saber lo que hace.
+          </p>
+          <ul>
+            <li><strong>No es una predicción de precio.</strong> SALI no pronostica el precio futuro de Bitcoin. La función de proyección aplica tus entradas de tasas de crecimiento mecánicamente — no tiene poder predictivo y no implica ninguna visión sobre dónde cotizará Bitcoin.</li>
+            <li><strong>No es un modelo de inflación.</strong> SALI no mide el poder adquisitivo en bienes y servicios. El alquiler, la comida y la atención médica tienen precios en fiat — SALI no los rastrea. Para salarios reales ajustados por inflación, usa datos del IPC. SALI e IPC responden preguntas diferentes.</li>
+            <li><strong>No es asesoramiento financiero.</strong> SALI es un índice. No te dice que compres Bitcoin, mantengas Bitcoin, ni tomes ninguna decisión financiera. Úsalo para medir; usa tu propio juicio para actuar.</li>
+            <li><strong>No es un cuadro financiero completo.</strong> Tu salud financiera depende de muchos factores más allá de tu SALI. Es una lente, no un veredicto.</li>
+          </ul>
+
+          <h2>Limitaciones</h2>
+
+          <h3>Bitcoin es el Benchmark por Diseño</h3>
+          <p>
+            SALI usa Bitcoin porque es el único activo monetario de oferta fija con un límite máximo de 21 millones de monedas y un calendario de emisión completamente transparente y auditable. Eso lo convierte en el benchmark más exigente para el trabajo: ningún banco central puede inflarlo, ningún gobierno puede devaluarlo, y ningún comité puede cambiar sus reglas. La elección es deliberada. SALI incluye comparaciones con S&amp;P 500, Oro e IPC para mostrar la divergencia de Bitcoin en contexto — no porque esas sean unidades de cuenta igualmente válidas.
+          </p>
+
+          <h3>La Ventana Histórica Fue Extraordinaria</h3>
+          <p>
+            Los datos históricos disponibles (2015–2025) cubren una apreciación de aproximadamente 370× en el precio de Bitcoin ($272 a $101,642) — una de las carreras más excepcionales en la historia financiera moderna. Las proyecciones construidas sobre esa ventana como base pueden sobrestimar lo que viene después. Usa supuestos conservadores de crecimiento de BTC, ejecuta múltiples escenarios y trata la gráfica histórica como contexto, no como una garantía de rendimiento.
+          </p>
+
+          <h3>SALI No Mide el Costo de Vida</h3>
+          <p>
+            Un SALI creciente no significa que tu nivel de vida mejoró. Un SALI decreciente no significa que se deterioró. El alquiler, la comida y la atención médica tienen precios en fiat. SALI mide una cosa: el valor de tu salario en términos de Bitcoin. Ese es su alcance, y es intencionalmente estrecho.
+          </p>
+
+          <h3>Volatilidad de Bitcoin</h3>
+          <p>
+            El precio de Bitcoin puede moverse un 10–20% en un solo día. Tu SALI lo reflejará. Un SALI alto durante una caída de precio no significa que tu labor sea repentinamente más valiosa — significa que Bitcoin está temporalmente más barato. Los precios promedio anuales suavizan la volatilidad a corto plazo para el análisis histórico; el precio spot captura el momento presente.
+          </p>
+
+          <h3>Los Supuestos de Proyección Son Tuyos, No Nuestros</h3>
+          <p>
+            La precisión de la proyección depende completamente de las tasas de crecimiento que ingreses. Si asumes una apreciación anual de BTC del 20% y Bitcoin crece un 5%, tus proyecciones estarán materialmente equivocadas. Ejecuta múltiples escenarios con diferentes supuestos. Trata el resultado como análisis de sensibilidad — una herramienta para pensar, no un pronóstico.
+          </p>
+
+          <h3>Conversión de Moneda</h3>
+          <p>
+            Los salarios no USD se convierten usando tasas de cambio en vivo obtenidas del Banco Central Europeo (via API de Frankfurter) al cargar la página. Si la obtención falla, se usan tasas de respaldo. Para mayor precisión, convierte tu salario a USD manualmente y selecciona la opción USD.
+          </p>
+
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Pie de página -->
+  <footer class="footer">
+    <div class="container footer__content">
+      <p class="footer__disclaimer">
+        SALI es solo para fines informativos y no constituye asesoramiento financiero.
+      </p>
+      <p class="footer__support">
+        Apoya el mantenimiento continuo: <a href="lightning:angarlo@strike.me">⚡ angarlo@strike.me</a> · <a href="/es/contact.html#support">QR y más &rarr;</a>
+      </p>
+      <p class="footer__privacy">
+        Análisis de privacidad amigable por Cloudflare Web Analytics. Sin cookies, sin rastreo publicitario. · <a href="/es/privacy.html">Política de Privacidad</a>
+      </p>
+      <p class="footer__contact">
+        Contacto: <a href="mailto:angarlotv@gmail.com">angarlotv@gmail.com</a>
+      </p>
+    </div>
+  </footer>
+  <script src="/assets/js/theme.js"></script>
+  <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"50af8042fed14fbdb35bde67c57585bf"}'></script>
+</body>
+</html>
