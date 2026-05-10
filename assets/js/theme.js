@@ -1,5 +1,6 @@
 (function () {
-  var STORAGE_KEY = 'saliTheme';
+  var STORAGE_KEY = 'sali.angarlo.theme';
+  var LEGACY_KEY = 'saliTheme';
   var DARK_CLASS = 'dark';
 
   function applyTheme(theme) {
@@ -14,6 +15,14 @@
   }
 
   var saved = localStorage.getItem(STORAGE_KEY);
+  if (!saved) {
+    var legacy = localStorage.getItem(LEGACY_KEY);
+    if (legacy) {
+      saved = legacy;
+      localStorage.setItem(STORAGE_KEY, saved);
+      localStorage.removeItem(LEGACY_KEY);
+    }
+  }
   if (saved) applyTheme(saved);
 
   var toggle = document.getElementById('themeToggle');
@@ -29,6 +38,12 @@
   var navToggle = document.getElementById('navToggle');
   var nav = document.querySelector('.nav');
   if (navToggle && nav) {
+    function closeNav() {
+      nav.classList.remove('nav--open');
+      navToggle.textContent = '☰';
+      navToggle.setAttribute('aria-expanded', 'false');
+    }
+
     navToggle.addEventListener('click', function (e) {
       e.stopPropagation();
       var isOpen = nav.classList.toggle('nav--open');
@@ -37,10 +52,13 @@
     });
     document.addEventListener('click', function (e) {
       if (!nav.contains(e.target)) {
-        nav.classList.remove('nav--open');
-        navToggle.textContent = '☰';
-        navToggle.setAttribute('aria-expanded', 'false');
+        closeNav();
       }
     });
+    window.addEventListener('scroll', function () {
+      if (nav.classList.contains('nav--open')) {
+        closeNav();
+      }
+    }, { passive: true });
   }
 })();

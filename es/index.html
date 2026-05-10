@@ -23,6 +23,7 @@
   <link rel="canonical" href="https://sali.angarlo.com/es/">
   <link rel="alternate" hreflang="en" href="https://sali.angarlo.com/">
   <link rel="alternate" hreflang="es" href="https://sali.angarlo.com/es/">
+  <link rel="alternate" hreflang="x-default" href="https://sali.angarlo.com/">
   <link rel="alternate" type="application/rss+xml" title="SALI Notas" href="https://sali.angarlo.com/rss.xml">
   <script type="application/ld+json">
   {
@@ -46,7 +47,7 @@
     }
   }
   </script>
-  <link rel="stylesheet" href="/assets/css/styles.css?v=10">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=11">
 </head>
 <body>
   <!-- Navegación -->
@@ -62,7 +63,7 @@
         <li><a href="/es/contact.html" class="nav__link">Contacto</a></li>
       </ul>
       <button class="nav__hamburger" id="navToggle" aria-label="Toggle navigation" aria-expanded="false">&#9776;</button>
-      <a href="/" class="lang-toggle" aria-label="View in English">🇺🇸</a>
+      <a href="/" class="lang-toggle" aria-label="Ver en inglés">🇺🇸</a>
       <button id="themeToggle" class="theme-toggle" aria-label="Cambiar modo oscuro">🌙</button>
     </div>
   </nav>
@@ -104,7 +105,7 @@
     <section id="calculator" class="section">
       <div class="container">
         <div class="calculator">
-          <h2 class="calculator__title">Calculadora SALI<span class="info-tip"><button class="info-tip__btn" type="button">?</button><span class="info-tip__content">SALI — Índice Anual de Labor en Satoshis — mide tu salario anual expresado en satoshis, mostrando cuánto Bitcoin podría adquirir tu labor cada año. Es un índice, como el IPC, pero denominado en Bitcoin en lugar de una canasta de bienes.</span></span></h2>
+          <h2 class="calculator__title">Calculadora SALI<span class="info-tip"><button class="info-tip__btn" type="button" aria-describedby="tip-1">?</button><span class="info-tip__content" id="tip-1" role="tooltip">SALI — Índice Anual de Labor en Satoshis — mide tu salario anual expresado en satoshis, mostrando cuánto Bitcoin podría adquirir tu labor cada año. Es un índice, como el IPC, pero denominado en Bitcoin en lugar de una canasta de bienes.</span></span></h2>
           <p class="calculator__context">SALI mide tu salario en satoshis — la unidad de cuenta de Bitcoin. No mide el costo de vida ni la inflación. Mide una sola cosa: el valor de tu labor en términos de Bitcoin.</p>
 
           <div class="calculator__grid">
@@ -135,7 +136,7 @@
               <!-- Salario Bajo $STRC / STRETCH -->
               <div class="form-group strc-form-group">
                 <label>Salario Bajo $STRC
-                  <span class="info-tip"><button class="info-tip__btn" type="button">?</button><span class="info-tip__content">Las acciones preferentes $STRC de Strategy pagan un dividendo variable (actualmente ~11%). "UNDER STRETCH" significa la porción de tu compensación asignada a $STRC — generando ingresos por dividendos en lugar de permanecer en fiat. El resto permanece en dólares. Más información en <a href="https://www.strategy.com" target="_blank" rel="noopener noreferrer">strategy.com</a>.</span></span>
+                  <span class="info-tip"><button class="info-tip__btn" type="button" aria-describedby="tip-2">?</button><span class="info-tip__content" id="tip-2" role="tooltip">Las acciones preferentes $STRC de Strategy pagan un dividendo variable (actualmente ~11%). "UNDER STRETCH" significa la porción de tu compensación asignada a $STRC — generando ingresos por dividendos en lugar de permanecer en fiat. El resto permanece en dólares. Más información en <a href="https://www.strategy.com" target="_blank" rel="noopener noreferrer">strategy.com</a>.</span></span>
                 </label>
                 <div class="strc-enable-row">
                   <input type="checkbox" id="strcEnableToggle" class="strc-checkbox">
@@ -181,7 +182,7 @@
               </div>
 
               <div class="form-group">
-                <label for="btcPriceMethodSelect">Método de Precio de Bitcoin<span class="info-tip"><button class="info-tip__btn" type="button">?</button><span class="info-tip__content"><strong>Spot:</strong> precio en vivo ahora mismo. <strong>Promedio Anual:</strong> el promedio de los precios de cierre diarios de Bitcoin durante todo el año calendario — suaviza la volatilidad diaria para comparaciones históricas más estables. <strong>Manual:</strong> ingresa cualquier precio que quieras.</span></span></label>
+                <label for="btcPriceMethodSelect">Método de Precio de Bitcoin<span class="info-tip"><button class="info-tip__btn" type="button" aria-describedby="tip-3">?</button><span class="info-tip__content" id="tip-3" role="tooltip"><strong>Spot:</strong> precio en vivo ahora mismo. <strong>Promedio Anual:</strong> el promedio de los precios de cierre diarios de Bitcoin durante todo el año calendario — suaviza la volatilidad diaria para comparaciones históricas más estables. <strong>Manual:</strong> ingresa cualquier precio que quieras.</span></span></label>
                 <select id="btcPriceMethodSelect">
                   <option value="spot" selected>Spot (En vivo)</option>
                   <option value="annual">Promedio Anual</option>
@@ -197,7 +198,7 @@
               </div>
 
               <div class="form-group">
-                <label for="btcGrowthInput">Tasa de Crecimiento del Precio de BTC<span class="info-tip"><button class="info-tip__btn" type="button">?</button><span class="info-tip__content">BTC es el símbolo ticker de Bitcoin — el activo digital de oferta fija más grande del mundo. Su oferta total está limitada a 21 millones de monedas para siempre. Ningún gobierno o empresa puede crear más.</span></span> (% por año)</label>
+                <label for="btcGrowthInput">Tasa de Crecimiento del Precio de BTC<span class="info-tip"><button class="info-tip__btn" type="button" aria-describedby="tip-4">?</button><span class="info-tip__content" id="tip-4" role="tooltip">BTC es el símbolo ticker de Bitcoin — el activo digital de oferta fija más grande del mundo. Su oferta total está limitada a 21 millones de monedas para siempre. Ningún gobierno o empresa puede crear más.</span></span> (% por año)</label>
                 <div class="salary-mode-toggle btc-growth-mode-toggle">
                   <button type="button" id="btcCustomModeBtn" class="mode-btn mode-btn--active">Personalizado</button>
                   <button type="button" id="btcHistoricalModeBtn" class="mode-btn">CAGR Histórico</button>
@@ -302,7 +303,7 @@
 
               <!-- Nivel SALI -->
               <div id="saliTierWrap" style="display:none">
-                <div class="sali-tier__label">Tu Nivel SALI<span class="info-tip"><button class="info-tip__btn" type="button">?</button><span class="info-tip__content">Compara tu salario denominado en Bitcoin con los niveles de ingreso de EE.UU. al precio actual de BTC. Te da un punto de referencia inmediato: ¿mi número de satoshis es alto o bajo en relación a otros?</span></span></div>
+                <div class="sali-tier__label">Tu Nivel SALI<span class="info-tip"><button class="info-tip__btn" type="button" aria-describedby="tip-5">?</button><span class="info-tip__content" id="tip-5" role="tooltip">Compara tu salario denominado en Bitcoin con los niveles de ingreso de EE.UU. al precio actual de BTC. Te da un punto de referencia inmediato: ¿mi número de satoshis es alto o bajo en relación a otros?</span></span></div>
                 <div id="saliTier" class="sali-tier">—</div>
               </div>
 
@@ -536,7 +537,7 @@
           crossorigin="anonymous"
           referrerpolicy="no-referrer"></script>
   <script src="/assets/js/app.js?v=9"></script>
-  <script src="/assets/js/theme.js?v=3"></script>
+  <script src="/assets/js/theme.js?v=4"></script>
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"50af8042fed14fbdb35bde67c57585bf"}'></script>
 </body>
 </html>

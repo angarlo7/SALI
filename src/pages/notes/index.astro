@@ -24,8 +24,11 @@ const notes = (await getCollection('notes'))
   <meta name="twitter:description" content="Notes, essays, updates, and whatever else ANGARLO wants to publish.">
   <meta name="twitter:image" content="https://sali.angarlo.com/assets/images/sali-share.png">
   <link rel="canonical" href="https://sali.angarlo.com/notes">
+  <link rel="alternate" hreflang="en" href="https://sali.angarlo.com/notes">
+  <link rel="alternate" hreflang="es" href="https://sali.angarlo.com/es/notas">
+  <link rel="alternate" hreflang="x-default" href="https://sali.angarlo.com/notes">
   <link rel="alternate" type="application/rss+xml" title="SALI Notes" href="https://sali.angarlo.com/rss.xml">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=10">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=11">
   <style>
     .notes-shell {
       max-width: 920px;
@@ -96,7 +99,7 @@ const notes = (await getCollection('notes'))
         <li><a href="/contact.html" class="nav__link">Contact</a></li>
       </ul>
       <button class="nav__hamburger" id="navToggle" aria-label="Toggle navigation" aria-expanded="false">&#9776;</button>
-      <a href="/es/notas" class="lang-toggle" aria-label="Ver en español">🇲🇽</a>
+      <a href="/es/notas" class="lang-toggle" aria-label="View in Spanish">🇲🇽</a>
       <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
     </div>
   </nav>
@@ -118,7 +121,7 @@ const notes = (await getCollection('notes'))
     </div>
   </main>
 
-  <script is:inline src="/assets/js/theme.js?v=3"></script>
+  <script is:inline src="/assets/js/theme.js?v=4"></script>
   <!-- Cloudflare Web Analytics -->
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"50af8042fed14fbdb35bde67c57585bf"}'></script>
   <!-- End Cloudflare Web Analytics -->
