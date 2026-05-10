@@ -23,6 +23,7 @@
   <link rel="canonical" href="https://sali.angarlo.com/">
   <link rel="alternate" hreflang="en" href="https://sali.angarlo.com/">
   <link rel="alternate" hreflang="es" href="https://sali.angarlo.com/es/">
+  <link rel="alternate" hreflang="x-default" href="https://sali.angarlo.com/">
   <link rel="alternate" type="application/rss+xml" title="SALI Notes" href="https://sali.angarlo.com/rss.xml">
   <script type="application/ld+json">
   {
@@ -46,7 +47,7 @@
     }
   }
   </script>
-  <link rel="stylesheet" href="/assets/css/styles.css?v=10">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=11">
 </head>
 <body>
   <!-- Navigation -->
@@ -62,7 +63,7 @@
         <li><a href="/contact.html" class="nav__link">Contact</a></li>
       </ul>
       <button class="nav__hamburger" id="navToggle" aria-label="Toggle navigation" aria-expanded="false">&#9776;</button>
-      <a href="/es/" class="lang-toggle" aria-label="Ver en español">🇲🇽</a>
+      <a href="/es/" class="lang-toggle" aria-label="View in Spanish">🇲🇽</a>
       <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
     </div>
   </nav>
@@ -104,7 +105,7 @@
     <section id="calculator" class="section">
       <div class="container">
         <div class="calculator">
-          <h2 class="calculator__title">SALI Calculator<span class="info-tip"><button class="info-tip__btn" type="button">?</button><span class="info-tip__content">SALI — Satoshi Annual Labor Index — measures your annual salary expressed in satoshis, showing how much Bitcoin your labor could acquire each year. It's an index, like CPI, but denominated in Bitcoin instead of a basket of goods.</span></span></h2>
+          <h2 class="calculator__title">SALI Calculator<span class="info-tip"><button class="info-tip__btn" type="button" aria-describedby="tip-1">?</button><span class="info-tip__content" id="tip-1" role="tooltip">SALI — Satoshi Annual Labor Index — measures your annual salary expressed in satoshis, showing how much Bitcoin your labor could acquire each year. It's an index, like CPI, but denominated in Bitcoin instead of a basket of goods.</span></span></h2>
           <p class="calculator__context">SALI measures your salary in satoshis — Bitcoin's unit of account. It does not measure cost of living or inflation. It measures one thing: your labor's value in Bitcoin terms.</p>
 
           <div class="calculator__grid">
@@ -135,7 +136,7 @@
               <!-- Salary Under $STRC / STRETCH -->
               <div class="form-group strc-form-group">
                 <label>Salary Under $STRC
-                  <span class="info-tip"><button class="info-tip__btn" type="button">?</button><span class="info-tip__content">Strategy's $STRC preferred stock pays a variable dividend (currently ~11%). "UNDER STRETCH" means the portion of your compensation allocated to $STRC — earning dividend income instead of sitting in fiat. The rest stays in dollars. Learn more at <a href="https://www.strategy.com" target="_blank" rel="noopener noreferrer">strategy.com</a>.</span></span>
+                  <span class="info-tip"><button class="info-tip__btn" type="button" aria-describedby="tip-2">?</button><span class="info-tip__content" id="tip-2" role="tooltip">Strategy's $STRC preferred stock pays a variable dividend (currently ~11%). "UNDER STRETCH" means the portion of your compensation allocated to $STRC — earning dividend income instead of sitting in fiat. The rest stays in dollars. Learn more at <a href="https://www.strategy.com" target="_blank" rel="noopener noreferrer">strategy.com</a>.</span></span>
                 </label>
                 <div class="strc-enable-row">
                   <input type="checkbox" id="strcEnableToggle" class="strc-checkbox">
@@ -181,7 +182,7 @@
               </div>
 
               <div class="form-group">
-                <label for="btcPriceMethodSelect">Bitcoin Price Method<span class="info-tip"><button class="info-tip__btn" type="button">?</button><span class="info-tip__content"><strong>Spot:</strong> live price now. <strong>Annual Average:</strong> the average of Bitcoin's daily closing prices across the full calendar year — smooths out day-to-day volatility for more stable historical comparisons. <strong>Manual:</strong> enter any price you want.</span></span></label>
+                <label for="btcPriceMethodSelect">Bitcoin Price Method<span class="info-tip"><button class="info-tip__btn" type="button" aria-describedby="tip-3">?</button><span class="info-tip__content" id="tip-3" role="tooltip"><strong>Spot:</strong> live price now. <strong>Annual Average:</strong> the average of Bitcoin's daily closing prices across the full calendar year — smooths out day-to-day volatility for more stable historical comparisons. <strong>Manual:</strong> enter any price you want.</span></span></label>
                 <select id="btcPriceMethodSelect">
                   <option value="spot" selected>Spot (Live)</option>
                   <option value="annual">Annual Average</option>
@@ -197,7 +198,7 @@
               </div>
 
               <div class="form-group">
-                <label for="btcGrowthInput">BTC<span class="info-tip"><button class="info-tip__btn" type="button">?</button><span class="info-tip__content">BTC is the ticker symbol for Bitcoin — the world's first and largest fixed-supply digital asset. Its total supply is capped at 21 million coins forever. No government or company can create more of it.</span></span> Price Growth Rate (% per year)</label>
+                <label for="btcGrowthInput">BTC<span class="info-tip"><button class="info-tip__btn" type="button" aria-describedby="tip-4">?</button><span class="info-tip__content" id="tip-4" role="tooltip">BTC is the ticker symbol for Bitcoin — the world's first and largest fixed-supply digital asset. Its total supply is capped at 21 million coins forever. No government or company can create more of it.</span></span> Price Growth Rate (% per year)</label>
                 <div class="salary-mode-toggle btc-growth-mode-toggle">
                   <button type="button" id="btcCustomModeBtn" class="mode-btn mode-btn--active">Custom</button>
                   <button type="button" id="btcHistoricalModeBtn" class="mode-btn">Historical CAGR</button>
@@ -302,7 +303,7 @@
 
               <!-- SALI Tier -->
               <div id="saliTierWrap" style="display:none">
-                <div class="sali-tier__label">Your SALI Tier<span class="info-tip"><button class="info-tip__btn" type="button">?</button><span class="info-tip__content">Compares your Bitcoin-denominated salary to US income benchmarks at today's BTC price. Gives you an immediate anchor: is my satoshi number high or low relative to other earners?</span></span></div>
+                <div class="sali-tier__label">Your SALI Tier<span class="info-tip"><button class="info-tip__btn" type="button" aria-describedby="tip-5">?</button><span class="info-tip__content" id="tip-5" role="tooltip">Compares your Bitcoin-denominated salary to US income benchmarks at today's BTC price. Gives you an immediate anchor: is my satoshi number high or low relative to other earners?</span></span></div>
                 <div id="saliTier" class="sali-tier">—</div>
               </div>
 
@@ -536,7 +537,7 @@
           crossorigin="anonymous"
           referrerpolicy="no-referrer"></script>
   <script src="/assets/js/app.js?v=8"></script>
-  <script src="/assets/js/theme.js?v=3"></script>
+  <script src="/assets/js/theme.js?v=4"></script>
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"50af8042fed14fbdb35bde67c57585bf"}'></script>
 </body>
 </html>
