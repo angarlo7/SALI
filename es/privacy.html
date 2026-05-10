@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Política de privacidad de SALI — análisis amigable con la privacidad, sin cookies, sin almacenamiento de datos. Qué servicios externos contacta la calculadora y por qué.">
+  <title>Privacidad | SALI - Índice Anual de Labor en Satoshis</title>
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://sali.angarlo.com/es/privacy.html">
+  <meta property="og:title" content="Privacidad - SALI">
+  <meta property="og:description" content="Análisis amigable con la privacidad, sin cookies, sin almacenamiento de datos. SALI funciona completamente en tu navegador.">
+  <meta property="og:image" content="https://sali.angarlo.com/assets/images/sali-share.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@angarlo">
+  <meta name="twitter:creator" content="@angarlo">
+  <meta name="twitter:title" content="Privacidad - SALI">
+  <meta name="twitter:description" content="Análisis amigable con la privacidad, sin cookies, sin almacenamiento de datos. SALI funciona completamente en tu navegador.">
+  <meta name="twitter:image" content="https://sali.angarlo.com/assets/images/sali-share.png">
+  <link rel="canonical" href="https://sali.angarlo.com/es/privacy.html">
+  <link rel="alternate" hreflang="en" href="https://sali.angarlo.com/privacy.html">
+  <link rel="alternate" hreflang="es" href="https://sali.angarlo.com/es/privacy.html">
+  <link rel="alternate" type="application/rss+xml" title="SALI Notas" href="https://sali.angarlo.com/rss.xml">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=9">
+</head>
+<body>
+  <!-- Navegación -->
+  <nav class="nav">
+    <div class="container nav__inner">
+      <a href="/es/" class="nav__logo">ANGARLO</a>
+      <ul class="nav__links">
+        <li><a href="/es/" class="nav__link">Inicio</a></li>
+        <li><a href="/es/methodology.html" class="nav__link">Metodología</a></li>
+        <li><a href="/es/examples.html" class="nav__link">Ejemplos</a></li>
+        <li><a href="/es/notas" class="nav__link">Notas</a></li>
+        <li><a href="/es/podcast.html" class="nav__link">Podcast</a></li>
+        <li><a href="/es/contact.html" class="nav__link">Contacto</a></li>
+        <li><a href="/privacy.html" class="nav__link nav__link--lang">EN</a></li>
+      </ul>
+      <button id="themeToggle" class="theme-toggle" aria-label="Cambiar modo oscuro">🌙</button>
+    </div>
+  </nav>
+
+  <main>
+    <div class="page-header">
+      <div class="container">
+        <h1>Privacidad</h1>
+        <p class="page-header__subtitle">Última actualización: mayo de 2026</p>
+      </div>
+    </div>
+
+    <section class="section">
+      <div class="container">
+        <div class="methodology-content">
+
+          <h2>La versión corta</h2>
+          <p>
+            SALI no recopila tu salario, nombre, correo electrónico ni datos de cuenta personal. La calculadora funciona en tu navegador. SALI utiliza Cloudflare Web Analytics para conteos de tráfico amigables con la privacidad; no usa cookies, rastreadores publicitarios ni perfiles de usuario entre sitios.
+          </p>
+
+          <h2>Servicios externos contactados</h2>
+          <p>Cuando cargas la calculadora, la página realiza las siguientes solicitudes anónimas a servicios de terceros:</p>
+
+          <div class="privacy-service-list">
+
+            <div class="privacy-service">
+              <div class="privacy-service__name">API Pública de Coinbase</div>
+              <div class="privacy-service__purpose">Precio spot en vivo de Bitcoin (USD). Solicitud HTTP anónima — sin cuenta, sin clave, sin datos identificables enviados.</div>
+              <div class="privacy-service__url">api.coinbase.com/v2/prices/BTC-USD/spot</div>
+            </div>
+
+            <div class="privacy-service">
+              <div class="privacy-service__name">Frankfurter (Banco Central Europeo)</div>
+              <div class="privacy-service__purpose">Tasas de cambio en vivo de EUR y MXN para la entrada de salario en múltiples monedas. Solicitud anónima.</div>
+              <div class="privacy-service__url">api.frankfurter.app/latest</div>
+            </div>
+
+            <div class="privacy-service">
+              <div class="privacy-service__name">Yahoo Finance</div>
+              <div class="privacy-service__purpose">Precio en vivo de $STRC (Nasdaq), usado para calcular el rendimiento de dividendo actual para la función "Salario Bajo $STRC". Solicitud anónima con tiempo de espera de 2 segundos. Si la solicitud falla o es bloqueada (común por CORS), la calculadora silenciosamente usa la tasa declarada públicamente del 11.5%.</div>
+              <div class="privacy-service__url">query1.finance.yahoo.com/v8/finance/chart/STRC</div>
+            </div>
+
+            <div class="privacy-service">
+              <div class="privacy-service__name">jsDelivr CDN</div>
+              <div class="privacy-service__purpose">Archivo de la librería Chart.js para renderizar el gráfico SALI. Solicitud estándar de CDN — tu IP es visible para jsDelivr como con cualquier CDN.</div>
+              <div class="privacy-service__url">cdn.jsdelivr.net/npm/chart.js</div>
+            </div>
+
+            <div class="privacy-service">
+              <div class="privacy-service__name">YouTube (modo sin cookies)</div>
+              <div class="privacy-service__purpose">Video del podcast incrustado en la página de Podcast, cargado vía youtube-nocookie.com. En modo sin cookies, YouTube no establece cookies de seguimiento a menos que interactúes con el reproductor.</div>
+              <div class="privacy-service__url">www.youtube-nocookie.com</div>
+            </div>
+
+            <div class="privacy-service">
+              <div class="privacy-service__name">Cloudflare Web Analytics</div>
+              <div class="privacy-service__purpose">Análisis de tráfico amigable con la privacidad: vistas de página, visitas, referentes, ubicación a nivel de país, básicos de dispositivo/navegador y métricas de rendimiento. Cloudflare Web Analytics no usa cookies y no rastrea visitantes individuales entre sitios.</div>
+              <div class="privacy-service__url">static.cloudflareinsights.com/beacon.min.js</div>
+            </div>
+
+          </div>
+
+          <h2>Lo que no se recopila</h2>
+          <ul>
+            <li>Tus cifras salariales como datos de cuenta o registros de usuario — SALI no tiene backend, base de datos ni cuentas de usuario</li>
+            <li>Tu nombre, dirección de correo electrónico ni ningún identificador personal</li>
+            <li>Cookies de sesión ni cookies persistentes de ningún tipo</li>
+            <li>Identificadores publicitarios, perfiles de anuncios conductuales ni cookies de seguimiento entre sitios</li>
+            <li>Datos de ubicación</li>
+          </ul>
+
+          <h2>Parámetros de URL</h2>
+          <p>
+            La calculadora codifica tus entradas (salario, año de inicio, configuración de proyección, asignación STRC) como parámetros de consulta de URL para que puedas guardar como favorito o compartir una configuración específica. Si compartes o visitas una URL que contiene configuraciones de salario, esas configuraciones son parte de la URL y pueden ser visibles para el destinatario, el historial del navegador, los registros de hosting y las herramientas de análisis agregado. El enlace de calificación "Publicar en X" de la aplicación es solo de calificación y no incluye tu salario.
+          </p>
+
+          <h2>Almacenamiento de datos</h2>
+          <p>
+            Nada se almacena en ningún servidor. La calculadora no tiene backend, base de datos ni cuentas de usuario. Todo el cálculo ocurre localmente en tu navegador.
+          </p>
+
+          <h2>Hosting</h2>
+          <p>
+            El sitio se sirve como archivos estáticos. El proveedor de hosting puede recopilar registros de acceso estándar del servidor (dirección IP, timestamp, ruta) como parte de las operaciones normales de hosting web. SALI también usa Cloudflare Web Analytics para entender el tráfico agregado y el rendimiento de la página sin cookies ni rastreadores publicitarios.
+          </p>
+
+          <h2>Enlaces de terceros</h2>
+          <p>
+            Los enlaces externos (a strategy.com, listados de Nasdaq, etc.) se proporcionan como referencia. SALI no tiene control sobre las prácticas de privacidad de esos sitios.
+          </p>
+
+          <h2>Cambios</h2>
+          <p>
+            Si se realizan cambios materiales a esta política, la fecha de "Última actualización" arriba cambiará. El sitio no tiene mecanismo para notificarte directamente — revisa esta página periódicamente si quieres mantenerte al tanto.
+          </p>
+
+          <h2>Contacto</h2>
+          <p>
+            Preguntas sobre privacidad: <a href="mailto:angarlotv@gmail.com">angarlotv@gmail.com</a>
+          </p>
+
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Pie de página -->
+  <footer class="footer">
+    <div class="container footer__content">
+      <p class="footer__disclaimer">
+        SALI es solo para fines informativos y no constituye asesoramiento financiero.
+      </p>
+      <p class="footer__support">
+        Apoya el mantenimiento continuo: <a href="lightning:angarlo@strike.me">⚡ angarlo@strike.me</a> · <a href="/es/contact.html#support">QR y más &rarr;</a>
+      </p>
+      <p class="footer__privacy">
+        Análisis de privacidad amigable por Cloudflare Web Analytics. Sin cookies, sin rastreo publicitario. · <a href="/es/privacy.html">Política de Privacidad</a>
+      </p>
+      <p class="footer__contact">
+        Contacto: <a href="mailto:angarlotv@gmail.com">angarlotv@gmail.com</a>
+      </p>
+    </div>
+  </footer>
+  <script src="/assets/js/theme.js"></script>
+  <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"50af8042fed14fbdb35bde67c57585bf"}'></script>
+</body>
+</html>
