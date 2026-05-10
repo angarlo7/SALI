@@ -279,7 +279,7 @@ body.dark .hero__logo--dark { display: block; }
   .projection-table th, .projection-table td { padding: var(--spacing-xs) var(--spacing-sm); }
   .theme-toggle { position: fixed; top: 12px; right: 16px; z-index: 1001; }
   .lang-toggle { position: fixed; top: 11px; right: 58px; z-index: 1001; }
-  .nav__hamburger { display: block; position: fixed; top: 12px; right: 104px; z-index: 1001; }
+  .nav__hamburger { display: block !important; position: fixed; top: 12px; right: 104px; z-index: 1001; }
   .nav__links { display: none; }
   .nav--open .nav__links {
     display: flex;
@@ -392,8 +392,9 @@ body.dark .fx-warning { background: #1a1200; border-color: #4a3600; color: #d4a0
 .theme-toggle:hover { border-color: var(--color-accent); color: var(--color-text); }
 .lang-toggle { background: none; border: none; padding: 4px 5px; font-size: 1.15rem; line-height: 1; cursor: pointer; text-decoration: none; flex-shrink: 0; opacity: 0.8; transition: opacity 0.2s ease; }
 .lang-toggle:hover { opacity: 1; }
-.nav__hamburger { display: none; background: none; border: 1px solid var(--color-border); border-radius: var(--radius-sm); padding: 4px 9px; font-size: 1rem; line-height: 1; cursor: pointer; color: var(--color-text-muted); flex-shrink: 0; transition: border-color 0.2s ease, color 0.2s ease; }
+.nav__hamburger { background: none; border: 1px solid var(--color-border); border-radius: var(--radius-sm); padding: 4px 9px; font-size: 1rem; line-height: 1; cursor: pointer; color: var(--color-text-muted); flex-shrink: 0; transition: border-color 0.2s ease, color 0.2s ease; display: none; }
 .nav__hamburger:hover { border-color: var(--color-accent); color: var(--color-text); }
+@media (min-width: 769px) { .nav__hamburger { display: none !important; } }
 
 .sali-score-wrap { margin: var(--spacing-md) 0; }
 .sali-score { display: flex; align-items: center; gap: var(--spacing-lg); background: var(--color-bg-secondary); border: 1px solid var(--color-border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); }
