@@ -792,6 +792,7 @@
     });
   }
 
+
   /**
    * Fetch live FX rates from Frankfurter (ECB-sourced, free, no API key)
    */
@@ -1854,6 +1855,7 @@
     }
 
     const freshCtx = canvas.getContext('2d');
+    const bmTheme = getThemeColors();
     benchmarkChartInstance = new Chart(freshCtx, {
       type: 'line',
       data: {
@@ -1914,14 +1916,14 @@
           title: {
             display: true,
             text: S.benchTitle(startYear),
-            color: '#111111',
+            color: bmTheme.text,
             font: { family: '"Roboto Mono", monospace', size: 13 }
           },
           legend: {
             display: true,
             position: 'top',
             labels: {
-              color: '#555555',
+              color: bmTheme.textSecondary,
               usePointStyle: true,
               pointStyleWidth: 14,
               boxHeight: 8,
@@ -1929,11 +1931,11 @@
             }
           },
           tooltip: {
-            backgroundColor: '#ffffff',
-            borderColor: '#e5e5e5',
+            backgroundColor: bmTheme.bgCard,
+            borderColor: bmTheme.border,
             borderWidth: 1,
-            titleColor: '#111111',
-            bodyColor: '#555555',
+            titleColor: bmTheme.text,
+            bodyColor: bmTheme.textSecondary,
             padding: 12,
             displayColors: true,
             callbacks: {
@@ -1948,18 +1950,18 @@
         },
         scales: {
           x: {
-            title: { display: true, text: S.chartAxisYear, color: '#999999' },
-            ticks: { color: '#999999' },
-            grid: { color: 'rgba(0, 0, 0, 0.06)' }
+            title: { display: true, text: S.chartAxisYear, color: bmTheme.textMuted },
+            ticks: { color: bmTheme.textMuted },
+            grid: { color: bmTheme.grid }
           },
           y: {
             beginAtZero: false,
-            title: { display: true, text: S.benchAxisY, color: '#999999' },
+            title: { display: true, text: S.benchAxisY, color: bmTheme.textMuted },
             ticks: {
-              color: '#999999',
+              color: bmTheme.textMuted,
               callback: v => v.toFixed(0)
             },
-            grid: { color: 'rgba(0, 0, 0, 0.06)' }
+            grid: { color: bmTheme.grid }
           }
         }
       }
@@ -2253,7 +2255,6 @@
       strcAllocOutput: document.getElementById('strcAllocOutput'),
       strcDivOutput: document.getElementById('strcDivOutput'),
       strcRemainOutput: document.getElementById('strcRemainOutput'),
-      strcEffSaliOutput: document.getElementById('strcEffSaliOutput'),
       strcYieldNote: document.getElementById('strcYieldNote')
     };
 
@@ -2269,13 +2270,13 @@
         if (elements.strcPctGroup) {
           elements.strcPctGroup.classList.toggle('form-group--hidden', !strcEnabled);
         }
-        if (spotPrice !== null) compute();
+        compute();
       });
     }
     if (elements.strcPctInput) {
       const onStrcPct = () => {
         strcPct = parseFloat(elements.strcPctInput.value) || 0;
-        if (spotPrice !== null) compute();
+        compute();
       };
       elements.strcPctInput.addEventListener('input', onStrcPct);
       elements.strcPctInput.addEventListener('change', onStrcPct);

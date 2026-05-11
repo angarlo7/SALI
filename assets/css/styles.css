@@ -100,7 +100,7 @@ a:hover { color: var(--color-accent-hover); }
 .hero__product-name { font-family: var(--font-mono); font-size: 3.5rem; font-weight: 700; color: var(--color-accent); line-height: 1; letter-spacing: -0.02em; margin-bottom: 0.2rem; }
 .hero__product-subtitle { font-family: var(--font-mono); font-size: 0.75rem; font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-text-muted); margin-bottom: var(--spacing-sm); }
 .hero__logo-wrap { margin-bottom: var(--spacing-md); display: flex; justify-content: center; }
-.hero__logo { max-width: 300px; width: 80%; height: auto; }
+.hero__logo { max-width: 460px; width: 85%; height: auto; }
 .hero__logo--dark { display: none; }
 body.dark .hero__logo--light { display: none; }
 body.dark .hero__logo--dark { display: block; }
