@@ -650,7 +650,11 @@
     else if (annualRate >= -50)  { grade = 'D'; tagline = S.gradeD; colorClass = 'sali-score__grade--D'; }
     else                         { grade = 'F'; tagline = S.gradeF; colorClass = 'sali-score__grade--F'; }
 
-    return { grade, annualRate, gap, tagline, colorClass };
+    const cumulativeDeficit = current.sats < first.sats
+      ? Math.round((1 - current.sats / first.sats) * 100)
+      : 0;
+
+    return { grade, annualRate, gap, tagline, colorClass, cumulativeDeficit, firstYear: first.year };
   }
 
   /**
@@ -711,7 +715,7 @@
   function updateShareLinks(gradeData) {
     const validGrades = new Set(['S', 'A', 'B', 'C', 'D', 'F']);
     const gradeUrl = (gradeData && validGrades.has(gradeData.grade))
-      ? `https://sali.angarlo.com/share/${gradeData.grade}.html`
+      ? `https://sali.angarlo.com/share?rank=${gradeData.grade}&deficit=${gradeData.cumulativeDeficit}&raise=${Math.max(0, Math.round(gradeData.gap))}&since=${gradeData.firstYear}`
       : 'https://sali.angarlo.com';
 
     let shortText;
