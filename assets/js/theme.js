@@ -35,30 +35,17 @@
     });
   }
 
-  var navToggle = document.getElementById('navToggle');
-  var nav = document.querySelector('.nav');
-  if (navToggle && nav) {
-    function closeNav() {
-      nav.classList.remove('nav--open');
-      navToggle.textContent = '☰';
-      navToggle.setAttribute('aria-expanded', 'false');
-    }
-
-    navToggle.addEventListener('click', function (e) {
-      e.stopPropagation();
-      var isOpen = nav.classList.toggle('nav--open');
-      navToggle.textContent = isOpen ? '✕' : '☰';
-      navToggle.setAttribute('aria-expanded', String(isOpen));
-    });
-    document.addEventListener('click', function (e) {
-      if (!nav.contains(e.target)) {
-        closeNav();
-      }
-    });
-    window.addEventListener('scroll', function () {
-      if (nav.classList.contains('nav--open')) {
-        closeNav();
-      }
-    }, { passive: true });
+  // ES/EN language toggle
+  var isEs = window.location.pathname.indexOf('/es') === 0;
+  var altLang = isEs ? 'en' : 'es';
+  var altLink = document.querySelector('link[rel="alternate"][hreflang="' + altLang + '"]');
+  if (altLink && toggle) {
+    var langBtn = document.createElement('a');
+    langBtn.href = altLink.getAttribute('href');
+    langBtn.textContent = isEs ? 'EN' : 'ES';
+    langBtn.className = 'lang-toggle';
+    langBtn.setAttribute('aria-label', isEs ? 'View in English' : 'View in Spanish');
+    toggle.parentNode.insertBefore(langBtn, toggle);
   }
+
 })();
