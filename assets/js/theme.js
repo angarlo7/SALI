@@ -35,7 +35,7 @@
     });
   }
 
-  // ES/EN language toggle
+  // ES/EN language toggle — grouped with theme toggle
   var isEs = window.location.pathname.indexOf('/es') === 0;
   var altLang = isEs ? 'en' : 'es';
   var altLink = document.querySelector('link[rel="alternate"][hreflang="' + altLang + '"]');
@@ -45,7 +45,11 @@
     langBtn.textContent = isEs ? 'EN' : 'ES';
     langBtn.className = 'lang-toggle';
     langBtn.setAttribute('aria-label', isEs ? 'View in English' : 'View in Spanish');
-    toggle.parentNode.insertBefore(langBtn, toggle);
+    var wrapper = document.createElement('div');
+    wrapper.className = 'nav__controls';
+    toggle.parentNode.insertBefore(wrapper, toggle);
+    wrapper.appendChild(langBtn);
+    wrapper.appendChild(toggle);
   }
 
 })();
