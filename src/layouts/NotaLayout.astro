@@ -31,6 +31,8 @@ const formattedDate = date
   <meta name="twitter:description" content={description}>
   <meta name="twitter:image" content="https://sali.angarlo.com/assets/images/sali-share.png">
   <link rel="alternate" hreflang="es" href={canonicalUrl}>
+  <link rel="alternate" hreflang="en" href="https://sali.angarlo.com/notes">
+  <link rel="alternate" hreflang="x-default" href="https://sali.angarlo.com/notes">
   <link rel="alternate" type="application/rss+xml" title="SALI Notas" href="https://sali.angarlo.com/rss.xml">
   <script type="application/ld+json" set:html={JSON.stringify({
     "@context": "https://schema.org",
@@ -52,7 +54,7 @@ const formattedDate = date
       "url": "https://sali.angarlo.com/"
     }
   })}></script>
-  <link rel="stylesheet" href="/assets/css/styles.css?v=12">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=15">
   <style>
     .note-shell {
       max-width: 760px;
@@ -137,8 +139,6 @@ const formattedDate = date
         <li><a href="/es/podcast.html" class="nav__link">Podcast</a></li>
         <li><a href="/es/contact.html" class="nav__link">Contacto</a></li>
       </ul>
-      <button class="nav__hamburger" id="navToggle" aria-label="Toggle navigation" aria-expanded="false">&#9776;</button>
-      <a href="/notes" class="lang-toggle" aria-label="Ver en inglés">🇺🇸</a>
       <button id="themeToggle" class="theme-toggle" aria-label="Cambiar modo oscuro">🌙</button>
     </div>
   </nav>
@@ -160,7 +160,7 @@ const formattedDate = date
     </div>
   </main>
 
-  <script is:inline src="/assets/js/theme.js?v=4"></script>
+  <script is:inline src="/assets/js/theme.js?v=5"></script>
   <!-- Cloudflare Web Analytics -->
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"50af8042fed14fbdb35bde67c57585bf"}'></script>
   <!-- End Cloudflare Web Analytics -->
