@@ -15,7 +15,7 @@ export async function onRequest(context) {
   const raise   = Math.max(1, Math.min(999,  parseInt(url.searchParams.get('raise')   || '25', 10)));
   const since   = Math.max(2010, Math.min(2035, parseInt(url.searchParams.get('since') || '2020', 10)));
 
-  const ogImageUrl = `https://sali.angarlo.com/og?rank=${rank}&deficit=${deficit}&raise=${raise}&since=${since}`;
+  const ogImageUrl = `https://sali.angarlo.com/og/${rank}.png`;
   const keepingPace = rank === 'S';
 
   const title = keepingPace
