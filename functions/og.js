@@ -1,5 +1,6 @@
 import satori from 'satori';
 import { initWasm, Resvg } from '@resvg/resvg-wasm';
+import resvgWasm from '@resvg/resvg-wasm/index_bg.wasm';
 
 const RANK_COLORS = {
   S: '#22c55e',
@@ -19,10 +20,7 @@ let fontBoldBuf = null;
 async function ensureWasm() {
   if (wasmReady) return;
   if (!wasmPromise) {
-    wasmPromise = fetch('https://unpkg.com/@resvg/resvg-wasm@2.6.2/index_bg.wasm')
-      .then(r => r.arrayBuffer())
-      .then(buf => initWasm(buf))
-      .then(() => { wasmReady = true; });
+    wasmPromise = initWasm(resvgWasm).then(() => { wasmReady = true; });
   }
   return wasmPromise;
 }
@@ -145,7 +143,7 @@ export async function onRequest(context) {
     });
   } catch (err) {
     return new Response(JSON.stringify({ error: err.message, stack: err.stack }), {
-      status: 200,
+      status: 500,
       headers: { 'Content-Type': 'application/json' },
     });
   }
