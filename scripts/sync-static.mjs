@@ -3,6 +3,7 @@ import { existsSync } from 'node:fs';
 
 const rootFiles = [
   '.nojekyll',
+  '_headers',
   'CNAME',
   'contact.html',
   'examples.html',
