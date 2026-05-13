@@ -143,7 +143,7 @@ export async function onRequest(context) {
     });
   } catch (err) {
     return new Response(JSON.stringify({ error: err.message, stack: err.stack }), {
-      status: 500,
+      status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
   }
