@@ -1,5 +1,6 @@
 import satori from 'satori';
-import { Resvg } from '@cf-wasm/resvg';
+import { initWasm, Resvg } from '@resvg/resvg-wasm';
+import resvgWasm from './resvg_bg.wasm';
 
 const RANK_COLORS = {
   S: '#22c55e',
@@ -12,6 +13,14 @@ const RANK_COLORS = {
 
 let fontRegularBuf = null;
 let fontBoldBuf = null;
+let resvgReady = false;
+
+async function ensureResvg() {
+  if (!resvgReady) {
+    await initWasm(resvgWasm);
+    resvgReady = true;
+  }
+}
 
 async function getFonts() {
   if (!fontRegularBuf || !fontBoldBuf) {
@@ -42,7 +51,7 @@ export async function onRequest(context) {
       ? 'Extremely rare.'
       : `I'd need +${raise}%/yr just to keep up.`;
 
-    const fonts = await getFonts();
+    const [fonts] = await Promise.all([getFonts(), ensureResvg()]);
 
     const element = {
       type: 'div',
