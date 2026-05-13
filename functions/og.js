@@ -1,6 +1,5 @@
 import satori from 'satori';
-import { initWasm, Resvg } from '@resvg/resvg-wasm';
-import resvgWasm from '@resvg/resvg-wasm/index_bg.wasm';
+import { Resvg } from '@cf-wasm/resvg';
 
 const RANK_COLORS = {
   S: '#22c55e',
@@ -11,34 +10,17 @@ const RANK_COLORS = {
   F: '#b91c1c',
 };
 
-// Module-level cache — persists across requests within the same Worker instance
-let wasmReady = false;
-let wasmPromise = null;
 let fontRegularBuf = null;
 let fontBoldBuf = null;
 
-async function ensureWasm() {
-  if (wasmReady) return;
-  if (!wasmPromise) {
-    wasmPromise = initWasm(resvgWasm).then(() => { wasmReady = true; });
-  }
-  return wasmPromise;
-}
-
-async function getFont(url) {
-  const r = await fetch(url);
-  if (!r.ok) throw new Error(`Font fetch failed: ${r.status}`);
-  return r.arrayBuffer();
-}
-
 async function getFonts() {
-  const [regular, bold] = await Promise.all([
-    fontRegularBuf ?? getFont('https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2'),
-    fontBoldBuf    ?? getFont('https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuI6fAZ9hiA.woff2'),
-  ]);
-  fontRegularBuf = regular;
-  fontBoldBuf    = bold;
-  return { regular, bold };
+  if (!fontRegularBuf || !fontBoldBuf) {
+    [fontRegularBuf, fontBoldBuf] = await Promise.all([
+      fetch('https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2').then(r => r.arrayBuffer()),
+      fetch('https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuI6fAZ9hiA.woff2').then(r => r.arrayBuffer()),
+    ]);
+  }
+  return { regular: fontRegularBuf, bold: fontBoldBuf };
 }
 
 export async function onRequest(context) {
@@ -60,7 +42,7 @@ export async function onRequest(context) {
       ? 'Extremely rare.'
       : `I'd need +${raise}%/yr just to keep up.`;
 
-    const [, fonts] = await Promise.all([ensureWasm(), getFonts()]);
+    const fonts = await getFonts();
 
     const element = {
       type: 'div',
@@ -143,7 +125,7 @@ export async function onRequest(context) {
     });
   } catch (err) {
     return new Response(JSON.stringify({ error: err.message, stack: err.stack }), {
-      status: 200,
+      status: 500,
       headers: { 'Content-Type': 'application/json' },
     });
   }
