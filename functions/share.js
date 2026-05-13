@@ -46,7 +46,6 @@ export async function onRequest(context) {
   <meta name="twitter:description" content="${esc(description)}">
   <meta name="twitter:image" content="${esc(ogImageUrl)}">
   <script>window.location.replace('/');</script>
-  <meta http-equiv="refresh" content="2;url=/">
 </head>
 <body style="background:#0a0a0a;color:#fff;font-family:system-ui,sans-serif;text-align:center;padding:4rem 1rem;">
   <p>Redirecting to SALI&hellip;</p>
