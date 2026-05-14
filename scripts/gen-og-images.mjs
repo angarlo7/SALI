@@ -25,72 +25,98 @@ const regularBuf = readFileSync(join(fontsDir, 'inter-latin-400-normal.woff'));
 const boldBuf    = readFileSync(join(fontsDir, 'inter-latin-600-normal.woff'));
 
 const GRADES = {
-  S: { color: '#22c55e', line1: 'My salary is keeping pace with Bitcoin.', line2: 'Extremely rare.' },
-  A: { color: '#84cc16', line1: 'My salary is nearly keeping pace with Bitcoin.', line2: 'Top 15% of earners.' },
-  B: { color: '#facc15', line1: 'My salary is moderately behind Bitcoin.', line2: 'Still ahead of most.' },
-  C: { color: '#f97316', line1: 'My salary is significantly behind Bitcoin.', line2: 'The average result.' },
-  D: { color: '#ef4444', line1: 'My salary is severely behind Bitcoin.', line2: 'Losing ground fast.' },
-  F: { color: '#b91c1c', line1: 'My salary cannot keep up with Bitcoin.', line2: 'Time to reassess.' },
+  S: { color: '#22c55e', label: 'Keeping pace with Bitcoin.', sub: 'Extremely rare.' },
+  A: { color: '#84cc16', label: 'Barely losing ground.', sub: 'Top earner.' },
+  B: { color: '#facc15', label: 'Falling behind Bitcoin.', sub: 'Still recoverable.' },
+  C: { color: '#f97316', label: 'Significantly behind Bitcoin.', sub: 'Most workers are here.' },
+  D: { color: '#ef4444', label: 'Severely behind Bitcoin.', sub: 'Losing ground fast.' },
+  F: { color: '#b91c1c', label: 'Cannot keep up with Bitcoin.', sub: 'Time to reassess.' },
 };
 
 const outDir = join(root, 'og');
 mkdirSync(outDir, { recursive: true });
 
-for (const [grade, { color, line1, line2 }] of Object.entries(GRADES)) {
+for (const [grade, { color, label, sub }] of Object.entries(GRADES)) {
   const element = {
     type: 'div',
     props: {
       style: {
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'row',
         width: '1200px',
         height: '630px',
         backgroundColor: '#0a0a0a',
-        padding: '60px 80px',
       },
       children: [
+        // Left panel — grade letter on colored strip
         {
           type: 'div',
           props: {
-            style: { display: 'flex', flexDirection: 'column', marginBottom: '44px' },
-            children: [
-              { type: 'span', props: { style: { fontSize: 22, fontWeight: 600, color: '#ffffff', letterSpacing: '0.18em' }, children: 'SALI' } },
-              { type: 'span', props: { style: { fontSize: 11, color: '#555555', letterSpacing: '0.14em', marginTop: 6 }, children: 'SATOSHI ANNUAL LABOR INDEX' } },
-            ],
-          },
-        },
-        {
-          type: 'div',
-          props: {
-            style: { display: 'flex', flexDirection: 'row', alignItems: 'center', flex: 1, gap: 56 },
+            style: {
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 320,
+              backgroundColor: color + '15',
+              borderRight: `6px solid ${color}`,
+              flexShrink: 0,
+            },
             children: [
               {
-                type: 'div',
+                type: 'span',
                 props: {
-                  style: { fontSize: 196, fontWeight: 600, color, lineHeight: 1, width: 200, textAlign: 'center', flexShrink: 0 },
+                  style: { fontSize: 260, fontWeight: 600, color, lineHeight: 1 },
                   children: grade,
                 },
               },
-              {
-                type: 'div',
-                props: {
-                  style: { display: 'flex', flexDirection: 'column', gap: 20 },
-                  children: [
-                    { type: 'span', props: { style: { fontSize: 38, fontWeight: 600, color: '#f0f0f0', lineHeight: 1.25 }, children: line1 } },
-                    { type: 'span', props: { style: { fontSize: 30, color: '#888888', lineHeight: 1.3 }, children: line2 } },
-                  ],
-                },
-              },
             ],
           },
         },
+        // Right panel — branding + insight
         {
           type: 'div',
           props: {
-            style: { display: 'flex', justifyContent: 'space-between', marginTop: 44 },
+            style: {
+              display: 'flex',
+              flexDirection: 'column',
+              flex: 1,
+              padding: '56px 64px',
+            },
             children: [
-              { type: 'span', props: { style: { fontSize: 15, color: '#3a3a3a', letterSpacing: '0.06em' }, children: 'sali.angarlo.com' } },
-              { type: 'span', props: { style: { fontSize: 15, color: '#3a3a3a', letterSpacing: '0.06em' }, children: '#Bitcoin  #SALI' } },
+              // Branding
+              {
+                type: 'div',
+                props: {
+                  style: { display: 'flex', flexDirection: 'column', marginBottom: 'auto' },
+                  children: [
+                    { type: 'span', props: { style: { fontSize: 42, fontWeight: 600, color: '#ffffff', letterSpacing: '0.12em' }, children: 'SALI' } },
+                    { type: 'span', props: { style: { fontSize: 13, color: '#555555', letterSpacing: '0.16em', marginTop: 6 }, children: 'SATOSHI ANNUAL LABOR INDEX' } },
+                  ],
+                },
+              },
+              // Insight
+              {
+                type: 'div',
+                props: {
+                  style: { display: 'flex', flexDirection: 'column', gap: 16, marginTop: 'auto' },
+                  children: [
+                    { type: 'span', props: { style: { fontSize: 40, fontWeight: 600, color: '#f0f0f0', lineHeight: 1.2 }, children: label } },
+                    { type: 'span', props: { style: { fontSize: 24, color: color, letterSpacing: '0.02em' }, children: sub } },
+                  ],
+                },
+              },
+              // Footer
+              {
+                type: 'div',
+                props: {
+                  style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 40 },
+                  children: [
+                    { type: 'span', props: { style: { fontSize: 14, color: '#333333', letterSpacing: '0.06em' }, children: 'sali.angarlo.com' } },
+                    { type: 'span', props: { style: { fontSize: 14, color: '#333333', letterSpacing: '0.06em' }, children: '#Bitcoin  #SALI' } },
+                  ],
+                },
+              },
             ],
           },
         },
