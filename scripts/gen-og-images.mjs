@@ -130,7 +130,7 @@ for (const [grade, { color, label, sub }] of Object.entries(GRADES)) {
   const resvg = new Resvg(svg, { fitTo: { mode: 'width', value: 1200 } });
   const png   = resvg.render().asPng();
 
-  const outPath = join(outDir, `${grade}.png`);
+  const outPath = join(outDir, `${grade}2.png`);
   writeFileSync(outPath, png);
   console.log(`Generated ${outPath} (${Math.round(png.byteLength / 1024)}KB)`);
 }
