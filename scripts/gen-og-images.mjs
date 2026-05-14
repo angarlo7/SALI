@@ -40,7 +40,7 @@ for (const [grade, { color, label, sub }] of Object.entries(GRADES)) {
     props: {
       style: { display: 'flex', flexDirection: 'row', width: '1200px', height: '630px' },
       children: [
-        // Left — solid color panel
+        // Left — solid color, white letter, high contrast
         {
           type: 'div',
           props: {
@@ -48,7 +48,7 @@ for (const [grade, { color, label, sub }] of Object.entries(GRADES)) {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              width: 380,
+              width: 340,
               height: 630,
               backgroundColor: color,
               flexShrink: 0,
@@ -57,14 +57,14 @@ for (const [grade, { color, label, sub }] of Object.entries(GRADES)) {
               {
                 type: 'span',
                 props: {
-                  style: { fontSize: 300, fontWeight: 600, color: 'rgba(0,0,0,0.2)', lineHeight: 1 },
+                  style: { fontSize: 280, fontWeight: 600, color: 'rgba(255,255,255,0.9)', lineHeight: 1 },
                   children: grade,
                 },
               },
             ],
           },
         },
-        // Right — dark panel
+        // Right — dark, tight layout, bigger text
         {
           type: 'div',
           props: {
@@ -74,49 +74,40 @@ for (const [grade, { color, label, sub }] of Object.entries(GRADES)) {
               justifyContent: 'space-between',
               flex: 1,
               height: 630,
-              padding: '52px 60px',
-              backgroundColor: '#0a0a0a',
+              padding: '56px 64px',
+              backgroundColor: '#0d0d0d',
             },
             children: [
-              // Branding
+              // Top: branding
               {
                 type: 'div',
                 props: {
-                  style: { display: 'flex', flexDirection: 'column' },
+                  style: { display: 'flex', flexDirection: 'column', gap: 8 },
                   children: [
-                    { type: 'span', props: { style: { fontSize: 48, fontWeight: 600, color: '#ffffff', letterSpacing: '0.14em' }, children: 'SALI' } },
-                    { type: 'span', props: { style: { fontSize: 12, color: '#444444', letterSpacing: '0.18em', marginTop: 8 }, children: 'SATOSHI ANNUAL LABOR INDEX' } },
+                    { type: 'span', props: { style: { fontSize: 52, fontWeight: 600, color: '#ffffff', letterSpacing: '0.12em' }, children: 'SALI' } },
+                    { type: 'span', props: { style: { fontSize: 13, color: '#444444', letterSpacing: '0.2em' }, children: 'SATOSHI ANNUAL LABOR INDEX' } },
                   ],
                 },
               },
-              // Insight + footer
+              // Middle: main insight — bigger, no dead space
               {
                 type: 'div',
                 props: {
-                  style: { display: 'flex', flexDirection: 'column', gap: 32 },
+                  style: { display: 'flex', flexDirection: 'column', gap: 16 },
                   children: [
-                    // Insight
-                    {
-                      type: 'div',
-                      props: {
-                        style: { display: 'flex', flexDirection: 'column', gap: 12 },
-                        children: [
-                          { type: 'span', props: { style: { fontSize: 36, fontWeight: 600, color: '#f0f0f0', lineHeight: 1.25 }, children: label } },
-                          { type: 'span', props: { style: { fontSize: 20, color: '#666666', borderLeft: `4px solid ${color}`, paddingLeft: 14 }, children: sub } },
-                        ],
-                      },
-                    },
-                    // Footer
-                    {
-                      type: 'div',
-                      props: {
-                        style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
-                        children: [
-                          { type: 'span', props: { style: { fontSize: 13, color: '#2a2a2a', letterSpacing: '0.06em' }, children: 'sali.angarlo.com' } },
-                          { type: 'span', props: { style: { fontSize: 13, color: '#2a2a2a', letterSpacing: '0.06em' }, children: '#Bitcoin  #SALI' } },
-                        ],
-                      },
-                    },
+                    { type: 'span', props: { style: { fontSize: 46, fontWeight: 600, color: '#f5f5f5', lineHeight: 1.2 }, children: label } },
+                    { type: 'span', props: { style: { fontSize: 24, color: color, fontWeight: 600 }, children: sub } },
+                  ],
+                },
+              },
+              // Bottom: footer
+              {
+                type: 'div',
+                props: {
+                  style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
+                  children: [
+                    { type: 'span', props: { style: { fontSize: 14, color: '#333333', letterSpacing: '0.06em' }, children: 'sali.angarlo.com' } },
+                    { type: 'span', props: { style: { fontSize: 14, color: '#333333', letterSpacing: '0.06em' }, children: '#Bitcoin  #SALI' } },
                   ],
                 },
               },
