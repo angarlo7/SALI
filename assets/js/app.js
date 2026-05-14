@@ -722,7 +722,7 @@
 
     if (gradeData) {
       const { grade, annualRate, gap } = gradeData;
-      const rateStr = annualRate >= 0 ? `+${annualRate.toFixed(1)}%/yr` : `${annualRate.toFixed(1)}%/yr`;
+      const rateStr = annualRate >= 0 ? `+${annualRate.toFixed(1)}%/yr` : `${Math.abs(annualRate).toFixed(1)}%/yr`;
 
       let hook;
       if (strcEnabled && strcPct > 0) {
