@@ -1,7 +1,7 @@
 /**
  * Generates static OG images for each SALI grade (S, A, B, C, D, F).
  * Runs in Node.js at build time where WASM works fine.
- * Output: public/og/S.png through F.png
+ * Output: og/S.png through F.png
  */
 
 import satori from 'satori';
@@ -15,11 +15,9 @@ const require = createRequire(import.meta.url);
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, '..');
 
-// Init WASM from local file (works fine in Node.js)
 const wasmPath = join(root, 'node_modules', '@resvg', 'resvg-wasm', 'index_bg.wasm');
 await initWasm(readFileSync(wasmPath));
 
-// Load Inter fonts from @fontsource/inter (woff, works with satori)
 const fontsDir = join(root, 'node_modules', '@fontsource', 'inter', 'files');
 const regularBuf = readFileSync(join(fontsDir, 'inter-latin-400-normal.woff'));
 const boldBuf    = readFileSync(join(fontsDir, 'inter-latin-600-normal.woff'));
@@ -40,80 +38,85 @@ for (const [grade, { color, label, sub }] of Object.entries(GRADES)) {
   const element = {
     type: 'div',
     props: {
-      style: {
-        display: 'flex',
-        flexDirection: 'row',
-        width: '1200px',
-        height: '630px',
-        backgroundColor: '#0a0a0a',
-      },
+      style: { display: 'flex', flexDirection: 'row', width: '1200px', height: '630px' },
       children: [
-        // Left panel — grade letter on colored strip
+        // Left — solid color panel
         {
           type: 'div',
           props: {
             style: {
               display: 'flex',
-              flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              width: 320,
-              backgroundColor: color + '15',
-              borderRight: `6px solid ${color}`,
+              width: 380,
+              height: 630,
+              backgroundColor: color,
               flexShrink: 0,
             },
             children: [
               {
                 type: 'span',
                 props: {
-                  style: { fontSize: 260, fontWeight: 600, color, lineHeight: 1 },
+                  style: { fontSize: 300, fontWeight: 600, color: 'rgba(0,0,0,0.2)', lineHeight: 1 },
                   children: grade,
                 },
               },
             ],
           },
         },
-        // Right panel — branding + insight
+        // Right — dark panel
         {
           type: 'div',
           props: {
             style: {
               display: 'flex',
               flexDirection: 'column',
+              justifyContent: 'space-between',
               flex: 1,
-              padding: '56px 64px',
+              height: 630,
+              padding: '52px 60px',
+              backgroundColor: '#0a0a0a',
             },
             children: [
               // Branding
               {
                 type: 'div',
                 props: {
-                  style: { display: 'flex', flexDirection: 'column', marginBottom: 'auto' },
+                  style: { display: 'flex', flexDirection: 'column' },
                   children: [
-                    { type: 'span', props: { style: { fontSize: 42, fontWeight: 600, color: '#ffffff', letterSpacing: '0.12em' }, children: 'SALI' } },
-                    { type: 'span', props: { style: { fontSize: 13, color: '#555555', letterSpacing: '0.16em', marginTop: 6 }, children: 'SATOSHI ANNUAL LABOR INDEX' } },
+                    { type: 'span', props: { style: { fontSize: 48, fontWeight: 600, color: '#ffffff', letterSpacing: '0.14em' }, children: 'SALI' } },
+                    { type: 'span', props: { style: { fontSize: 12, color: '#444444', letterSpacing: '0.18em', marginTop: 8 }, children: 'SATOSHI ANNUAL LABOR INDEX' } },
                   ],
                 },
               },
-              // Insight
+              // Insight + footer
               {
                 type: 'div',
                 props: {
-                  style: { display: 'flex', flexDirection: 'column', gap: 16, marginTop: 'auto' },
+                  style: { display: 'flex', flexDirection: 'column', gap: 32 },
                   children: [
-                    { type: 'span', props: { style: { fontSize: 40, fontWeight: 600, color: '#f0f0f0', lineHeight: 1.2 }, children: label } },
-                    { type: 'span', props: { style: { fontSize: 24, color: color, letterSpacing: '0.02em' }, children: sub } },
-                  ],
-                },
-              },
-              // Footer
-              {
-                type: 'div',
-                props: {
-                  style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 40 },
-                  children: [
-                    { type: 'span', props: { style: { fontSize: 14, color: '#333333', letterSpacing: '0.06em' }, children: 'sali.angarlo.com' } },
-                    { type: 'span', props: { style: { fontSize: 14, color: '#333333', letterSpacing: '0.06em' }, children: '#Bitcoin  #SALI' } },
+                    // Insight
+                    {
+                      type: 'div',
+                      props: {
+                        style: { display: 'flex', flexDirection: 'column', gap: 12 },
+                        children: [
+                          { type: 'span', props: { style: { fontSize: 36, fontWeight: 600, color: '#f0f0f0', lineHeight: 1.25 }, children: label } },
+                          { type: 'span', props: { style: { fontSize: 20, color: '#666666', borderLeft: `4px solid ${color}`, paddingLeft: 14 }, children: sub } },
+                        ],
+                      },
+                    },
+                    // Footer
+                    {
+                      type: 'div',
+                      props: {
+                        style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
+                        children: [
+                          { type: 'span', props: { style: { fontSize: 13, color: '#2a2a2a', letterSpacing: '0.06em' }, children: 'sali.angarlo.com' } },
+                          { type: 'span', props: { style: { fontSize: 13, color: '#2a2a2a', letterSpacing: '0.06em' }, children: '#Bitcoin  #SALI' } },
+                        ],
+                      },
+                    },
                   ],
                 },
               },
@@ -134,7 +137,7 @@ for (const [grade, { color, label, sub }] of Object.entries(GRADES)) {
   });
 
   const resvg = new Resvg(svg, { fitTo: { mode: 'width', value: 1200 } });
-  const png = resvg.render().asPng();
+  const png   = resvg.render().asPng();
 
   const outPath = join(outDir, `${grade}.png`);
   writeFileSync(outPath, png);

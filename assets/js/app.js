@@ -97,12 +97,12 @@
         `SALI changed <strong style="color:${tc}">${tot}</strong> since ${yr}: ` +
         `salary <strong style="color:${sc}">${sal}</strong> (positive) · ` +
         `BTC <strong style="color:${bc}">${btc}</strong> impact`,
-      shareSameStrc: (pct, boost, grade) => `With ${pct}% in $STRC (+${boost}%/yr yield), my salary is keeping pace with Bitcoin. Grade: ${grade}.`,
-      shareGapStrc: (pct, boost, grade, rate) => `${pct}% in $STRC adds ${boost}%/yr dividend income - closing the Bitcoin gap. Grade: ${grade} (${rate}).`,
-      shareSame: (rate, grade) => `My salary is keeping pace with Bitcoin (${rate}). Grade: ${grade} - extremely rare.`,
-      shareLosing: (rate, gap, grade) => `My salary loses ${rate} to Bitcoin every year. A +${gap}%/yr raise would just break even. Grade: ${grade}.`,
+      shareSameStrc: (pct, boost, grade) => `${pct}% in $STRC (+${boost}%/yr yield) keeps my salary even with Bitcoin. Grade: ${grade}.`,
+      shareGapStrc: (pct, boost, grade, rate) => `My salary loses ${rate} to Bitcoin. $STRC adds ${boost}%/yr — closing the gap. Grade: ${grade}.`,
+      shareSame: (rate, grade) => `My salary is keeping pace with Bitcoin (${rate}). Grade: ${grade} — extremely rare.`,
+      shareLosing: (rate, gap, grade) => `My salary loses ${rate} to Bitcoin every year. I need +${gap}%/yr just to break even. Grade: ${grade}.`,
       shareBreakEven: (rate, grade) => `My salary is right at Bitcoin break-even (${rate}). Grade: ${grade}.`,
-      shareFallback: '🟠 How much is your salary worth in Bitcoin? Calculate your SALI Grade → #Bitcoin #SALI',
+      shareFallback: '🟠 Is your salary keeping up with Bitcoin? Find out your SALI Grade → #Bitcoin #SALI',
       shareReddit: g => `My SALI Grade: ${g} — How much is your salary worth in Bitcoin?`,
       shareRedditFallback: 'How much is your salary worth in Bitcoin? — SALI Calculator',
       shareCopied: '✓ Copied!',
@@ -212,12 +212,12 @@
         `SALI cambió <strong style="color:${tc}">${tot}</strong> desde ${yr}: ` +
         `salario <strong style="color:${sc}">${sal}</strong> (positivo) · ` +
         `BTC <strong style="color:${bc}">${btc}</strong> impacto`,
-      shareSameStrc: (pct, boost, grade) => `Con ${pct}% en $STRC (+${boost}%/año de rendimiento), mi salario mantiene el ritmo con Bitcoin. Calificación: ${grade}.`,
-      shareGapStrc: (pct, boost, grade, rate) => `${pct}% en $STRC agrega ${boost}%/año de dividendos — cerrando la brecha con Bitcoin. Calificación: ${grade} (${rate}).`,
+      shareSameStrc: (pct, boost, grade) => `${pct}% en $STRC (+${boost}%/año) mantiene mi salario al ritmo de Bitcoin. Calificación: ${grade}.`,
+      shareGapStrc: (pct, boost, grade, rate) => `Mi salario pierde ${rate} ante Bitcoin. $STRC agrega ${boost}%/año — cerrando la brecha. Calificación: ${grade}.`,
       shareSame: (rate, grade) => `Mi salario mantiene el ritmo con Bitcoin (${rate}). Calificación: ${grade} — extremadamente raro.`,
-      shareLosing: (rate, gap, grade) => `Mi salario pierde ${rate} ante Bitcoin cada año. Un aumento de +${gap}%/año sería el punto de equilibrio. Calificación: ${grade}.`,
+      shareLosing: (rate, gap, grade) => `Mi salario pierde ${rate} ante Bitcoin cada año. Necesito +${gap}%/año solo para empatar. Calificación: ${grade}.`,
       shareBreakEven: (rate, grade) => `Mi salario está en el punto de equilibrio con Bitcoin (${rate}). Calificación: ${grade}.`,
-      shareFallback: '🟠 ¿Cuánto vale tu salario en Bitcoin? Calcula tu Calificación SALI → #Bitcoin #SALI',
+      shareFallback: '🟠 ¿Tu salario le sigue el ritmo a Bitcoin? Descubre tu Calificación SALI → #Bitcoin #SALI',
       shareReddit: g => `Mi Calificación SALI: ${g} — ¿Cuánto vale tu salario en Bitcoin?`,
       shareRedditFallback: '¿Cuánto vale tu salario en Bitcoin? — Calculadora SALI',
       shareCopied: '✓ ¡Copiado!',
@@ -741,7 +741,7 @@
       }
 
       const tags = strcEnabled && strcPct > 0 ? '#Bitcoin #SALI #STRC' : '#Bitcoin #SALI';
-      shortText = `🟠 SALI - ${hook}\n\nCalculate yours: ${tags}`;
+      shortText = `🟠 ${hook}\n\nWhat's yours? → ${tags}`;
     } else {
       shortText = S.shareFallback;
     }
