@@ -1,9 +1,8 @@
 import satori from 'satori';
 import { initWasm, Resvg } from '@resvg/resvg-wasm';
-
-// RESVG_WASM is injected as a pre-compiled WebAssembly.Module via wrangler.toml [wasm_modules]
-// This is the ONLY form CF Workers allow — no runtime compilation from bytes
-/* global RESVG_WASM */
+import resvgWasm from '../resvg_bg.wasm';
+// Wrangler's Workers bundler pre-compiles .wasm imports as WebAssembly.Module
+// so initWasm(resvgWasm) calls WebAssembly.instantiate(module) — the allowed form
 
 const RANK_COLORS = {
   S: '#22c55e',
@@ -20,7 +19,7 @@ let resvgReady     = false;
 
 async function ensureResvg() {
   if (!resvgReady) {
-    await initWasm(RESVG_WASM);
+    await initWasm(resvgWasm);
     resvgReady = true;
   }
 }

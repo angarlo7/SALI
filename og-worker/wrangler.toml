@@ -3,9 +3,7 @@ main = "src/index.js"
 compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
 
-[wasm_modules]
-RESVG_WASM = "resvg_bg.wasm"
+[[rules]]
+type = "CompiledWasm"
+globs = ["**/*.wasm"]
 
-[[routes]]
-pattern = "sali.angarlo.com/og"
-zone_name = "angarlo.com"
