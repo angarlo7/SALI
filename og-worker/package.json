@@ -1,0 +1,10 @@
+{
+  "name": "sali-og-worker",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@resvg/resvg-wasm": "^2.6.2",
+    "satori": "^0.26.0"
+  }
+}
