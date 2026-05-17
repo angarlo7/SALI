@@ -681,10 +681,10 @@
         `${sign}${annualRate.toFixed(1)}% ${S.scoreRateSuffix}${boostNote}`;
     }
     if (elements.saliScoreGap) {
-      if (gap > 0.1) {
-        elements.saliScoreGap.textContent = S.scoreNeedMore(gap.toFixed(1));
-      } else if (gap < -0.1) {
-        elements.saliScoreGap.textContent = S.scoreOutpacing(Math.abs(gap).toFixed(1));
+      if (annualRate < -0.1) {
+        elements.saliScoreGap.textContent = S.scoreNeedMore(Math.abs(annualRate).toFixed(1));
+      } else if (annualRate > 0.1) {
+        elements.saliScoreGap.textContent = S.scoreOutpacing(annualRate.toFixed(1));
       } else {
         elements.saliScoreGap.textContent = S.scoreBreakEven;
       }
@@ -715,7 +715,7 @@
   function updateShareLinks(gradeData) {
     const validGrades = new Set(['S', 'A', 'B', 'C', 'D', 'F']);
     const gradeUrl = (gradeData && validGrades.has(gradeData.grade))
-      ? `https://sali.angarlo.com/share?rank=${gradeData.grade}&deficit=${gradeData.cumulativeDeficit}&raise=${Math.max(0, Math.round(gradeData.gap))}&since=${gradeData.firstYear}`
+      ? `https://sali.angarlo.com/share?rank=${gradeData.grade}&deficit=${gradeData.cumulativeDeficit}&raise=${Math.max(0, Math.round(Math.abs(gradeData.annualRate)))}&since=${gradeData.firstYear}`
       : 'https://sali.angarlo.com';
 
     let shortText;
@@ -734,10 +734,8 @@
         }
       } else if (annualRate >= 0) {
         hook = S.shareSame(rateStr, grade);
-      } else if (gap > 0.1) {
-        hook = S.shareLosing(rateStr, gap.toFixed(1), grade);
       } else {
-        hook = S.shareBreakEven(rateStr, grade);
+        hook = S.shareLosing(rateStr, Math.abs(annualRate).toFixed(1), grade);
       }
 
       const tags = strcEnabled && strcPct > 0 ? '#Bitcoin #SALI #STRC' : '#Bitcoin #SALI';
