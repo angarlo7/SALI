@@ -20,7 +20,7 @@
       gradeF: 'Bitcoin is winning by a wide margin',
       scoreRateSuffix: '/ yr Bitcoin purchasing power',
       scoreStrcFwd: p => `incl. +${p}% $STRC fwd`,
-      scoreNeedMore: g => `Need +${g}%/yr more salary growth to keep pace`,
+      scoreNeedMore: g => `Need +${g}%/yr more salary growth to keep pace (at your BTC growth assumption)`,
       scoreOutpacing: g => `Outpacing Bitcoin by ${g}%/yr`,
       scoreBreakEven: 'At break-even with Bitcoin',
       docTitle: g => `SALI Grade: ${g} | Satoshi Annual Labor Index`,
@@ -135,7 +135,7 @@
       gradeF: 'Bitcoin gana por amplio margen',
       scoreRateSuffix: '/ año de poder adquisitivo en Bitcoin',
       scoreStrcFwd: p => `incl. +${p}% $STRC adelante`,
-      scoreNeedMore: g => `Necesitas +${g}%/año más de crecimiento salarial para mantener el ritmo`,
+      scoreNeedMore: g => `Necesitas +${g}%/año más de crecimiento salarial para mantener el ritmo (según tu supuesto de crecimiento de BTC)`,
       scoreOutpacing: g => `Superando a Bitcoin por ${g}%/año`,
       scoreBreakEven: 'En equilibrio con Bitcoin',
       docTitle: g => `Calificación SALI: ${g} | Índice Anual de Labor en Satoshis`,
@@ -681,10 +681,10 @@
         `${sign}${annualRate.toFixed(1)}% ${S.scoreRateSuffix}${boostNote}`;
     }
     if (elements.saliScoreGap) {
-      if (annualRate < -0.1) {
-        elements.saliScoreGap.textContent = S.scoreNeedMore(Math.abs(annualRate).toFixed(1));
-      } else if (annualRate > 0.1) {
-        elements.saliScoreGap.textContent = S.scoreOutpacing(annualRate.toFixed(1));
+      if (gap > 0.1) {
+        elements.saliScoreGap.textContent = S.scoreNeedMore(gap.toFixed(1));
+      } else if (gap < -0.1) {
+        elements.saliScoreGap.textContent = S.scoreOutpacing(Math.abs(gap).toFixed(1));
       } else {
         elements.saliScoreGap.textContent = S.scoreBreakEven;
       }
@@ -715,7 +715,7 @@
   function updateShareLinks(gradeData) {
     const validGrades = new Set(['S', 'A', 'B', 'C', 'D', 'F']);
     const gradeUrl = (gradeData && validGrades.has(gradeData.grade))
-      ? `https://sali.angarlo.com/share?rank=${gradeData.grade}&deficit=${gradeData.cumulativeDeficit}&raise=${Math.max(0, Math.round(Math.abs(gradeData.annualRate)))}&since=${gradeData.firstYear}`
+      ? `https://sali.angarlo.com/share?rank=${gradeData.grade}&deficit=${gradeData.cumulativeDeficit}&raise=${Math.max(0, Math.round(gradeData.gap))}&since=${gradeData.firstYear}`
       : 'https://sali.angarlo.com';
 
     let shortText;
@@ -734,8 +734,10 @@
         }
       } else if (annualRate >= 0) {
         hook = S.shareSame(rateStr, grade);
+      } else if (gap > 0.1) {
+        hook = S.shareLosing(rateStr, gap.toFixed(1), grade);
       } else {
-        hook = S.shareLosing(rateStr, Math.abs(annualRate).toFixed(1), grade);
+        hook = S.shareBreakEven(rateStr, grade);
       }
 
       const tags = strcEnabled && strcPct > 0 ? '#Bitcoin #SALI #STRC' : '#Bitcoin #SALI';
