@@ -51,21 +51,30 @@ const notes = (await getCollection('notes'))
     }
     .notes-list {
       display: grid;
-      gap: 1rem;
+      gap: 0;
     }
+
+    /* Card base */
     .note-card {
-      display: block;
-      padding: 1.4rem 0;
+      display: grid;
+      grid-template-columns: 1fr;
+      padding: 1.6rem 0;
       border-top: 1px solid var(--color-border);
       color: var(--color-text);
       text-decoration: none;
+      gap: 1rem;
     }
-    .note-card:last-child {
-      border-bottom: 1px solid var(--color-border);
+    .note-card:last-child { border-bottom: 1px solid var(--color-border); }
+
+    /* Two-column when a cover image is present */
+    .note-card--has-image {
+      grid-template-columns: 1fr 200px;
+      align-items: center;
     }
-    .note-card:hover h2 {
-      color: var(--color-accent);
+    @media (max-width: 540px) {
+      .note-card--has-image { grid-template-columns: 1fr; }
     }
+
     .note-card__meta {
       font-family: var(--font-mono);
       color: var(--color-text-muted);
@@ -79,10 +88,25 @@ const notes = (await getCollection('notes'))
       margin: 0 0 0.45rem;
       font-size: 1.55rem;
       letter-spacing: 0;
+      transition: color 0.15s;
     }
+    .note-card:hover h2 { color: var(--color-accent); }
     .note-card p {
       margin: 0;
       max-width: 660px;
+      color: var(--color-text-secondary);
+    }
+
+    /* Thumbnail */
+    .note-card__thumb {
+      width: 200px;
+      height: 130px;
+      object-fit: cover;
+      border-radius: 6px;
+      justify-self: end;
+    }
+    @media (max-width: 540px) {
+      .note-card__thumb { width: 100%; height: 180px; justify-self: stretch; }
     }
   </style>
 </head>
@@ -109,21 +133,32 @@ const notes = (await getCollection('notes'))
       {notes.length === 0 ? (
         <p style="color: var(--color-text-muted); font-size: 0.95rem;">No notes yet — check back soon.</p>
       ) : notes.map((note) => (
-        <a class="note-card" href={`/notes/${note.slug}`}>
-          <div class="note-card__meta">
-            {new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(note.data.date)}
-            {note.data.tags.length > 0 && ` / ${note.data.tags.join(' / ')}`}
+        <a
+          class={`note-card${note.data.image ? ' note-card--has-image' : ''}`}
+          href={`/notes/${note.slug}`}
+        >
+          <div class="note-card__body">
+            <div class="note-card__meta">
+              {new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(note.data.date)}
+              {note.data.tags.length > 0 && ` / ${note.data.tags.join(' / ')}`}
+            </div>
+            <h2>{note.data.title}</h2>
+            <p>{note.data.description}</p>
           </div>
-          <h2>{note.data.title}</h2>
-          <p>{note.data.description}</p>
+          {note.data.image && (
+            <img
+              class="note-card__thumb"
+              src={note.data.image}
+              alt={note.data.image_alt ?? note.data.title}
+              loading="lazy"
+            />
+          )}
         </a>
       ))}
     </div>
   </main>
 
   <script is:inline src="/assets/js/theme.js?v=5"></script>
-  <!-- Cloudflare Web Analytics -->
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"50af8042fed14fbdb35bde67c57585bf"}'></script>
-  <!-- End Cloudflare Web Analytics -->
 </body>
 </html>

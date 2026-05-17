@@ -3,13 +3,26 @@ const {
   title,
   description,
   date,
-  tags = []
+  tags = [],
+  image,
+  image_alt,
+  comments = true
 } = Astro.props;
 
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
 const formattedDate = date
   ? new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric', year: 'numeric' }).format(date)
   : '';
+
+const encodedTitle = encodeURIComponent(title);
+const encodedUrl   = encodeURIComponent(canonicalUrl.toString());
+const shareX       = `https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}&via=angarlo`;
+const shareLI      = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`;
+const shareReddit  = `https://reddit.com/submit?url=${encodedUrl}&title=${encodedTitle}`;
+
+const ogImage = image
+  ? (image.startsWith('http') ? image : new URL(image, Astro.site).toString())
+  : 'https://sali.angarlo.com/assets/images/sali-share.png';
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -23,13 +36,13 @@ const formattedDate = date
   <meta property="og:url" content={canonicalUrl}>
   <meta property="og:title" content={title}>
   <meta property="og:description" content={description}>
-  <meta property="og:image" content="https://sali.angarlo.com/assets/images/sali-share.png">
+  <meta property="og:image" content={ogImage}>
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:site" content="@angarlo">
   <meta name="twitter:creator" content="@angarlo">
   <meta name="twitter:title" content={title}>
   <meta name="twitter:description" content={description}>
-  <meta name="twitter:image" content="https://sali.angarlo.com/assets/images/sali-share.png">
+  <meta name="twitter:image" content={ogImage}>
   <link rel="alternate" hreflang="en" href={canonicalUrl}>
   <link rel="alternate" hreflang="x-default" href={canonicalUrl}>
   <link rel="alternate" hreflang="es" href="https://sali.angarlo.com/es/notas">
@@ -42,6 +55,7 @@ const formattedDate = date
     "url": canonicalUrl.toString(),
     "inLanguage": "en",
     ...(date ? { "datePublished": date.toISOString() } : {}),
+    ...(image ? { "image": ogImage } : {}),
     "author": {
       "@type": "Person",
       "name": "Angarlo",
@@ -56,11 +70,24 @@ const formattedDate = date
   })}></script>
   <link rel="stylesheet" href="/assets/css/styles.css?v=15">
   <style>
+    /* ── Shell ── */
     .note-shell {
       max-width: 760px;
       margin: 0 auto;
       padding: 4rem 1.5rem;
     }
+
+    /* ── Hero image ── */
+    .note-hero {
+      width: 100%;
+      max-height: 480px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 2.5rem;
+      display: block;
+    }
+
+    /* ── Header ── */
     .note-kicker,
     .note-date,
     .note-tags {
@@ -69,10 +96,7 @@ const formattedDate = date
       letter-spacing: 0.08em;
       text-transform: uppercase;
     }
-    .note-kicker {
-      font-size: 0.75rem;
-      margin-bottom: 1rem;
-    }
+    .note-kicker { font-size: 0.75rem; margin-bottom: 1rem; }
     .note-title {
       color: var(--color-text);
       font-size: clamp(2.4rem, 7vw, 4.25rem);
@@ -93,6 +117,8 @@ const formattedDate = date
       margin-bottom: 3rem;
       font-size: 0.75rem;
     }
+
+    /* ── Body ── */
     .note-content {
       font-size: 1.08rem;
       line-height: 1.8;
@@ -111,12 +137,113 @@ const formattedDate = date
       margin-bottom: 1.25rem;
     }
     .note-content :global(a) {
+      color: var(--color-accent);
       text-decoration: underline;
       text-underline-offset: 3px;
     }
+    .note-content :global(a:hover) { opacity: 0.8; }
+
+    /* Inline images */
+    .note-content :global(img) {
+      max-width: 100%;
+      height: auto;
+      border-radius: 6px;
+      margin: 1.5rem 0;
+      display: block;
+    }
+    /* Caption: italic text immediately after an image */
+    .note-content :global(img + em) {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      text-align: center;
+      margin-top: -0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Blockquotes */
+    .note-content :global(blockquote) {
+      border-left: 3px solid var(--color-accent);
+      padding-left: 1.25rem;
+      margin-left: 0;
+      color: var(--color-text-muted);
+      font-style: italic;
+    }
+
+    /* Code */
+    .note-content :global(code) {
+      font-family: var(--font-mono);
+      font-size: 0.9em;
+      background: var(--color-surface);
+      padding: 0.15em 0.4em;
+      border-radius: 3px;
+    }
+    .note-content :global(pre) {
+      background: var(--color-surface);
+      padding: 1.25rem;
+      border-radius: 6px;
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
+    }
+    .note-content :global(pre code) { background: none; padding: 0; }
+
+    /* ── Share strip ── */
+    .note-share {
+      border-top: 1px solid var(--color-border);
+      margin-top: 3.5rem;
+      padding-top: 2rem;
+    }
+    .note-share__label {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      margin-bottom: 0.9rem;
+    }
+    .note-share__buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+    }
+    .share-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-decoration: none;
+      border: 1px solid var(--color-border);
+      color: var(--color-text);
+      background: transparent;
+      cursor: pointer;
+      font-family: inherit;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .share-btn:hover { border-color: var(--color-accent); color: var(--color-accent); }
+    .share-btn--copy.copied { border-color: #22c55e; color: #22c55e; }
+
+    /* ── Comments ── */
+    .note-comments {
+      margin-top: 3.5rem;
+      border-top: 1px solid var(--color-border);
+      padding-top: 2rem;
+    }
+    .note-comments__label {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      margin-bottom: 1.25rem;
+    }
+
+    /* ── Footer ── */
     .note-footer {
       border-top: 1px solid var(--color-border);
-      margin-top: 4rem;
+      margin-top: 3rem;
       padding-top: 1.5rem;
       display: flex;
       flex-wrap: wrap;
@@ -125,6 +252,8 @@ const formattedDate = date
       align-items: center;
       font-size: 0.9rem;
     }
+    .note-footer a { color: var(--color-text-muted); text-decoration: none; }
+    .note-footer a:hover { color: var(--color-accent); }
   </style>
 </head>
 <body>
@@ -144,6 +273,10 @@ const formattedDate = date
   </nav>
 
   <main class="note-shell">
+    {image && (
+      <img src={image} alt={image_alt ?? title} class="note-hero" loading="eager" />
+    )}
+
     <div class="note-kicker">ANGARLO Notes</div>
     <h1 class="note-title">{title}</h1>
     <p class="note-description">{description}</p>
@@ -151,18 +284,67 @@ const formattedDate = date
       {formattedDate && <span class="note-date">{formattedDate}</span>}
       {tags.length > 0 && <span class="note-tags">{tags.join(' / ')}</span>}
     </div>
+
     <article class="note-content">
       <slot />
     </article>
+
+    <!-- Share strip -->
+    <div class="note-share">
+      <div class="note-share__label">Share this note</div>
+      <div class="note-share__buttons">
+        <a class="share-btn" href={shareX} target="_blank" rel="noopener noreferrer">✕ Post on X</a>
+        <a class="share-btn" href={shareLI} target="_blank" rel="noopener noreferrer">in LinkedIn</a>
+        <a class="share-btn" href={shareReddit} target="_blank" rel="noopener noreferrer">↑ Reddit</a>
+        <button class="share-btn share-btn--copy" id="copyLinkBtn" data-url={canonicalUrl.toString()}>🔗 Copy link</button>
+      </div>
+    </div>
+
+    <!-- Comments via Giscus (GitHub Discussions) -->
+    {comments && (
+      <div class="note-comments">
+        <div class="note-comments__label">Discussion</div>
+        <script
+          is:inline
+          src="https://giscus.app/client.js"
+          data-repo="angarlo7/SALI"
+          data-repo-id="PLACEHOLDER_REPO_ID"
+          data-category="Notes"
+          data-category-id="PLACEHOLDER_CATEGORY_ID"
+          data-mapping="pathname"
+          data-strict="0"
+          data-reactions-enabled="1"
+          data-emit-metadata="0"
+          data-input-position="top"
+          data-theme="preferred_color_scheme"
+          data-lang="en"
+          crossorigin="anonymous"
+          async
+        ></script>
+      </div>
+    )}
+
     <div class="note-footer">
-      <a href="/notes">All notes</a>
-      <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(canonicalUrl.toString())}`} target="_blank" rel="noopener noreferrer">Share on X</a>
+      <a href="/notes">← All notes</a>
     </div>
   </main>
 
+  <script is:inline>
+    const copyBtn = document.getElementById('copyLinkBtn');
+    if (copyBtn) {
+      copyBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText(copyBtn.dataset.url).then(() => {
+          copyBtn.textContent = '✓ Copied!';
+          copyBtn.classList.add('copied');
+          setTimeout(() => {
+            copyBtn.textContent = '🔗 Copy link';
+            copyBtn.classList.remove('copied');
+          }, 2000);
+        });
+      });
+    }
+  </script>
   <script is:inline src="/assets/js/theme.js?v=5"></script>
-  <!-- Cloudflare Web Analytics -->
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"50af8042fed14fbdb35bde67c57585bf"}'></script>
-  <!-- End Cloudflare Web Analytics -->
 </body>
 </html>
