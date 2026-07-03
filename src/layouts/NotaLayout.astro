@@ -54,7 +54,7 @@ const formattedDate = date
       "url": "https://sali.angarlo.com/"
     }
   })}></script>
-  <link rel="stylesheet" href="/assets/css/styles.css?v=15">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=16">
   <style>
     .note-shell {
       max-width: 760px;
@@ -128,6 +128,7 @@ const formattedDate = date
   </style>
 </head>
 <body>
+  <script is:inline>try{var t=localStorage.getItem('sali.angarlo.theme')||localStorage.getItem('saliTheme');if(t==='dark')document.body.classList.add('dark');}catch(e){}</script>
   <nav class="nav">
     <div class="container nav__inner">
       <a href="/es/" class="nav__logo">ANGARLO</a>
@@ -139,6 +140,7 @@ const formattedDate = date
         <li><a href="/es/podcast.html" class="nav__link">Podcast</a></li>
         <li><a href="/es/contact.html" class="nav__link">Contacto</a></li>
       </ul>
+      <a href="/notes" class="lang-toggle" aria-label="View in English">🇺🇸</a>
       <button id="themeToggle" class="theme-toggle" aria-label="Cambiar modo oscuro">🌙</button>
     </div>
   </nav>

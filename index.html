@@ -47,9 +47,10 @@
     }
   }
   </script>
-  <link rel="stylesheet" href="/assets/css/styles.css?v=15">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=16">
 </head>
 <body>
+  <script>try{var t=localStorage.getItem('sali.angarlo.theme')||localStorage.getItem('saliTheme');if(t==='dark')document.body.classList.add('dark');}catch(e){}</script>
   <!-- Navigation -->
   <nav class="nav">
     <div class="container nav__inner">
@@ -62,6 +63,7 @@
         <li><a href="/podcast.html" class="nav__link">Podcast</a></li>
         <li><a href="/contact.html" class="nav__link">Contact</a></li>
       </ul>
+      <a href="/es/" class="lang-toggle" aria-label="Ver en español">🇲🇽</a>
       <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
     </div>
   </nav>
@@ -129,22 +131,6 @@
 
               <div id="fxWarning" class="fx-warning fx-warning--hidden">
                 Loading live FX rates (ECB source)... For best accuracy, convert your salary to USD manually and use the USD option.
-              </div>
-
-              <!-- Salary Under $STRC / STRETCH -->
-              <div class="form-group strc-form-group">
-                <label>Salary Under $STRC
-                  <span class="info-tip"><button class="info-tip__btn" type="button" aria-describedby="tip-2">?</button><span class="info-tip__content" id="tip-2" role="tooltip">Strategy's $STRC preferred stock pays a variable dividend (currently ~11%). "UNDER STRETCH" means the portion of your compensation allocated to $STRC — earning dividend income instead of sitting in fiat. The rest stays in dollars. Learn more at <a href="https://www.strategy.com" target="_blank" rel="noopener noreferrer">strategy.com</a>.</span></span>
-                </label>
-                <div class="strc-enable-row">
-                  <input type="checkbox" id="strcEnableToggle" class="strc-checkbox">
-                  <label for="strcEnableToggle" class="strc-enable-label">Allocate salary to $STRC</label>
-                </div>
-              </div>
-              <div class="form-group form-group--hidden" id="strcPctGroup">
-                <label for="strcPctInput">% of Salary → $STRC</label>
-                <input type="number" id="strcPctInput" value="10" min="0" max="100" step="1" placeholder="e.g. 10">
-                <div id="strcYieldDisplay" class="strc-yield-display">Loading $STRC yield…</div>
               </div>
 
               <div class="form-group">
@@ -255,26 +241,6 @@
                   <span class="equiv-value" id="equivPctBtc">—</span>
                   <span class="equiv-label">% of 1 BTC</span>
                 </div>
-              </div>
-
-              <!-- Salary Under $STRC output -->
-              <div id="strcOutputWrap" class="strc-output-wrap" style="display:none">
-                <div class="strc-output__title">Salary Under $STRC</div>
-                <div class="strc-output__grid">
-                  <div class="output-group">
-                    <div class="output-group__label">STRC Allocation</div>
-                    <div id="strcAllocOutput" class="output-group__value output-group__value--secondary">—</div>
-                  </div>
-                  <div class="output-group">
-                    <div class="output-group__label">Annual Dividend Income</div>
-                    <div id="strcDivOutput" class="output-group__value output-group__value--primary strc-value--dividend">—</div>
-                  </div>
-                  <div class="output-group">
-                    <div class="output-group__label">Remaining Salary (USD)</div>
-                    <div id="strcRemainOutput" class="output-group__value output-group__value--secondary">—</div>
-                  </div>
-                </div>
-                <div id="strcYieldNote" class="strc-yield-note"></div>
               </div>
 
               <div class="share-row" id="shareRow" style="display:none">
@@ -521,7 +487,7 @@
         Support continued maintenance: <a href="lightning:angarlo@strike.me">⚡ angarlo@strike.me</a> · <a href="/contact.html#support">QR &amp; more &rarr;</a>
       </p>
       <p class="footer__privacy">
-        Privacy-friendly analytics by Cloudflare Web Analytics. No cookies, no ad tracking. The site loads live BTC prices from Coinbase, FX rates from the European Central Bank (via Frankfurter), $STRC yield from Yahoo Finance, Chart.js from jsDelivr, and the podcast video from youtube-nocookie.com. · <a href="/privacy.html">Privacy Policy</a>
+        Privacy-friendly analytics by Cloudflare Web Analytics. No cookies, no ad tracking. The site loads live BTC prices from Coinbase, FX rates from the European Central Bank (via Frankfurter), Chart.js from jsDelivr, and the podcast video from youtube-nocookie.com. · <a href="/privacy.html">Privacy Policy</a>
       </p>
       <p class="footer__contact">
         Contact: <a href="mailto:angarlotv@gmail.com">angarlotv@gmail.com</a>
@@ -534,7 +500,7 @@
           integrity="sha384-9nhczxUqK87bcKHh20fSQcTGD4qq5GhayNYSYWqwBkINBhOfQLg/P5HG5lF1urn4"
           crossorigin="anonymous"
           referrerpolicy="no-referrer"></script>
-  <script src="/assets/js/app.js?v=9"></script>
+  <script src="/assets/js/app.js?v=10"></script>
   <script src="/assets/js/theme.js?v=5"></script>
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"50af8042fed14fbdb35bde67c57585bf"}'></script>
 </body>

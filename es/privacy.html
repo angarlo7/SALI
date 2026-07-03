@@ -25,9 +25,10 @@
   <link rel="alternate" hreflang="es" href="https://sali.angarlo.com/es/privacy.html">
   <link rel="alternate" hreflang="x-default" href="https://sali.angarlo.com/privacy.html">
   <link rel="alternate" type="application/rss+xml" title="SALI Notas" href="https://sali.angarlo.com/rss.xml">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=15">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=16">
 </head>
 <body>
+  <script>try{var t=localStorage.getItem('sali.angarlo.theme')||localStorage.getItem('saliTheme');if(t==='dark')document.body.classList.add('dark');}catch(e){}</script>
   <!-- Navegación -->
   <nav class="nav">
     <div class="container nav__inner">
@@ -40,6 +41,7 @@
         <li><a href="/es/podcast.html" class="nav__link">Podcast</a></li>
         <li><a href="/es/contact.html" class="nav__link">Contacto</a></li>
       </ul>
+      <a href="/privacy.html" class="lang-toggle" aria-label="View in English">🇺🇸</a>
       <button id="themeToggle" class="theme-toggle" aria-label="Cambiar modo oscuro">🌙</button>
     </div>
   </nav>
@@ -48,7 +50,7 @@
     <div class="page-header">
       <div class="container">
         <h1>Privacidad</h1>
-        <p class="page-header__subtitle">Última actualización: mayo de 2026</p>
+        <p class="page-header__subtitle">Última actualización: julio 2026</p>
       </div>
     </div>
 
@@ -78,13 +80,7 @@
               <div class="privacy-service__url">api.frankfurter.app/latest</div>
             </div>
 
-            <div class="privacy-service">
-              <div class="privacy-service__name">Yahoo Finance</div>
-              <div class="privacy-service__purpose">Precio en vivo de $STRC (Nasdaq), usado para calcular el rendimiento de dividendo actual para la función "Salario Bajo $STRC". Solicitud anónima con tiempo de espera de 2 segundos. Si la solicitud falla o es bloqueada (común por CORS), la calculadora silenciosamente usa la tasa declarada públicamente del 11.5%.</div>
-              <div class="privacy-service__url">query1.finance.yahoo.com/v8/finance/chart/STRC</div>
-            </div>
-
-            <div class="privacy-service">
+                        <div class="privacy-service">
               <div class="privacy-service__name">jsDelivr CDN</div>
               <div class="privacy-service__purpose">Archivo de la librería Chart.js para renderizar el gráfico SALI. Solicitud estándar de CDN — tu IP es visible para jsDelivr como con cualquier CDN.</div>
               <div class="privacy-service__url">cdn.jsdelivr.net/npm/chart.js</div>
@@ -115,7 +111,7 @@
 
           <h2>Parámetros de URL</h2>
           <p>
-            La calculadora codifica tus entradas (salario, año de inicio, configuración de proyección, asignación STRC) como parámetros de consulta de URL para que puedas guardar como favorito o compartir una configuración específica. Si compartes o visitas una URL que contiene configuraciones de salario, esas configuraciones son parte de la URL y pueden ser visibles para el destinatario, el historial del navegador, los registros de hosting y las herramientas de análisis agregado. El enlace de calificación "Publicar en X" de la aplicación es solo de calificación y no incluye tu salario.
+            La calculadora codifica tus entradas (salario, año de inicio, configuración de proyección) como parámetros de consulta de URL para que puedas guardar como favorito o compartir una configuración específica. Si compartes o visitas una URL que contiene configuraciones de salario, esas configuraciones son parte de la URL y pueden ser visibles para el destinatario, el historial del navegador, los registros de hosting y las herramientas de análisis agregado. El enlace de calificación "Publicar en X" de la aplicación es solo de calificación y no incluye tu salario.
           </p>
 
           <h2>Almacenamiento de datos</h2>
@@ -130,7 +126,7 @@
 
           <h2>Enlaces de terceros</h2>
           <p>
-            Los enlaces externos (a strategy.com, listados de Nasdaq, etc.) se proporcionan como referencia. SALI no tiene control sobre las prácticas de privacidad de esos sitios.
+            Los enlaces externos se proporcionan como referencia. SALI no tiene control sobre las prácticas de privacidad de esos sitios.
           </p>
 
           <h2>Cambios</h2>

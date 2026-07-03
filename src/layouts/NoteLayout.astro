@@ -6,7 +6,9 @@ const {
   tags = [],
   image,
   image_alt,
-  comments = true
+  // Giscus is not configured yet (placeholder repo/category IDs below).
+  // Default OFF until real IDs from giscus.app are filled in — then flip back to true.
+  comments = false
 } = Astro.props;
 
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
@@ -68,7 +70,7 @@ const ogImage = image
       "url": "https://sali.angarlo.com/"
     }
   })}></script>
-  <link rel="stylesheet" href="/assets/css/styles.css?v=15">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=16">
   <style>
     /* ── Shell ── */
     .note-shell {
@@ -257,6 +259,7 @@ const ogImage = image
   </style>
 </head>
 <body>
+  <script is:inline>try{var t=localStorage.getItem('sali.angarlo.theme')||localStorage.getItem('saliTheme');if(t==='dark')document.body.classList.add('dark');}catch(e){}</script>
   <nav class="nav">
     <div class="container nav__inner">
       <a href="/" class="nav__logo">ANGARLO</a>
@@ -268,6 +271,7 @@ const ogImage = image
         <li><a href="/podcast.html" class="nav__link">Podcast</a></li>
         <li><a href="/contact.html" class="nav__link">Contact</a></li>
       </ul>
+      <a href="/es/notas" class="lang-toggle" aria-label="Ver en español">🇲🇽</a>
       <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
     </div>
   </nav>

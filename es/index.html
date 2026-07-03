@@ -47,9 +47,10 @@
     }
   }
   </script>
-  <link rel="stylesheet" href="/assets/css/styles.css?v=15">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=16">
 </head>
 <body>
+  <script>try{var t=localStorage.getItem('sali.angarlo.theme')||localStorage.getItem('saliTheme');if(t==='dark')document.body.classList.add('dark');}catch(e){}</script>
   <!-- Navegación -->
   <nav class="nav">
     <div class="container nav__inner">
@@ -62,6 +63,7 @@
         <li><a href="/es/podcast.html" class="nav__link">Podcast</a></li>
         <li><a href="/es/contact.html" class="nav__link">Contacto</a></li>
       </ul>
+      <a href="/" class="lang-toggle" aria-label="View in English">🇺🇸</a>
       <button id="themeToggle" class="theme-toggle" aria-label="Cambiar modo oscuro">🌙</button>
     </div>
   </nav>
@@ -129,22 +131,6 @@
 
               <div id="fxWarning" class="fx-warning fx-warning--hidden">
                 Cargando tasas de cambio en vivo (fuente ECB)... Para mayor precisión, convierte tu salario a USD manualmente y usa la opción USD.
-              </div>
-
-              <!-- Salario Bajo $STRC / STRETCH -->
-              <div class="form-group strc-form-group">
-                <label>Salario Bajo $STRC
-                  <span class="info-tip"><button class="info-tip__btn" type="button" aria-describedby="tip-2">?</button><span class="info-tip__content" id="tip-2" role="tooltip">Las acciones preferentes $STRC de Strategy pagan un dividendo variable (actualmente ~11%). "UNDER STRETCH" significa la porción de tu compensación asignada a $STRC — generando ingresos por dividendos en lugar de permanecer en fiat. El resto permanece en dólares. Más información en <a href="https://www.strategy.com" target="_blank" rel="noopener noreferrer">strategy.com</a>.</span></span>
-                </label>
-                <div class="strc-enable-row">
-                  <input type="checkbox" id="strcEnableToggle" class="strc-checkbox">
-                  <label for="strcEnableToggle" class="strc-enable-label">Asignar salario a $STRC</label>
-                </div>
-              </div>
-              <div class="form-group form-group--hidden" id="strcPctGroup">
-                <label for="strcPctInput">% del Salario → $STRC</label>
-                <input type="number" id="strcPctInput" value="10" min="0" max="100" step="1" placeholder="ej. 10">
-                <div id="strcYieldDisplay" class="strc-yield-display">Cargando rendimiento $STRC…</div>
               </div>
 
               <div class="form-group">
@@ -255,26 +241,6 @@
                   <span class="equiv-value" id="equivPctBtc">—</span>
                   <span class="equiv-label">% de 1 BTC</span>
                 </div>
-              </div>
-
-              <!-- Salida de Salario Bajo $STRC -->
-              <div id="strcOutputWrap" class="strc-output-wrap" style="display:none">
-                <div class="strc-output__title">Salario Bajo $STRC</div>
-                <div class="strc-output__grid">
-                  <div class="output-group">
-                    <div class="output-group__label">Asignación STRC</div>
-                    <div id="strcAllocOutput" class="output-group__value output-group__value--secondary">—</div>
-                  </div>
-                  <div class="output-group">
-                    <div class="output-group__label">Ingreso Anual por Dividendos</div>
-                    <div id="strcDivOutput" class="output-group__value output-group__value--primary strc-value--dividend">—</div>
-                  </div>
-                  <div class="output-group">
-                    <div class="output-group__label">Salario Restante (USD)</div>
-                    <div id="strcRemainOutput" class="output-group__value output-group__value--secondary">—</div>
-                  </div>
-                </div>
-                <div id="strcYieldNote" class="strc-yield-note"></div>
               </div>
 
               <div class="share-row" id="shareRow" style="display:none">
@@ -521,7 +487,7 @@
         Apoya el mantenimiento continuo: <a href="lightning:angarlo@strike.me">⚡ angarlo@strike.me</a> · <a href="/es/contact.html#support">QR y más &rarr;</a>
       </p>
       <p class="footer__privacy">
-        Análisis de privacidad amigable por Cloudflare Web Analytics. Sin cookies, sin rastreo publicitario. El sitio carga precios de BTC en vivo desde Coinbase, tasas de cambio del Banco Central Europeo (via Frankfurter), rendimiento de $STRC desde Yahoo Finance, Chart.js desde jsDelivr, y el video del podcast desde youtube-nocookie.com. · <a href="/es/privacy.html">Política de Privacidad</a>
+        Análisis de privacidad amigable por Cloudflare Web Analytics. Sin cookies, sin rastreo publicitario. El sitio carga precios de BTC en vivo desde Coinbase, tasas de cambio del Banco Central Europeo (via Frankfurter), Chart.js desde jsDelivr, y el video del podcast desde youtube-nocookie.com. · <a href="/es/privacy.html">Política de Privacidad</a>
       </p>
       <p class="footer__contact">
         Contacto: <a href="mailto:angarlotv@gmail.com">angarlotv@gmail.com</a>
@@ -534,7 +500,7 @@
           integrity="sha384-9nhczxUqK87bcKHh20fSQcTGD4qq5GhayNYSYWqwBkINBhOfQLg/P5HG5lF1urn4"
           crossorigin="anonymous"
           referrerpolicy="no-referrer"></script>
-  <script src="/assets/js/app.js?v=9"></script>
+  <script src="/assets/js/app.js?v=10"></script>
   <script src="/assets/js/theme.js?v=5"></script>
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"50af8042fed14fbdb35bde67c57585bf"}'></script>
 </body>

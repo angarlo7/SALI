@@ -28,7 +28,7 @@ const notes = (await getCollection('notes'))
   <link rel="alternate" hreflang="es" href="https://sali.angarlo.com/es/notas">
   <link rel="alternate" hreflang="x-default" href="https://sali.angarlo.com/notes">
   <link rel="alternate" type="application/rss+xml" title="SALI Notes" href="https://sali.angarlo.com/rss.xml">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=15">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=16">
   <style>
     .notes-shell {
       max-width: 920px;
@@ -111,6 +111,7 @@ const notes = (await getCollection('notes'))
   </style>
 </head>
 <body>
+  <script is:inline>try{var t=localStorage.getItem('sali.angarlo.theme')||localStorage.getItem('saliTheme');if(t==='dark')document.body.classList.add('dark');}catch(e){}</script>
   <nav class="nav">
     <div class="container nav__inner">
       <a href="/" class="nav__logo">ANGARLO</a>
@@ -122,6 +123,7 @@ const notes = (await getCollection('notes'))
         <li><a href="/podcast.html" class="nav__link">Podcast</a></li>
         <li><a href="/contact.html" class="nav__link">Contact</a></li>
       </ul>
+      <a href="/es/notas" class="lang-toggle" aria-label="Ver en español">🇲🇽</a>
       <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
     </div>
   </nav>

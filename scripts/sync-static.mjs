@@ -14,7 +14,7 @@ const rootFiles = [
   'robots.txt'
 ];
 
-const rootDirs = ['assets', 'data', 'es', 'og', 'share'];
+const rootDirs = ['assets', 'data', 'es', 'og'];
 
 await rm('public', { recursive: true, force: true });
 await mkdir('public', { recursive: true });

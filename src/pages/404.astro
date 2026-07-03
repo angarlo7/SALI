@@ -1,0 +1,50 @@
+---
+// Branded 404 page. Cloudflare Pages serves dist/404.html automatically
+// for any path that doesn't match a static file.
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <title>Page Not Found | SALI - Satoshi Annual Labor Index</title>
+  <link rel="stylesheet" href="/assets/css/styles.css?v=16">
+  <style>
+    .nf-shell { max-width: 640px; margin: 0 auto; padding: 6rem 1.5rem; text-align: center; }
+    .nf-code { font-family: var(--font-mono); font-size: clamp(4rem, 15vw, 7rem); line-height: 1; color: var(--color-accent); margin-bottom: 1rem; }
+    .nf-title { color: var(--color-text); margin-bottom: 0.75rem; }
+    .nf-desc { color: var(--color-text-secondary); margin-bottom: 2rem; line-height: 1.6; }
+    .nf-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+  </style>
+</head>
+<body>
+  <script is:inline>try{var t=localStorage.getItem('sali.angarlo.theme')||localStorage.getItem('saliTheme');if(t==='dark')document.body.classList.add('dark');}catch(e){}</script>
+  <nav class="nav">
+    <div class="container nav__inner">
+      <a href="/" class="nav__logo">ANGARLO</a>
+      <ul class="nav__links">
+        <li><a href="/" class="nav__link">Home</a></li>
+        <li><a href="/methodology.html" class="nav__link">Methodology</a></li>
+        <li><a href="/examples.html" class="nav__link">Examples</a></li>
+        <li><a href="/notes" class="nav__link">Notes</a></li>
+        <li><a href="/podcast.html" class="nav__link">Podcast</a></li>
+        <li><a href="/contact.html" class="nav__link">Contact</a></li>
+      </ul>
+      <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </nav>
+  <main>
+    <div class="nf-shell">
+      <div class="nf-code">404</div>
+      <h1 class="nf-title">This page doesn't exist</h1>
+      <p class="nf-desc">The page you're looking for was moved, renamed, or never existed. Your SALI, however, is still waiting to be measured. · <span lang="es">Esta página no existe — la calculadora sigue disponible.</span></p>
+      <div class="nf-actions">
+        <a href="/" class="btn btn--primary">Calculate My SALI →</a>
+        <a href="/notes" class="btn btn--secondary">Read the Notes</a>
+      </div>
+    </div>
+  </main>
+  <script is:inline src="/assets/js/theme.js?v=5"></script>
+</body>
+</html>
