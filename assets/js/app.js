@@ -591,7 +591,11 @@
       elements.saliScoreTagline.textContent = tagline;
     }
 
-    document.title = S.docTitle(grade);
+    // Only retitle the tab once the user has actually interacted (or arrived
+    // via a shared link) - not for the automatic default computation on load.
+    if (initComputeComplete || hasInitialUrlParams) {
+      document.title = S.docTitle(grade);
+    }
     wrap.style.display = 'block';
   }
 
@@ -1115,7 +1119,15 @@
    */
   function updateUrlParams() {
     const params = new URLSearchParams();
-    if (elements.salaryInput.value) params.set('salary', elements.salaryInput.value);
+    // Always store the ANNUAL salary: in monthly mode the raw input is a monthly
+    // figure, and shared URLs are parsed as annual (no frequency param).
+    if (elements.salaryInput.value) {
+      const raw = parseFloat(elements.salaryInput.value);
+      if (!isNaN(raw) && raw > 0) {
+        const annual = salaryFrequency === 'monthly' ? Math.round(raw * 12) : raw;
+        params.set('salary', String(annual));
+      }
+    }
     const currency = elements.currencySelect.value;
     if (currency !== 'USD') params.set('currency', currency);
     const salaryGrowth = elements.salaryGrowthInput.value;
