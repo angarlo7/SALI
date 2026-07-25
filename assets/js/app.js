@@ -91,7 +91,7 @@
       histNow: ' (Now)',
       decompSummary: (tot, tc, yr, sal, sc, btc, bc) =>
         `SALI changed <strong style="color:${tc}">${tot}</strong> since ${yr}: ` +
-        `salary <strong style="color:${sc}">${sal}</strong> (positive) · ` +
+        `salary <strong style="color:${sc}">${sal}</strong> · ` +
         `BTC <strong style="color:${bc}">${btc}</strong> impact`,
       shareSame: (rate, grade) => `My salary is keeping pace with Bitcoin (${rate}). Grade: ${grade} — extremely rare.`,
       shareLosing: (rate, gap, grade) => `My salary loses ${rate} to Bitcoin every year. I need +${gap}%/yr just to break even. Grade: ${grade}.`,
@@ -516,7 +516,10 @@
 
     const totalSaliChange = ((current.sats - first.sats) / first.sats) * 100;
     const salaryCumulative = (current.salary / first.salary - 1) * 100;
-    const btcCumulative = -(current.btcPrice / first.btcPrice - 1) * 100;
+    // BTC's drag on SALI is multiplicative, not additive: express it as the change
+    // in how much BTC one unit of salary buys, so that
+    // (1 + salary%) x (1 + btc%) = (1 + total%) actually holds for the reader.
+    const btcCumulative = (first.btcPrice / current.btcPrice - 1) * 100;
 
     const sign = v => v >= 0 ? '+' : '';
     const fmt = v => sign(v) + v.toFixed(1) + '%';
@@ -1079,7 +1082,7 @@
       if (idx > 0) {
         const prev = projections[idx - 1];
         const salaryEffect = (p.salary / prev.salary - 1) * 100;
-        const btcEffect = -(p.btcPrice / prev.btcPrice - 1) * 100;
+        const btcEffect = (prev.btcPrice / p.btcPrice - 1) * 100;
         const seCls = salaryEffect >= 0 ? 'score--gaining' : 'score--losing';
         const beCls = btcEffect >= 0 ? 'score--gaining' : 'score--losing';
         salaryEffectCell = `<td class="breakdown-col ${seCls}" ${dispStyle}>${formatPercent(salaryEffect)}</td>`;
