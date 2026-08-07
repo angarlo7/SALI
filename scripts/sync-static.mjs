@@ -9,6 +9,7 @@ const rootFiles = [
   'favicon-32x32.png',
   'apple-touch-icon.png',
   'contact.html',
+  'dice-seed.html',
   'examples.html',
   'index.html',
   'methodology.html',
