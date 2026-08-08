@@ -133,11 +133,11 @@
 
         <div class="calculator">
           <h2 class="calculator__title">Dice entropy to BIP&#8209;39 phrase</h2>
-          <p class="calculator__context">Roll one six&#8209;sided die and type each result. Your rolls are hashed with SHA&#8209;256 to erase any bias, then mapped onto the official 2048&#8209;word list. Everything is computed in this browser.</p>
+          <p class="calculator__context">Roll one six&#8209;sided die and type each result. Your rolls are hashed with SHA&#8209;256 to condition the entropy uniformly, then mapped onto the official 2048&#8209;word list. Everything is computed in this browser.</p>
 
           <div class="ds-form">
             <div class="form-group">
-              <label>Seed strength<span class="info-tip"><button class="info-tip__btn" type="button" aria-describedby="ds-tip-strength">?</button><span class="info-tip__content" id="ds-tip-strength" role="tooltip">Twelve words hold 128 bits of security and need at least 50 rolls. Twenty&#8209;four words hold 256 bits and need at least 99 rolls. Both are far beyond brute force; 24 words is the belt&#8209;and&#8209;suspenders choice.</span></span></label>
+              <label>Seed strength<span class="info-tip"><button class="info-tip__btn" type="button" aria-describedby="ds-tip-strength">?</button><span class="info-tip__content" id="ds-tip-strength" role="tooltip">Twelve words hold 128 bits of security and need at least 50 rolls. Twenty&#8209;four words hold 256 bits and need at least 100 rolls. Both are far beyond brute force; 24 words is the belt&#8209;and&#8209;suspenders choice.</span></span></label>
               <div class="salary-mode-toggle" id="modeToggle" role="group" aria-label="Seed strength">
                 <button type="button" class="mode-btn mode-btn--active" id="mode12">12 words &middot; 128&#8209;bit</button>
                 <button type="button" class="mode-btn" id="mode24">24 words &middot; 256&#8209;bit</button>
@@ -169,6 +169,10 @@
               <span class="tag" id="outTag">12 words &middot; 128&#8209;bit</span>
             </div>
             <ol class="ds-grid" id="grid"></ol>
+            <div id="entropyHexBox" style="display:none; margin-top:1.25rem; padding:.85rem 1rem; background:var(--color-bg-secondary); border:1px solid var(--color-border); border-radius:var(--radius-sm);">
+              <div style="font-family:var(--font-mono); font-size:.68rem; text-transform:uppercase; letter-spacing:.07em; color:var(--color-text-muted); margin-bottom:.4rem;">Entropy hex — paste into Ian Coleman → Raw/Advanced to verify:</div>
+              <code id="entropyHexVal" style="font-family:var(--font-mono); font-size:.78rem; color:var(--color-text-secondary); word-break:break-all;"></code>
+            </div>
             <div class="ds-warn"><strong>Write these words on paper, by hand.</strong> Do not photograph, screenshot, print, or type them into any connected device. Whoever holds this phrase holds the coins it protects. When you are finished, reset this page and close it.</div>
           </div>
         </div>
@@ -178,10 +182,10 @@
           <p>The steps are deliberately simple, so you never have to trust a black box:</p>
           <ol>
             <li>Your roll digits are joined into a plain string, for example <code>416253361&hellip;</code></li>
-            <li>The page takes <code>SHA-256</code> of that string. Hashing spreads the input evenly, which removes any lean in the physical dice and makes the result unbiased.</li>
+            <li>The page takes <code>SHA-256</code> of that string. Hashing distributes whatever randomness your rolls contain evenly across the output. SHA-256 cannot create entropy that isn't there — a fair die with enough rolls is what provides the security.</li>
             <li>The first 128 or 256 bits become your entropy. A standard BIP&#8209;39 checksum is appended, and the bits are split into groups of 11 that index the 2048&#8209;word English list.</li>
           </ol>
-          <p>To check the result against a separate implementation, open an offline copy of Ian Coleman’s BIP&#8209;39 tool, choose "Show entropy details", set the entropy type to Base 10, and paste your roll digits. You should get the exact same words. The same dice procedure is offered by several hardware wallets, so the output is a shared standard and is not tied to this page.</p>
+          <p>To verify the result in Ian Coleman’s BIP&#8209;39 tool: open an offline copy, enable "Show entropy details", set entropy type to <strong>Raw/Advanced</strong>, and paste the entropy hex that appears below your phrase after generating. You should get the exact same words. Note: Ian Coleman’s "Base 10" or "Dice" modes use a different derivation and will not match — only the raw entropy hex will.</p>
           <p>On startup the tool verifies itself against the published BIP&#8209;39 test vectors and refuses to generate anything if a check fails.</p>
           <p class="ds-integrity" id="integrity"></p>
         </details>
@@ -200,7 +204,7 @@
             <li>Copy the saved file onto a device that will stay offline, for example an old laptop or a spare phone kept in airplane mode.</li>
             <li>Turn off Wi&#8209;Fi and unplug any network cable.</li>
             <li>Open the saved file by double&#8209;clicking it. The address bar will begin with <code>file://</code> and no server is involved.</li>
-            <li>Roll your dice, generate the phrase, and write the words on paper. If the page had been tampered with, the startup self&#8209;test would refuse to run.</li>
+            <li>Roll your dice, generate the phrase, and write the words on paper. The startup self&#8209;test confirms this implementation matches the BIP&#8209;39 standard for known test vectors — it detects implementation errors, not page tampering. A malicious modification could still pass the test, which is why independently verifying the file hash matters.</li>
           </ol>
           <p>You can prove the silence for yourself: open your browser’s developer tools, watch the Network tab, and generate a seed. Nothing is requested.</p>
         </details>
@@ -379,7 +383,7 @@
     }
 
     function setMode(m){
-      MODE=m; MIN=(m===12)?50:99; TARGET=(m===12)?128:256;
+      MODE=m; MIN=(m===12)?50:100; TARGET=(m===12)?128:256;
       mode12.classList.toggle('mode-btn--active', m===12);
       mode24.classList.toggle('mode-btn--active', m===24);
       outTag.innerHTML=(m===12)?L.tag12:L.tag24;
@@ -392,18 +396,26 @@
       var digits=digitsOf(rolls.value).join('');
       var byteLen=(MODE===12)?16:32;
       gen.disabled=true;
-      rollsToMnemonic(digits, byteLen).then(function(words){
-        grid.innerHTML='';
-        for(var i=0;i<words.length;i++){
-          var li=document.createElement('li');
-          var n=document.createElement('span'); n.className='n'; n.textContent=(i+1);
-          var w=document.createElement('span'); w.className='w'; w.textContent=words[i];
-          li.appendChild(n); li.appendChild(w); grid.appendChild(li);
-        }
-        outSection.classList.remove('ds-hidden');
-        setStatus(L.generated, 'success');
-        outSection.scrollIntoView({behavior:'smooth', block:'nearest'});
-        gen.disabled=false;
+      sha256(enc.encode(digits)).then(function(fullHash){
+        var entropyBytes=fullHash.subarray(0,byteLen);
+        var entropyHex=toHex(entropyBytes);
+        return entropyToMnemonic(entropyBytes).then(function(words){
+          grid.innerHTML='';
+          for(var i=0;i<words.length;i++){
+            var li=document.createElement('li');
+            var n=document.createElement('span'); n.className='n'; n.textContent=(i+1);
+            var w=document.createElement('span'); w.className='w'; w.textContent=words[i];
+            li.appendChild(n); li.appendChild(w); grid.appendChild(li);
+          }
+          var hexEl=document.getElementById('entropyHexVal');
+          var hexBox=document.getElementById('entropyHexBox');
+          if(hexEl) hexEl.textContent=entropyHex;
+          if(hexBox) hexBox.style.display='block';
+          outSection.classList.remove('ds-hidden');
+          setStatus(L.generated, 'success');
+          outSection.scrollIntoView({behavior:'smooth', block:'nearest'});
+          gen.disabled=false;
+        });
       }).catch(function(e){
         setStatus(L.genErr+e.message, 'error');
         gen.disabled=false;
@@ -412,6 +424,8 @@
 
     function clearAll(){
       rolls.value=''; grid.innerHTML=''; outSection.classList.add('ds-hidden');
+      var hexBox=document.getElementById('entropyHexBox');
+      if(hexBox) hexBox.style.display='none';
       refresh(); rolls.focus();
     }
 
