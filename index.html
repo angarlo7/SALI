@@ -50,7 +50,7 @@
   <link rel="icon" href="/favicon.ico" sizes="48x48">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=17">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=18">
 </head>
 <body>
   <script>try{var t=localStorage.getItem('sali.angarlo.theme')||localStorage.getItem('saliTheme');if(t==='dark')document.body.classList.add('dark');}catch(e){}</script>
@@ -95,11 +95,11 @@
       <div class="container">
         <div class="content-section">
           <h2>Four assets. One clear divergence.</h2>
-          <p class="norm-chart__desc">Every line starts at 100 in your selected start year. Bitcoin (orange) is the primary lens — the other three show how extraordinary its appreciation has been by comparison. Solid lines are real historical data; dashed lines are projections based on your inputs below.</p>
+          <p class="norm-chart__desc">Every line starts at 100 in your selected start year and tracks the salary you would need to buy the same amount of that asset. <strong>A rising line means the asset is pulling away from your pay.</strong> Bitcoin (orange) is the primary lens — the other three show how extraordinary its appreciation has been by comparison. Solid lines are real historical data; dashed lines are projections based on your inputs below.</p>
           <div class="chart-container chart-container--norm">
             <canvas id="normalizedChart"></canvas>
           </div>
-          <p class="norm-chart__note">Bitcoin (orange) · S&amp;P 500 (blue) · Gold (yellow) · Real purchasing power / CPI (green). Anything below 100 means your salary buys less of that asset than it did in the start year.</p>
+          <p class="norm-chart__note">Bitcoin (orange) · S&amp;P 500 (blue) · Gold (yellow) · Real purchasing power / CPI (green). Anything above 100 means your salary buys less of that asset than it did in the start year — a reading of 200 means you would need twice the pay for the same amount. Below 100 means your salary buys more.</p>
         </div>
       </div>
     </section>
@@ -503,7 +503,7 @@
           integrity="sha384-9nhczxUqK87bcKHh20fSQcTGD4qq5GhayNYSYWqwBkINBhOfQLg/P5HG5lF1urn4"
           crossorigin="anonymous"
           referrerpolicy="no-referrer"></script>
-  <script src="/assets/js/app.js?v=12"></script>
+  <script src="/assets/js/app.js?v=13"></script>
   <script src="/assets/js/theme.js?v=5"></script>
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"50af8042fed14fbdb35bde67c57585bf"}'></script>
 </body>

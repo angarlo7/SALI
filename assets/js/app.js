@@ -23,7 +23,9 @@
       scoreOutpacing: g => `Outpacing Bitcoin by ${g}%/yr`,
       scoreBreakEven: 'At break-even with Bitcoin',
       docTitle: g => `SALI Grade: ${g} | Satoshi Annual Labor Index`,
-      errSpotFetch: 'Unable to fetch live BTC price. Using Manual mode or try again later.',
+      errSpotFetch: 'Unable to fetch the live BTC price. Use Manual mode or try again later.',
+      spotFallback: y => `Live price unavailable — using the ${y} annual average instead. Switch to Manual mode to enter your own price.`,
+      errChart: 'The chart library did not load, so the charts are unavailable. All figures below are still correct.',
       errAnnualLoad: 'Unable to load annual average data.',
       errSalary: 'Please enter a valid salary.',
       errSalaryGrowth: 'Salary growth rate must be between -100% and 1000%.',
@@ -58,7 +60,7 @@
       chartProjected: ' (Projected)',
       chartBtcPrice: p => `BTC Price: ${p}`,
       chartBenchPrice: (n, p) => `${n} price: ${p}`,
-      normAxisY: 'Pressure vs Salary (Start = 100)',
+      normAxisY: 'Salary needed for the same amount (Start = 100)',
       normBitcoin: 'Bitcoin',
       normSP500: 'S&P 500',
       normGold: 'Gold',
@@ -111,6 +113,15 @@
       btc5yTitle: (a, b) => `${a}–${b} compound annual growth rate of BTC annual averages.`,
       salaryPlaceholderAnnual: 'e.g., 60000',
       salaryPlaceholderMonthly: 'e.g., 5000',
+      unitSatsPerYear: 'sats/year',
+      unitPerYear: '/year',
+      perYr: '/yr',
+      realSuffix: ' · real',
+      projectedChangeLabel: (n, real) => `Projected Change (${n}yr${real})`,
+      chartDatasetSali: (unit, real) => `SALI (${unit}${real})`,
+      chartTooltipSali: v => `SALI: ${v}`,
+      shareSuffix: "What's yours? → #Bitcoin #SALI",
+      cpiInputTitle: (span, a, b) => `Default: trailing ${span}-year US CPI (${a}–${b}) from BLS data. Edit to use your own assumption.`,
     },
     es: {
       gradeS: 'Mantiene el ritmo con Bitcoin — extremadamente raro',
@@ -125,6 +136,8 @@
       scoreBreakEven: 'En equilibrio con Bitcoin',
       docTitle: g => `Calificación SALI: ${g} | Índice Anual de Labor en Satoshis`,
       errSpotFetch: 'No se pudo obtener el precio en vivo de BTC. Usa el modo Manual o inténtalo más tarde.',
+      spotFallback: y => `Precio en vivo no disponible — usando el promedio anual de ${y}. Cambia al modo Manual para introducir tu propio precio.`,
+      errChart: 'La librería de gráficos no cargó, así que los gráficos no están disponibles. Todas las cifras siguen siendo correctas.',
       errAnnualLoad: 'No se pudieron cargar los datos del promedio anual.',
       errSalary: 'Por favor ingresa un salario válido.',
       errSalaryGrowth: 'La tasa de crecimiento del salario debe estar entre -100% y 1000%.',
@@ -159,7 +172,7 @@
       chartProjected: ' (Proyectado)',
       chartBtcPrice: p => `Precio BTC: ${p}`,
       chartBenchPrice: (n, p) => `Precio ${n}: ${p}`,
-      normAxisY: 'Presión vs Salario (Inicio = 100)',
+      normAxisY: 'Salario necesario para la misma cantidad (Inicio = 100)',
       normBitcoin: 'Bitcoin',
       normSP500: 'S&P 500',
       normGold: 'Oro',
@@ -192,7 +205,7 @@
       histNow: ' (Ahora)',
       decompSummary: (tot, tc, yr, sal, sc, btc, bc) =>
         `SALI cambió <strong style="color:${tc}">${tot}</strong> desde ${yr}: ` +
-        `salario <strong style="color:${sc}">${sal}</strong> (positivo) · ` +
+        `salario <strong style="color:${sc}">${sal}</strong> · ` +
         `BTC <strong style="color:${bc}">${btc}</strong> impacto`,
       shareSame: (rate, grade) => `Mi salario mantiene el ritmo con Bitcoin (${rate}). Calificación: ${grade} — extremadamente raro.`,
       shareLosing: (rate, gap, grade) => `Mi salario pierde ${rate} ante Bitcoin cada año. Necesito +${gap}%/año solo para empatar. Calificación: ${grade}.`,
@@ -212,6 +225,15 @@
       btc5yTitle: (a, b) => `CAGR de promedios anuales de BTC ${a}–${b}.`,
       salaryPlaceholderAnnual: 'ej. 60000',
       salaryPlaceholderMonthly: 'ej. 5000',
+      unitSatsPerYear: 'sats/año',
+      unitPerYear: '/año',
+      perYr: '/año',
+      realSuffix: ' · real',
+      projectedChangeLabel: (n, real) => `Cambio proyectado (${n} años${real})`,
+      chartDatasetSali: (unit, real) => `SALI (${unit}${real})`,
+      chartTooltipSali: v => `SALI: ${v}`,
+      shareSuffix: '¿Y el tuyo? → #Bitcoin #SALI',
+      cpiInputTitle: (span, a, b) => `Por defecto: IPC de EE. UU. de los últimos ${span} años (${a}–${b}), datos de BLS. Edítalo para usar tu propio supuesto.`,
     }
   };
   const S = STRINGS[LANG] || STRINGS.en;
@@ -273,6 +295,7 @@
   // State
   let spotPrice = null;
   let spotPriceFailed = false;
+  let spotFallbackYear = null;   // year of the annual average standing in for a failed spot fetch
   let annualAverages = null;
   let chartInstance = null;
   let normalizedChartInstance = null;
@@ -523,9 +546,14 @@
 
     const sign = v => v >= 0 ? '+' : '';
     const fmt = v => sign(v) + v.toFixed(1) + '%';
-    const salaryColor = salaryCumulative >= 0 ? '#16a34a' : '#dc2626';
-    const btcColor = btcCumulative >= 0 ? '#16a34a' : '#dc2626';
-    const totalColor = totalSaliChange >= 0 ? '#16a34a' : '#dc2626';
+    // Read the semantic colours from the stylesheet so they stay in step with
+    // the theme (and with the accessible light-theme values).
+    const css = getComputedStyle(document.body);
+    const gain = (css.getPropertyValue('--color-green') || '#15803D').trim();
+    const loss = (css.getPropertyValue('--color-red-loss') || '#B42318').trim();
+    const salaryColor = salaryCumulative >= 0 ? gain : loss;
+    const btcColor = btcCumulative >= 0 ? gain : loss;
+    const totalColor = totalSaliChange >= 0 ? gain : loss;
 
     el.innerHTML = S.decompSummary(fmt(totalSaliChange), totalColor, first.year, fmt(salaryCumulative), salaryColor, fmt(btcCumulative), btcColor);
     el.style.display = 'block';
@@ -627,7 +655,7 @@
 
     if (gradeData) {
       const { grade, annualRate, gap } = gradeData;
-      const rateStr = annualRate >= 0 ? `+${annualRate.toFixed(1)}%/yr` : `${Math.abs(annualRate).toFixed(1)}%/yr`;
+      const rateStr = annualRate >= 0 ? `+${annualRate.toFixed(1)}%${S.perYr}` : `${Math.abs(annualRate).toFixed(1)}%${S.perYr}`;
 
       let hook;
       if (annualRate >= 0) {
@@ -638,7 +666,7 @@
         hook = S.shareBreakEven(rateStr, grade);
       }
 
-      shortText = `🟠 ${hook}\n\nWhat's yours? → #Bitcoin #SALI`;
+      shortText = `🟠 ${hook}\n\n${S.shareSuffix}`;
     } else {
       shortText = S.shareFallback;
     }
@@ -738,7 +766,6 @@
     } catch (error) {
       console.error('Failed to fetch spot price:', error);
       spotPriceFailed = true;
-      setStatus(S.errSpotFetch, 'error');
       return null;
     }
   }
@@ -924,11 +951,22 @@
     const method = elements.btcPriceMethodSelect.value;
 
     switch (method) {
-      case 'spot':
+      case 'spot': {
         if (spotPrice === null) {
+          // The live price can fail for reasons that have nothing to do with the
+          // user: a corporate firewall, a blocklisted domain, a rate limit, a brief
+          // outage. The annual averages are already loaded, so fall back to the most
+          // recent one rather than emptying the entire calculator.
+          const fallbackYear = getMostRecentAverageYear();
+          if (annualAverages && fallbackYear) {
+            spotFallbackYear = fallbackYear;
+            return annualAverages[fallbackYear];
+          }
           throw new Error(S.errSpotNA);
         }
+        spotFallbackYear = null;
         return spotPrice;
+      }
 
       case 'annual':
         if (!annualAverages) {
@@ -981,7 +1019,10 @@
       if (spotPrice !== null) {
         displayText = S.btcSpot(formatUsdCurrency(spotPrice));
       } else if (spotPriceFailed) {
-        displayText = S.errSpotFetch;
+        const fallbackYear = getMostRecentAverageYear();
+        displayText = (annualAverages && fallbackYear)
+          ? S.btcAnnualStale(fallbackYear, formatUsdCurrency(annualAverages[fallbackYear]))
+          : S.errSpotFetch;
       } else {
         displayText = S.btcLoadingSpot;
       }
@@ -1177,12 +1218,13 @@
         ? projections.map(p => p.btcEquivalent)
         : projections.map(p => Math.round(p.sats));
       yAxisLabel = displayUnit === 'btc' ? S.chartAxisBtc : S.chartAxisSats;
+      const realSuffix = salaryGrowthMode === 'real' ? S.realSuffix : '';
       datasetLabel = displayUnit === 'btc'
-        ? `SALI (BTC/year${salaryGrowthMode === 'real' ? ' · real' : ''})`
-        : `SALI (sats/year${salaryGrowthMode === 'real' ? ' · real' : ''})`;
+        ? S.chartDatasetSali('BTC' + S.unitPerYear, realSuffix)
+        : S.chartDatasetSali(S.unitSatsPerYear, realSuffix);
       tooltipValueFn = p => displayUnit === 'btc'
-        ? `SALI: ${formatBtc(p.btcEquivalent)}/year`
-        : `SALI: ${formatSats(p.sats)} sats/year`;
+        ? S.chartTooltipSali(formatBtc(p.btcEquivalent) + S.unitPerYear)
+        : S.chartTooltipSali(`${formatSats(p.sats)} ${S.unitSatsPerYear}`);
       yTickFn = value => {
         if (displayUnit === 'btc') return value.toFixed(4);
         if (value >= 1e9) return (value / 1e9).toFixed(1).replace(/\.0$/, '') + 'B';
@@ -1588,7 +1630,7 @@
 
     const breakevenRate = Math.max(0, btcGrowth);
 
-    elements.breakevenRateOutput.textContent = '+' + breakevenRate.toFixed(1) + '%/yr';
+    elements.breakevenRateOutput.textContent = '+' + breakevenRate.toFixed(1) + '%' + S.perYr;
 
     const yearsAhead = 5;
     const salaryBreakEven5 = salary * Math.pow(1 + breakevenRate / 100, yearsAhead);
@@ -1861,6 +1903,18 @@
   }
 
   /**
+   * Hide (or restore) the chart frames so a failed chart library leaves no
+   * empty bordered boxes behind.
+   */
+  function setChartsAvailable(available) {
+    document.querySelectorAll('.chart-container').forEach(el => {
+      el.style.display = available ? '' : 'none';
+    });
+    const legend = document.querySelector('.chart-legend');
+    if (legend) legend.style.display = available ? '' : 'none';
+  }
+
+  /**
    * Main compute function
    */
   function compute() {
@@ -1888,11 +1942,11 @@
       const currentYearData = projections.find(p => p.isCurrentYear) || projections[projections.length - 1];
 
       if (displayUnit === 'btc') {
-        elements.saliSatsOutput.textContent = formatBtc(currentYearData.btcEquivalent) + '/year';
+        elements.saliSatsOutput.textContent = formatBtc(currentYearData.btcEquivalent) + S.unitPerYear;
         elements.btcOutputGroup.style.display = 'none';
       } else {
-        elements.saliSatsOutput.textContent = formatSats(currentYearData.sats) + ' sats/year';
-        elements.saliBtcOutput.textContent = formatBtc(currentYearData.btcEquivalent) + '/year';
+        elements.saliSatsOutput.textContent = formatSats(currentYearData.sats) + ' ' + S.unitSatsPerYear;
+        elements.saliBtcOutput.textContent = formatBtc(currentYearData.btcEquivalent) + S.unitPerYear;
         elements.btcOutputGroup.style.display = 'block';
       }
 
@@ -1911,8 +1965,8 @@
       }
 
       if (elements.projectedChangeLabel) {
-        const modeLabel = salaryGrowthMode === 'real' ? ' · real' : '';
-        elements.projectedChangeLabel.textContent = `Projected Change (${forecastYears}yr${modeLabel})`;
+        const modeLabel = salaryGrowthMode === 'real' ? S.realSuffix : '';
+        elements.projectedChangeLabel.textContent = S.projectedChangeLabel(forecastYears, modeLabel);
       }
       const lastProjection = projections[projections.length - 1];
       const currentYearData2 = projections.find(p => p.isCurrentYear);
@@ -1944,13 +1998,29 @@
       computeHistorical(baseBtcPrice, currency);
 
       renderTable(projections, currency);
-      renderChart(projections);
-      renderNormalizedChart(projections);
-      if (initComputeComplete || hasInitialUrlParams) {
-        buildBenchmarkChart(startYear);
-      } else {
-        const bSection = document.getElementById('benchmarkSection');
-        if (bSection) bSection.style.display = 'none';
+
+      // The charts depend on a third-party library from a CDN. If it fails to
+      // load, that must not take the figures above down with it.
+      let chartsFailed = false;
+      try {
+        renderChart(projections);
+        renderNormalizedChart(projections);
+        if (initComputeComplete || hasInitialUrlParams) {
+          buildBenchmarkChart(startYear);
+        } else {
+          const bSection = document.getElementById('benchmarkSection');
+          if (bSection) bSection.style.display = 'none';
+        }
+      } catch (chartError) {
+        console.error('Chart rendering failed:', chartError);
+        chartsFailed = true;
+      }
+      setChartsAvailable(!chartsFailed);
+
+      if (chartsFailed) {
+        setStatus(S.errChart, 'error');
+      } else if (spotFallbackYear) {
+        setStatus(S.spotFallback(spotFallbackYear), 'info');
       }
 
     } catch (error) {
@@ -2093,7 +2163,7 @@
       if (trailingCpi && elements.inflationInput) {
         elements.inflationInput.value = trailingCpi.cagr.toFixed(1);
         const [a, b] = trailingCpi.span;
-        elements.inflationInput.title = `Default: trailing ${b - a}-year US CPI (${a}–${b}) from BLS data. Edit to use your own assumption.`;
+        elements.inflationInput.title = S.cpiInputTitle(b - a, a, b);
       }
 
       const inputElements = [

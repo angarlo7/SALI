@@ -26,7 +26,7 @@
   <link rel="icon" href="/favicon.ico" sizes="48x48">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=17">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=18">
   <style>
     /* Tool-specific styles, built on SALI's design tokens. The crypto engine and
        wordlist below are fully inline, so seed generation still works if this page
@@ -35,9 +35,10 @@
     :root {
       --color-bg:#ffffff; --color-bg-secondary:#f8f8f8; --color-bg-card:#ffffff;
       --color-border:#e5e5e5; --color-border-light:#eeeeee;
-      --color-text:#111111; --color-text-secondary:#555555; --color-text-muted:#999999;
+      --color-text:#111111; --color-text-secondary:#555555; --color-text-muted:#6B7280;
       --color-accent:#F7931A; --color-accent-hover:#d97a0f; --color-accent-dim:rgba(247,147,26,.1);
-      --color-green:#16a34a; --color-red-loss:#dc2626;
+      --color-accent-text:#A85A05; --color-on-accent:#1A1205;
+      --color-green:#15803D; --color-red-loss:#B42318;
       --font-mono:'Roboto Mono','SF Mono','Monaco',monospace;
       --font-sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
       --spacing-xs:.25rem; --spacing-sm:.5rem; --spacing-md:1rem; --spacing-lg:1.5rem; --spacing-xl:2rem; --spacing-xxl:3rem; --spacing-xxxl:4rem;
@@ -47,6 +48,8 @@
       --color-bg:#0d0d0d; --color-bg-secondary:#1a1a1a; --color-bg-card:#1a1a1a;
       --color-border:#333333; --color-border-light:#2a2a2a;
       --color-text:#f0f0f0; --color-text-secondary:#cccccc; --color-text-muted:#999999;
+      --color-accent-text:#F7931A; --color-on-accent:#1A1205;
+      --color-green:#22c55e; --color-red-loss:#F87171;
     }
     *,*::before,*::after { box-sizing: border-box; }
     .ds-container { max-width: 760px; }
