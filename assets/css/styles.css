@@ -2,7 +2,43 @@
    Light theme with Bitcoin orange highlights
 */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500;600;700&display=swap');
+/* Self-hosted variable fonts. Previously an @import to fonts.googleapis.com,
+   which (a) chained two render-blocking round trips before any text could paint,
+   (b) exposed every visitor's IP to Google without being named in the privacy
+   policy, and (c) broke the offline copy of /dice-seed.html. unicode-range keeps
+   latin-ext from being fetched unless a page actually needs it. */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('/assets/fonts/inter-latin-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('/assets/fonts/inter-latin-ext-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Roboto Mono';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 700;
+  src: url('/assets/fonts/roboto-mono-latin-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Roboto Mono';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 700;
+  src: url('/assets/fonts/roboto-mono-latin-ext-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
 
 :root {
   --color-bg: #ffffff;
@@ -130,10 +166,15 @@ li a:not(.btn):not(.nav__link),
 .hero__product-name { font-family: var(--font-mono); font-size: 3.5rem; font-weight: 700; color: var(--color-accent-text); line-height: 1; letter-spacing: -0.02em; margin-bottom: 0.2rem; }
 .hero__product-subtitle { font-family: var(--font-mono); font-size: 0.75rem; font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-text-muted); margin-bottom: var(--spacing-sm); }
 .hero__logo-wrap { margin-bottom: var(--spacing-md); display: flex; justify-content: center; }
-.hero__logo { max-width: 460px; width: 85%; height: auto; }
-.hero__logo--dark { display: none; }
-body.dark .hero__logo--light { display: none; }
-body.dark .hero__logo--dark { display: block; }
+/* Both logos stay in the render tree — swapped by opacity, never display:none.
+   display:none defers decoding, so the incoming logo used to arrive a frame late
+   and the wordmark visibly blanked when you flipped the theme. The box carries an
+   explicit aspect-ratio so its height is reserved before either image decodes. */
+.hero__logo { position: relative; display: block; width: 85%; max-width: 460px; aspect-ratio: 920 / 613; }
+.hero__logo-img { position: absolute; inset: 0; width: 100%; height: 100%; transition: opacity 0.15s ease; }
+.hero__logo-img--dark { opacity: 0; }
+body.dark .hero__logo-img--light { opacity: 0; }
+body.dark .hero__logo-img--dark { opacity: 1; }
 .hero__headline { font-size: 2.5rem; font-weight: 700; margin-bottom: var(--spacing-lg); color: var(--color-text); line-height: 1.2; }
 .hero__highlight { color: var(--color-accent-text); }
 .hero__subheadline { font-size: 1.125rem; color: var(--color-text-secondary); max-width: 600px; margin: 0 auto var(--spacing-xl); line-height: 1.7; }
