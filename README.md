@@ -116,6 +116,16 @@ GitHub Actions deploys `dist/` automatically on every push to `main`. In GitHub,
     └── cpi_annual.json              # US CPI-U annual averages
 ```
 
+## Companion Project
+
+[The Whole Coin Standard](https://wcs.angarlo.com) is a sibling site, not part
+of this one. It lives in `../WCS` and deploys separately, because SALI is a
+measurement tool whose neutrality is what makes it citable and WCS is advocacy.
+
+The only thing SALI carries is one footer line per page, `.footer__sibling`,
+linking to it. If that link ever needs to change, it is in the footer block of
+every `*.html` and `es/*.html` page.
+
 ## License
 
 Educational use. Not financial advice.
