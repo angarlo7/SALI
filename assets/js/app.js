@@ -285,11 +285,12 @@
   };
 
   // FX rates to USD - updated at init via fetchFxRates() (ECB/Frankfurter).
-  // These fallback values are used only if the live fetch fails.
+  // These fallback values are used only if the live fetch fails, so they should
+  // be refreshed whenever anyone touches this file. Captured 27 Aug 2026.
   const FX_RATES = {
     USD: 1,
-    EUR: 1.18,  // fallback: 1 EUR ≈ 1.18 USD
-    MXN: 0.058  // fallback: 1 MXN ≈ 0.058 USD
+    EUR: 1.1645,  // fallback: 1 EUR ≈ 1.1645 USD
+    MXN: 0.0589   // fallback: 1 MXN ≈ 0.0589 USD
   };
 
   // State
@@ -728,7 +729,7 @@
   async function fetchFxRates() {
     try {
       const response = await fetch(
-        'https://api.frankfurter.app/latest?from=USD&to=EUR,MXN'
+        'https://api.frankfurter.dev/v1/latest?from=USD&to=EUR,MXN'
       );
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const data = await response.json();
