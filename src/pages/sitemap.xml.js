@@ -3,19 +3,19 @@ import { getCollection } from 'astro:content';
 
 const staticPages = [
   { path: '/', priority: '1.0' },
-  { path: '/methodology.html', priority: '0.8' },
-  { path: '/examples.html', priority: '0.8' },
-  { path: '/notes', priority: '0.8' },
-  { path: '/podcast.html', priority: '0.7' },
-  { path: '/contact.html', priority: '0.6' },
-  { path: '/privacy.html', priority: '0.5' },
+  { path: '/methodology', priority: '0.8' },
+  { path: '/examples', priority: '0.8' },
+  { path: '/notes/', priority: '0.8' },
+  { path: '/podcast', priority: '0.7' },
+  { path: '/contact', priority: '0.6' },
+  { path: '/privacy', priority: '0.5' },
   { path: '/es/', priority: '1.0' },
-  { path: '/es/methodology.html', priority: '0.8' },
-  { path: '/es/examples.html', priority: '0.8' },
-  { path: '/es/notas', priority: '0.8' },
-  { path: '/es/podcast.html', priority: '0.7' },
-  { path: '/es/contact.html', priority: '0.6' },
-  { path: '/es/privacy.html', priority: '0.5' }
+  { path: '/es/methodology', priority: '0.8' },
+  { path: '/es/examples', priority: '0.8' },
+  { path: '/es/notas/', priority: '0.8' },
+  { path: '/es/podcast', priority: '0.7' },
+  { path: '/es/contact', priority: '0.6' },
+  { path: '/es/privacy', priority: '0.5' }
 ];
 
 export async function GET(context) {
@@ -23,14 +23,14 @@ export async function GET(context) {
   const notes = (await getCollection('notes'))
     .filter((note) => !note.data.draft)
     .map((note) => ({
-      path: `/notes/${note.slug}`,
+      path: `/notes/${note.slug}/`,
       priority: '0.6'
     }));
 
   const notas = (await getCollection('notas'))
     .filter((nota) => !nota.data.draft)
     .map((nota) => ({
-      path: `/es/notas/${nota.slug}`,
+      path: `/es/notas/${nota.slug}/`,
       priority: '0.6'
     }));
 

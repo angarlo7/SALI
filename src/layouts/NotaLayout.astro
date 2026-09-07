@@ -31,8 +31,8 @@ const formattedDate = date
   <meta name="twitter:description" content={description}>
   <meta name="twitter:image" content="https://sali.angarlo.com/assets/images/sali-share.png">
   <link rel="alternate" hreflang="es" href={canonicalUrl}>
-  <link rel="alternate" hreflang="en" href="https://sali.angarlo.com/notes">
-  <link rel="alternate" hreflang="x-default" href="https://sali.angarlo.com/notes">
+  <link rel="alternate" hreflang="en" href="https://sali.angarlo.com/notes/">
+  <link rel="alternate" hreflang="x-default" href="https://sali.angarlo.com/notes/">
   <link rel="alternate" type="application/rss+xml" title="SALI Notas" href="https://sali.angarlo.com/rss.xml">
   <script type="application/ld+json" set:html={JSON.stringify({
     "@context": "https://schema.org",
@@ -137,12 +137,12 @@ const formattedDate = date
       <a href="/es/" class="nav__logo">ANGARLO</a>
       <ul class="nav__links">
         <li><a href="/es/" class="nav__link">Inicio</a></li>
-        <li><a href="/es/methodology.html" class="nav__link">Metodología</a></li>
-        <li><a href="/es/examples.html" class="nav__link">Ejemplos</a></li>
-        <li><a href="/es/notas" class="nav__link nav__link--active">Notas</a></li>
-        <li><a href="/es/dice-seed.html" class="nav__link">Semilla con Dados</a></li>
-        <li><a href="/es/podcast.html" class="nav__link">Podcast</a></li>
-        <li><a href="/es/contact.html" class="nav__link">Contacto</a></li>
+        <li><a href="/es/methodology" class="nav__link">Metodología</a></li>
+        <li><a href="/es/examples" class="nav__link">Ejemplos</a></li>
+        <li><a href="/es/notas/" class="nav__link nav__link--active">Notas</a></li>
+        <li><a href="/es/dice-seed" class="nav__link">Semilla con Dados</a></li>
+        <li><a href="/es/podcast" class="nav__link">Podcast</a></li>
+        <li><a href="/es/contact" class="nav__link">Contacto</a></li>
       </ul>
       <button id="themeToggle" class="theme-toggle" aria-label="Cambiar modo oscuro">🌙</button>
     </div>
@@ -160,7 +160,7 @@ const formattedDate = date
       <slot />
     </article>
     <div class="note-footer">
-      <a href="/es/notas">Todas las notas</a>
+      <a href="/es/notas/">Todas las notas</a>
       <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(canonicalUrl.toString())}`} target="_blank" rel="noopener noreferrer">Compartir en X</a>
     </div>
   </main>
@@ -171,10 +171,10 @@ const formattedDate = date
         SALI es solo para fines informativos y no constituye asesoramiento financiero.
       </p>
       <p class="footer__support">
-        Apoya el mantenimiento continuo: <a href="lightning:angarlo@strike.me">⚡ angarlo@strike.me</a> · <a href="/es/contact.html#support">QR y más &rarr;</a>
+        Apoya el mantenimiento continuo: <a href="lightning:angarlo@strike.me">⚡ angarlo@strike.me</a> · <a href="/es/contact#support">QR y más &rarr;</a>
       </p>
       <p class="footer__privacy">
-        Análisis de privacidad amigable por Cloudflare Web Analytics. Sin cookies, sin rastreo publicitario. El sitio carga precios de BTC en vivo desde Coinbase, tasas de cambio del Banco Central Europeo (via Frankfurter), Chart.js desde jsDelivr, y el video del podcast desde youtube-nocookie.com. · <a href="/es/privacy.html">Política de Privacidad</a>
+        Análisis de privacidad amigable por Cloudflare Web Analytics. Sin cookies, sin rastreo publicitario. El sitio carga precios de BTC en vivo desde Coinbase, tasas de cambio del Banco Central Europeo (via Frankfurter), Chart.js desde jsDelivr, y el video del podcast desde youtube-nocookie.com. · <a href="/es/privacy">Política de Privacidad</a>
       </p>
       <p class="footer__sibling">
         Proyecto hermano: <a href="https://wcs.angarlo.com">The Whole Coin Standard</a>, una especificación para financiar un bitcoin entero (en inglés).

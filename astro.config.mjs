@@ -2,7 +2,7 @@ import { defineConfig, passthroughImageService } from 'astro/config';
 
 export default defineConfig({
   site: 'https://sali.angarlo.com',
-  trailingSlash: 'never',
+  trailingSlash: 'always',
   output: 'static',
   image: {
     service: passthroughImageService()
